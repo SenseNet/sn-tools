@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9C2FA8D5-65F8-4CAD-A65D-B7CC804A821F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SenseNet</RootNamespace>
+    <AssemblyName>SenseNet.Tools</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\SenseNet.Tools.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\SenseNet.Tools.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Tools\CommandLineArguments\Argument.cs" />
+    <Compile Include="Tools\CommandLineArguments\NoNameOptionAttribute.cs" />
+    <Compile Include="Tools\CommandLineArguments\OptionAttribute.cs" />
+    <Compile Include="Tools\CommandLineArguments\ArgumentParser.cs" />
+    <Compile Include="Tools\CommandLineArguments\ParserContext.cs" />
+    <Compile Include="Tools\CommandLineArguments\ParsingException.cs" />
+    <Compile Include="Diagnostics\Analysis\Category.cs" />
+    <Compile Include="Diagnostics\Analysis\DirectoryReader.cs" />
+    <Compile Include="Diagnostics\Analysis\EntryEnumerable.cs" />
+    <Compile Include="Diagnostics\Analysis\FileReader.cs" />
+    <Compile Include="Diagnostics\Analysis\Filter.cs" />
+    <Compile Include="Diagnostics\Analysis\GenericLinker.cs" />
+    <Compile Include="Diagnostics\Analysis\GenericTransformer.cs" />
+    <Compile Include="Diagnostics\Analysis\Linker.cs" />
+    <Compile Include="Diagnostics\Analysis\LinkerState.cs" />
+    <Compile Include="Diagnostics\Analysis\Reader.cs" />
+    <Compile Include="Diagnostics\Analysis\SessionReader.cs" />
+    <Compile Include="Diagnostics\Analysis\SessionReaderEnumerator.cs" />
+    <Compile Include="Diagnostics\Analysis\Transformer.cs" />
+    <Compile Include="Diagnostics\Analysis\Status.cs" />
+    <Compile Include="Diagnostics\DebugEventLogger.cs" />
+    <Compile Include="Diagnostics\IAuditEvent.cs" />
+    <Compile Include="Diagnostics\IEventLogger.cs" />
+    <Compile Include="Diagnostics\IEventTypeProvider.cs" />
+    <Compile Include="Diagnostics\SnEventLogger.cs" />
+    <Compile Include="Diagnostics\SnLog.cs" />
+    <Compile Include="Diagnostics\SnTrace.cs" />
+    <Compile Include="Diagnostics\Analysis\Entry.cs" />
+    <Compile Include="Diagnostics\TraceEventLogger.cs" />
+    <Compile Include="Diagnostics\EventId.cs" />
+    <Compile Include="Tools\Extensions.cs" />
+    <Compile Include="Tools\Retrier.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\TypeNotFoundException.cs" />
+    <Compile Include="Tools\TypeResolver.cs" />
+    <Compile Include="Tools\Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tools\CommandLineArguments\Readme.md" />
+    <None Include="Diagnostics\Analysis\Readme.md" />
+    <None Include="Diagnostics\Readme.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
