@@ -1,4 +1,7 @@
 # SenseNet Tools
+
+[![Join the chat at https://gitter.im/SenseNet/sn-tools](https://badges.gitter.im/SenseNet/sn-tools.svg)](https://gitter.im/SenseNet/sn-tools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This library contains useful tools for developers ranging from tasks as small as retrying an operation multiple times to a robust trace component.
 
 The library is **independent from SenseNet ECM** and it does not have any SenseNet-related dependencies. It is the other way around: SenseNet ECM relies heavily on the tools published in this library.
