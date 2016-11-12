@@ -4,7 +4,7 @@
 
 This library contains useful tools for developers ranging from tasks as small as retrying an operation multiple times to a robust trace component.
 
-The library is **independent from SenseNet ECM** and it does not have any SenseNet-related dependencies. It is the other way around: SenseNet ECM relies heavily on the tools published in this library.
+The library is **independent from SenseNet ECM** and it does not have any SenseNet-related dependencies. It is the other way around: [SenseNet](https://github.com/SenseNet/sensenet) relies heavily on the tools published in this library.
 
 You can even use it in your custom project that has nothing to do with SenseNet!
 
