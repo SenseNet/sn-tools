@@ -1,4 +1,4 @@
-# SenseNet Tools
+# Sense/Net Tools
 
 [![Join the chat at https://gitter.im/SenseNet/sn-tools](https://badges.gitter.im/SenseNet/sn-tools.svg)](https://gitter.im/SenseNet/sn-tools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NuGet](https://img.shields.io/nuget/v/SenseNet.Tools.svg)](https://www.nuget.org/packages/SenseNet.Tools)
