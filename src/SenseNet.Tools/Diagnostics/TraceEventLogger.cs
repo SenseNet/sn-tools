@@ -30,7 +30,7 @@ namespace SenseNet.Diagnostics
                     ? string.Empty
                     : string.Join(", ", properties.Select(p => string.Concat(p.Key, ":", p.Value))))}";
 
-            Write(msg);
+            Write(msg.Replace('\r', '\n').Replace("\n\n", "\n").Replace("\n", " | "));
         }
 
         /// <summary>
