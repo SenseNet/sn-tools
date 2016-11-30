@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using SenseNet.Tools;
 
 namespace SenseNet.Diagnostics
@@ -189,6 +191,11 @@ namespace SenseNet.Diagnostics
                 var data = e.Data;
                 foreach (var key in data.Keys)
                     props.Add(epath + key, data[key]);
+
+                var rtle = e as ReflectionTypeLoadException;
+                if (rtle != null)
+                    props.Add("Types", string.Join(", ", rtle.Types.Select(x => x.FullName)));
+
                 e = e.InnerException;
             }
             return props;

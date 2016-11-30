@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,6 +13,7 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnLogTests
     {
+        #region Nested classes
         private class TestEventLogger : TraceEventLogger
         {
             private readonly StringBuilder _stringBuilder = new StringBuilder();
@@ -39,6 +42,10 @@ namespace SenseNet.Tools.Tests
             protected TestException_Information(SerializationInfo info, StreamingContext context) : base(info, context) { }
         }
 
+        private class Class1ForLoggingReflectionTypeLoadEx { }
+        private class Class2ForLoggingReflectionTypeLoadEx { }
+        #endregion
+
         [TestMethod]
         public void SnLog_WriteException()
         {
@@ -66,6 +73,49 @@ namespace SenseNet.Tools.Tests
             Assert.IsNotNull(thrown);
             Assert.IsTrue(written.Contains("123456"));
             Assert.IsTrue(written.Contains(thrown.Message));
+        }
+
+        [TestMethod]
+        public void SnLog_WriteTypeLoadException()
+        {
+            var loggerBackup = SnLog.Instance;
+            var logger = new TestEventLogger();
+            SnLog.Instance = logger;
+            Exception thrown = null;
+
+            try
+            {
+                var types = new[]
+                {
+                    typeof(Class1ForLoggingReflectionTypeLoadEx),
+                    typeof(Class2ForLoggingReflectionTypeLoadEx)
+                };
+                var exceptions = new[]
+                {
+                    new Exception("Exception1"),
+                    new Exception("Exception2"),
+                };
+
+                throw new ReflectionTypeLoadException(types, exceptions);
+            }
+            catch (Exception e)
+            {
+                thrown = e;
+                SnLog.WriteException(e, eventId: 123456);
+            }
+            finally
+            {
+                SnLog.Instance = loggerBackup;
+            }
+            Assert.IsNotNull(thrown);
+
+            var written = logger.Written.Split('\r', '\n')[0];
+
+            Assert.IsTrue(written.Contains("123456"));
+            Assert.IsTrue(written.Contains("Exception1"));
+            Assert.IsTrue(written.Contains("Exception2"));
+            Assert.IsTrue(written.Contains(typeof(Class1ForLoggingReflectionTypeLoadEx).FullName));
+            Assert.IsTrue(written.Contains(typeof(Class2ForLoggingReflectionTypeLoadEx).FullName));
         }
 
         [TestMethod]
