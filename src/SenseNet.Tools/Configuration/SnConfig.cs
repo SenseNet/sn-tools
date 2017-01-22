@@ -17,32 +17,7 @@ namespace SenseNet.Configuration
         /// Current configuration instance that serves the actual values internally. Created for testing purposes.
         /// </summary>
         internal static IConfigProvider Instance { get; set; } = new SnConfigProvider();
-
-        /// <summary>
-        /// Default config provider implementation that loads config values from regular
-        /// config files through the built-in .Net ConfigurationManager API.
-        /// </summary>
-        private class SnConfigProvider : IConfigProvider
-        {
-            public string GetString(string sectionName, string key)
-            {
-                if (string.IsNullOrEmpty(key))
-                    throw new ArgumentNullException(nameof(key));
-
-                string configValue = null;
-
-                var section = !string.IsNullOrEmpty(sectionName) 
-                    ? ConfigurationManager.GetSection(sectionName) as NameValueCollection 
-                    : null;
-
-                if (section != null)
-                    configValue = section[key];
-
-                // backward compatibility: fallback to the appsettings section
-                return configValue ?? ConfigurationManager.AppSettings[key];
-            }
-        }
-
+        
         /// <summary>
         /// Gets a configuration value from the specified section, with a fallback to the appSettings section.
         /// </summary>
