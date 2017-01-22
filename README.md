@@ -63,3 +63,8 @@ This is a simple API for loading types from the current app domain or a custom e
 var types = TypeResolver.GetTypesByInterface(typeof(ICustomInterface));
 var dbProvider = TypeResolver.CreateInstance<DbProvider>("MyNamespace.MyDbProvider");
 ````
+
+## Configuration
+This is a simple base API for loading **strongly typed values** from .Net configuration files. It lets you define your custom config classes and publish config properties with only a few lines of code.
+
+See details [here](src/SenseNet.Tools/Configuration/Readme.md).

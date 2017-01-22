@@ -88,6 +88,7 @@
     <Compile Include="Tools\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Configuration\Readme.md" />
     <None Include="SenseNet.Tools.nuspec" />
     <None Include="Tools\CommandLineArguments\Readme.md" />
     <None Include="Diagnostics\Analysis\Readme.md" />
