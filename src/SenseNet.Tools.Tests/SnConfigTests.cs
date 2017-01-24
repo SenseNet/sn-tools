@@ -80,7 +80,8 @@ namespace SenseNet.Tools.Tests
                     {"key3", "3.4"},
                     {"key4", "d,e;f"}, // note the two different separators
                     {"key5", "7,8,9"},
-                    {"key6", "Value2"}
+                    {"key6", "Value2"},
+                    {"key7", ""}
                 }
             }
         };
@@ -105,6 +106,10 @@ namespace SenseNet.Tools.Tests
                 Assert.AreEqual("value1", SnConfig.GetValue<string>(null, "key1"));
                 // from appSettings fallback
                 Assert.AreEqual("qwe", SnConfig.GetValue<string>("feature1", "keyX"));
+
+                // empty, but existing key
+                Assert.IsTrue(SnConfig.GetList<string>("feature1", "key7").SequenceEqual(new List<string>()));
+                Assert.IsTrue(SnConfig.GetListOrEmpty<string>("feature1", "key7").SequenceEqual(new List<string>()));
             }
         }
         [TestMethod]
@@ -122,9 +127,13 @@ namespace SenseNet.Tools.Tests
                 Assert.AreEqual("DEFAULT", SnConfig.GetValue("feature1", "NO-KEY", "DEFAULT"));
                 Assert.AreEqual(99, SnConfig.GetValue("feature1", "NO-KEY", 99));
                 Assert.AreEqual(99.9, SnConfig.GetValue("feature1", "NO-KEY", 99.9));
+                Assert.IsTrue(SnConfig.GetList("feature1", "NO-KEY", new List<string> {"a", "b"})
+                    .SequenceEqual(new List<string> {"a", "b"}));
 
                 // empty list
-                Assert.IsTrue(SnConfig.GetList<string>("feature1", "NO-KEY").SequenceEqual(new List<string>()));
+                Assert.IsNull(SnConfig.GetList<string>("feature1", "NO-KEY"));
+                Assert.IsTrue(SnConfig.GetList("feature1", "NO-KEY", new List<string>(0)).SequenceEqual(new List<string>()));
+                Assert.IsTrue(SnConfig.GetListOrEmpty<string>("feature1", "NO-KEY").SequenceEqual(new List<string>()));
             }
         }
         [TestMethod]

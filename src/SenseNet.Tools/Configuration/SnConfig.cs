@@ -30,6 +30,10 @@ namespace SenseNet.Configuration
         {
             var configString = GetString(sectionName, key);
 
+            // not found in the config at all (distinguished from empty string!)
+            if (configString == null)
+                return defaultValue;
+
             return string.IsNullOrEmpty(configString) 
                 ? defaultValue 
                 : Convert<T>(configString);
@@ -75,19 +79,48 @@ namespace SenseNet.Configuration
             var value = GetValue(sectionName, key, defaultValue);
             return Math.Min(Math.Max(value, minValue), maxValue);
         }
+
+        private static readonly char[] SplitSeparatorChars = {';', ','};
+
         /// <summary>
-        /// Gets a list of values fromr the specified section and key, with a fallback to the appSettings section.
+        /// Gets a list of values from the specified section and key, with a fallback to the appSettings section.
         /// The value found in config will be split by the ; and , characters with removing empty entries.
+        /// This method returns the provided default value (which may be null!) if the key was not found. It 
+        /// returns an empty list, if the key was found but the value is an empty string.
         /// </summary>
         /// <param name="sectionName">Section name (e.g. examplecompany/feature1)</param>
         /// <param name="key">Configuration key name.</param>
+        /// <param name="defaultValue">Optional default value, for a case when the key is not found in config.</param>
         /// <returns>The list of items found in the configuration or an empty list.</returns>
-        protected internal static List<T> GetList<T>(string sectionName, string key)
+        protected internal static List<T> GetList<T>(string sectionName, string key, List<T> defaultValue = null)
         {
-            var configValue = GetValue(sectionName, key, string.Empty);
+            var configValue = GetString(sectionName, key);
+            if (configValue == null)
+                return defaultValue;
 
             return !string.IsNullOrEmpty(configValue)
-                ? configValue.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(Convert<T>).ToList()
+                ? configValue.Split(SplitSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Select(Convert<T>).ToList()
+                : new List<T>();
+        }
+        /// <summary>
+        /// Gets a list of values fromr the specified section and key, with a fallback to the appSettings section.
+        /// The value found in config will be split by the ; and , characters with removing empty entries. 
+        /// This method does not return null, ever. It returns an empty list, if the key was not found, 
+        /// or a meaningful default value was not provided. If you want to distinguish a missing key
+        /// from an empty string, please use the GetList method.
+        /// </summary>
+        /// <param name="sectionName">Section name (e.g. examplecompany/feature1)</param>
+        /// <param name="key">Configuration key name.</param>
+        /// <param name="defaultValue">Optional default value, for a case when the key is not found in config.</param>
+        /// <returns>The list of items found in the configuration or an empty list.</returns>
+        protected internal static List<T> GetListOrEmpty<T>(string sectionName, string key, List<T> defaultValue = null)
+        {
+            var configValue = GetString(sectionName, key);
+            if (configValue == null)
+                return defaultValue ?? new List<T>();
+
+            return !string.IsNullOrEmpty(configValue)
+                ? configValue.Split(SplitSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Select(Convert<T>).ToList()
                 : new List<T>();
         }
 
