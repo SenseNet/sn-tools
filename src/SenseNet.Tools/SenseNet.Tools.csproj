@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\IConfigProvider.cs" />
+    <Compile Include="Configuration\SectionNameAttribute.cs" />
     <Compile Include="Configuration\SnConfig.cs" />
     <Compile Include="Configuration\SnConfigProvider.cs" />
     <Compile Include="Tools\CommandLineArguments\Argument.cs" />
