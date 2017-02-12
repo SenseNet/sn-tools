@@ -60,6 +60,7 @@
     <Compile Include="CommandLineArgumentParserTests.cs" />
     <Compile Include="RetrierTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnConfigTests.cs" />
     <Compile Include="SnTraceAnalysisTests.cs" />
     <Compile Include="SnTraceTestClass.cs" />
     <Compile Include="SnTraceTests.cs" />

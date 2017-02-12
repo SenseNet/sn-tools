@@ -48,6 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\IConfigProvider.cs" />
+    <Compile Include="Configuration\SectionNameAttribute.cs" />
+    <Compile Include="Configuration\SnConfig.cs" />
+    <Compile Include="Configuration\SnConfigProvider.cs" />
     <Compile Include="Tools\CommandLineArguments\Argument.cs" />
     <Compile Include="Tools\CommandLineArguments\NoNameOptionAttribute.cs" />
     <Compile Include="Tools\CommandLineArguments\OptionAttribute.cs" />
@@ -86,6 +90,7 @@
     <Compile Include="Tools\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Configuration\Readme.md" />
     <None Include="SenseNet.Tools.nuspec" />
     <None Include="Tools\CommandLineArguments\Readme.md" />
     <None Include="Diagnostics\Analysis\Readme.md" />
