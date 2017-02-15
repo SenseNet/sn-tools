@@ -23,8 +23,8 @@ namespace SenseNet.Configuration
         /// A dictionary storing available config classname/sectionname pairs 
         /// for aiding automatic sectionname discovery.
         /// </summary>
-        private static Dictionary<string, string> SectionNames { get; } = TypeResolver.GetTypesByBaseType(
-            typeof (SnConfig)).ToDictionary(t => t.FullName, GetSectionNameFromAttribute);
+        private static Dictionary<Type, string> SectionNames { get; } = TypeResolver.GetTypesByBaseType(
+            typeof (SnConfig)).ToDictionary(t => t, GetSectionNameFromAttribute);
 
         //============================================================================== GetValue
 
@@ -376,7 +376,7 @@ namespace SenseNet.Configuration
             if (!sectionType.IsSubclassOf(typeof(SnConfig)))
                 throw new InvalidOperationException($"Section type must derive from SnConfig. {sectionType.Name} does not fullfill this requirement.");
 
-            if (!SectionNames.TryGetValue(sectionType.FullName, out sectionName) || string.IsNullOrEmpty(sectionName))
+            if (!SectionNames.TryGetValue(sectionType, out sectionName) || string.IsNullOrEmpty(sectionName))
                 throw new InvalidOperationException($"Please provide a valid section name for the type {sectionType.Name} using the SectionName attribute.");
 
             return sectionName;
