@@ -247,22 +247,18 @@ namespace SenseNet.Tools
                                 list.AddRange(asm.GetTypes().Where(type =>
                                     type.GetInterfaces().Any(interf => interf == interfaceType)));
                             }
-                            catch (ReflectionTypeLoadException rtle)
+                            catch (ReflectionTypeLoadException e)
                             {
-                                SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", asm.FullName } });
-
-                                // Logging each exception
-                                foreach (var exc in rtle.LoaderExceptions)
+                                if (!IgnorableException(e))
                                 {
-                                    SnLog.WriteError(exc);
+                                    LogTypeLoadException(e, asm.FullName);
+                                    throw;
                                 }
-
-                                throw;
                             }
                             catch (Exception e)
                             {
                                 if (!IgnorableException(e))
-                                    throw;
+                                    throw TypeDiscoveryError(e, null, asm);
                             }
                         }
                         temp = list.ToArray();
@@ -312,17 +308,13 @@ namespace SenseNet.Tools
                                     }
                                 }
                             }
-                            catch (ReflectionTypeLoadException rtle)
+                            catch (ReflectionTypeLoadException e)
                             {
-                                SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", asm.FullName } });
-
-                                // Logging each exception
-                                foreach (var exc in rtle.LoaderExceptions)
+                                if (!IgnorableException(e))
                                 {
-                                    SnLog.WriteError(exc);
+                                    LogTypeLoadException(e, asm.FullName);
+                                    throw;
                                 }
-
-                                throw;
                             }
                             catch (Exception e)
                             {
@@ -343,6 +335,15 @@ namespace SenseNet.Tools
             return result;
         }
 
+        private static void LogTypeLoadException(ReflectionTypeLoadException rtle, string assemblyName = null)
+        {
+            SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", assemblyName ?? "unknown" } });
+
+            foreach (var exc in rtle.LoaderExceptions)
+            {
+                SnLog.WriteError(exc);
+            }
+        }
         private static bool IgnorableException(Exception e)
         {
             if (!Debugger.IsAttached)

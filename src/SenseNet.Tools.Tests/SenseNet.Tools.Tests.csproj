@@ -65,6 +65,7 @@
     <Compile Include="SnTraceTestClass.cs" />
     <Compile Include="SnTraceTests.cs" />
     <Compile Include="SnLogTests.cs" />
+    <Compile Include="TypeResolverTests.cs" />
     <Compile Include="UtilityTests.cs" />
   </ItemGroup>
   <ItemGroup>
