@@ -247,6 +247,18 @@ namespace SenseNet.Tools
                                 list.AddRange(asm.GetTypes().Where(type =>
                                     type.GetInterfaces().Any(interf => interf == interfaceType)));
                             }
+                            catch (ReflectionTypeLoadException rtle)
+                            {
+                                SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", asm.FullName } });
+
+                                // Logging each exception
+                                foreach (var exc in rtle.LoaderExceptions)
+                                {
+                                    SnLog.WriteError(exc);
+                                }
+
+                                throw;
+                            }
                             catch (Exception e)
                             {
                                 if (!IgnorableException(e))
