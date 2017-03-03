@@ -6,23 +6,7 @@ using SenseNet.Configuration;
 
 namespace SenseNet.Tools.Tests
 {
-    #region Test helper classes
-
-    [SectionName("feature1")]
-    internal class SnTestConfig : SnConfig
-    {
-    }
-    [SectionName("")]
-    internal class SnTestConfigInvalid : SnConfig
-    {
-    }
-    internal class SnTestConfigNoAttribute : SnConfig
-    {
-    }
-
     internal enum ConfigEnum { Value1, Value2, Value3 }
-
-    #endregion
 
     [TestClass]
     public class SnConfigTests
@@ -137,7 +121,6 @@ namespace SenseNet.Tools.Tests
                 // no section, no key
                 Assert.IsNull(SnConfig.GetValue<string>("NO-feature", "NO-KEY"));
                 Assert.IsNull(SnConfig.GetValue<string>((string)null, "NO-KEY"));
-                Assert.IsNull(SnConfig.GetValue<string>((Type)null, "NO-KEY"));
 
                 // default values
                 Assert.AreEqual("DEFAULT", SnConfig.GetValue("feature1", "NO-KEY", "DEFAULT"));
@@ -169,33 +152,6 @@ namespace SenseNet.Tools.Tests
                 Assert.IsTrue(a2.SequenceEqual(new[] { 7, 8, 9 }));
             }
         }
-        [TestMethod]
-        public void SnConfig_SectionType_TypeConversion()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                Assert.AreEqual(456, SnConfig.GetValue<SnTestConfig, int>("key2"));
-                Assert.AreEqual(456, SnConfig.GetValue(typeof(SnTestConfig), "key2", 0));
-
-                Assert.AreEqual(3.4, SnConfig.GetValue<SnTestConfig, double>("key3"));
-                Assert.AreEqual(3.4, SnConfig.GetValue(typeof(SnTestConfig), "key3", 0.0));
-
-                Assert.AreEqual(ConfigEnum.Value2, SnConfig.GetValue<SnTestConfig, ConfigEnum>("key6"));
-                Assert.AreEqual(ConfigEnum.Value2, SnConfig.GetValue(typeof(SnTestConfig), "key6", ConfigEnum.Value1));
-
-                var a1 = SnConfig.GetList<SnTestConfig, string>("key4");
-                Assert.IsTrue(a1.SequenceEqual(new[] { "d", "e", "f" }));
-
-                a1 = SnConfig.GetList(typeof(SnTestConfig), "key4", new List<string>());
-                Assert.IsTrue(a1.SequenceEqual(new[] { "d", "e", "f" }));
-
-                var a2 = SnConfig.GetList<SnTestConfig, int>("key5");
-                Assert.IsTrue(a2.SequenceEqual(new[] { 7, 8, 9 }));
-
-                a2 = SnConfig.GetList(typeof(SnTestConfig), "key5", new List<int>());
-                Assert.IsTrue(a2.SequenceEqual(new[] { 7, 8, 9 }));
-            }
-        }
 
         [TestMethod]
         public void SnConfig_SectionName_Boundaries()
@@ -215,63 +171,6 @@ namespace SenseNet.Tools.Tests
                 Assert.AreEqual(4.5, b2);
                 b2 = SnConfig.GetDouble("feature1", "key3", 0, 1, 2.3);
                 Assert.AreEqual(2.3, b2);
-            }
-        }
-        [TestMethod]
-        public void SnConfig_SectionType_Boundaries()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                var b1 = SnConfig.GetInt<SnTestConfig>("key2", 0, 400);
-                Assert.AreEqual(456, b1);
-                b1 = SnConfig.GetInt<SnTestConfig>("key2", 0, 500);
-                Assert.AreEqual(500, b1);
-                b1 = SnConfig.GetInt<SnTestConfig>("key2", 0, 0, 400);
-                Assert.AreEqual(400, b1);
-
-                var b2 = SnConfig.GetDouble<SnTestConfig>("key3", 0, 1);
-                Assert.AreEqual(3.4, b2);
-                b2 = SnConfig.GetDouble<SnTestConfig>("key3", 0, 4.5);
-                Assert.AreEqual(4.5, b2);
-                b2 = SnConfig.GetDouble<SnTestConfig>("key3", 0, 1, 2.3);
-                Assert.AreEqual(2.3, b2);
-            }
-        }
-
-        [TestMethod]
-        public void SnConfig_SectionType_ExistingValue()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                Assert.IsTrue(SnConfig.GetValue<SnTestConfig, bool>("key8"));
-                Assert.IsTrue(SnConfig.GetValue<bool>(typeof(SnTestConfig), "key8"));
-                Assert.IsTrue(SnConfig.GetValue(typeof(SnTestConfig), "key8", false));
-
-                Assert.AreEqual("value999", SnConfig.GetValue<SnTestConfig, string>("key1"));
-                Assert.AreEqual("value999", SnConfig.GetValue<string>(typeof(SnTestConfig), "key1"));
-                Assert.AreEqual("value999", SnConfig.GetValue(typeof(SnTestConfig), "key1", string.Empty));
-
-                Assert.AreEqual("value999", SnConfig.GetString<SnTestConfig>("key1"));
-                Assert.AreEqual("value999", SnConfig.GetString(typeof(SnTestConfig), "key1"));
-
-                //empty value
-                Assert.IsFalse(SnConfig.GetValue<SnTestConfig, bool>("key7"));
-                Assert.AreEqual(0, SnConfig.GetValue<SnTestConfig, int>("key7"));
-                Assert.AreEqual(0, SnConfig.GetValue<SnTestConfig, double>("key7"));
-            }
-        }
-        [TestMethod]
-        public void SnConfig_SectionType_NonExistingValue()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                Assert.IsFalse(SnConfig.GetValue<SnTestConfig, bool>("NO-KEY"));
-                Assert.IsFalse(SnConfig.GetValue<bool>(typeof(SnTestConfig), "NO-KEY"));
-
-                Assert.AreEqual("default", SnConfig.GetValue<SnTestConfig, string>("NO-KEY", "default"));
-                Assert.AreEqual("default", SnConfig.GetValue(typeof(SnTestConfig), "NO-KEY", "default"));
-
-                Assert.IsTrue(SnConfig.GetListOrEmpty<SnTestConfig, string>("NO-KEY").SequenceEqual(new List<string>()));
             }
         }
 
@@ -295,36 +194,6 @@ namespace SenseNet.Tools.Tests
             {
                 // type conversion error
                 SnConfig.GetList<int>("feature1", "key4");
-            }
-        }
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void SnConfig_SectionType_Error1()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                // type error
-                SnConfig.GetValue<int>(typeof(string), "key1");
-            }
-        }
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void SnConfig_SectionType_Error2()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                // type error
-                SnConfig.GetValue<int>(typeof(SnTestConfigInvalid), "key1");
-            }
-        }
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void SnConfig_SectionType_Error3()
-        {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
-            {
-                // type error
-                SnConfig.GetValue<int>(typeof(SnTestConfigNoAttribute), "key1");
             }
         }
     }
