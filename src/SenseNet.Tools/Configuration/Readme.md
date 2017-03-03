@@ -40,22 +40,10 @@ public class ExampleConfig : SnConfig
 This way your properties will be initialized only once, when the runtime first touches your config class.
 
 ### Sections
-When calling a loader method, you can provide the section path as the first parameter. The base class will try to load values from that section first, and if not found (or the provided section is null), only than will turn to the central appSettings section and look for the key there.
+When calling a loader method, you provide the section path as the first parameter. The base class will try to load values from that section first, and if not found (or the provided section is null), only than will turn to the central appSettings section and look for the key there.
 
 ### Default values
 As you can see in the example above, it is possible to provide a default value for the loader methods available in the base class. This makes it a very simple API that lets you define all the necessary information in one line when loading a config value.
-
-### Generic section definition
-It is also possible to provide the section info for loader metheds in a strongly typed way, by defining the section once in a class attribute:
-
-```csharp
-[SectionName("exampleapp/feature1")]
-public class ExampleConfig : SnConfig
-{
-    public static List<int> MyList { get; internal set; } = GetList<ExampleConfig, int>("MyListValue");
-    public static int TimeoutValue { get; internal set; } = GetInt<ExampleConfig>("TimeoutValue", 60, 10, 100);
-}
-```
 
 ## Loader methods
 The loader methods published by the base *SnConfig* class give you an easy way to **load strongly typed values** from configuration files. There is a generic method for types where an automatic conversion is possible (even for *enums*), and there are other helper methods for loading arrays and specialized ones with an API for defining boundaries (e.g. for *int* or *double* values).
