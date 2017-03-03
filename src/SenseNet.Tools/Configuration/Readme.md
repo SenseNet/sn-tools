@@ -47,3 +47,11 @@ As you can see in the example above, it is possible to provide a default value f
 
 ## Loader methods
 The loader methods published by the base *SnConfig* class give you an easy way to **load strongly typed values** from configuration files. There is a generic method for types where an automatic conversion is possible (even for *enums*), and there are other helper methods for loading arrays and specialized ones with an API for defining boundaries (e.g. for *int* or *double* values).
+
+```csharp
+public class ExampleConfig : SnConfig
+{
+    public static string[] NetworkTargets { get; internal set; } = GetListOrEmpty<string>("exampleapp/networkTargets", "NetworkTargets").ToArray();
+    public static int MyIntValue { get; internal set; } = GetInt("exampleapp/networkTargets", "myIntValue", 60, 10);
+}
+```
