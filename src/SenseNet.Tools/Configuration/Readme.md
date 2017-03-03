@@ -46,12 +46,12 @@ When calling a loader method, you provide the section path as the first paramete
 As you can see in the example above, it is possible to provide a default value for the loader methods available in the base class. This makes it a very simple API that lets you define all the necessary information in one line when loading a config value.
 
 ## Loader methods
-The loader methods published by the base *SnConfig* class give you an easy way to **load strongly typed values** from configuration files. There is a generic method for types where an automatic conversion is possible (even for *enums*), and there are other helper methods for loading arrays and specialized ones with an API for defining boundaries (e.g. for *int* or *double* values).
+The loader methods published by the base *SnConfig* class give you an easy way to **load strongly typed values** from configuration files. There is a generic method for types where an automatic conversion is possible (even for *enums*), and there are other helper methods for loading arrays and specialized ones with an API for defining boundaries (e.g. min or max for *int* and *double* values).
 
 ```csharp
 public class ExampleConfig : SnConfig
 {
-    public static string[] NetworkTargets { get; internal set; } = GetListOrEmpty<string>("exampleapp/networkTargets", "NetworkTargets").ToArray();
-    public static int MyIntValue { get; internal set; } = GetInt("exampleapp/networkTargets", "myIntValue", 60, 10);
+    public static string[] NetworkTargets { get; internal set; } = GetListOrEmpty<string>("exampleapp/sampleComponent", "NetworkTargets").ToArray();
+    public static int MyIntValue { get; internal set; } = GetInt("exampleapp/otherSection", "myIntValue", 60, 10);
 }
 ```
