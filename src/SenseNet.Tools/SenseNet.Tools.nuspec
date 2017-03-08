@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>SenseNet.Tools</id>
-        <version>2.1.0.0</version>
+        <version>$version$</version>
         <title>SenseNet Tools for .Net</title>
         <authors>tusmester,kavics</authors>
         <owners>Sense/Net</owners>
@@ -11,14 +11,8 @@
         <iconUrl>https://avatars2.githubusercontent.com/u/4069121?v=3&amp;s=200</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>General .Net tools that can be used even in projects independent from SenseNet ECM.</description>
-        <releaseNotes>Initial release.</releaseNotes>
         <copyright>Copyright © Sense/Net Inc.</copyright>
         <language>en-US</language>
         <tags>sensenet tools</tags>
     </metadata>
-    <files>
-        <file src="bin\Release\SenseNet.Tools.dll" target="lib\net45\SenseNet.Tools.dll" />
-        <file src="bin\Release\SenseNet.Tools.pdb" target="lib\net45\SenseNet.Tools.pdb" />
-        <file src="bin\Release\SenseNet.Tools.XML" target="lib\net45\SenseNet.Tools.XML" />
-    </files>
 </package>
