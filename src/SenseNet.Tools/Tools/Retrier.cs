@@ -8,7 +8,7 @@ namespace SenseNet.Tools
     /// the maximum number of retry attempts, the callback that should be
     /// called and the exception type that should be suppressed.
     /// </summary>
-    public class Retrier
+    public static class Retrier
     {
         /// <summary>
         /// Calls the callback method safely. If the given type of exception is caught,
@@ -204,7 +204,7 @@ namespace SenseNet.Tools
 
                 try
                 {
-                    result = await callback();
+                    result = await callback().ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -247,7 +247,7 @@ namespace SenseNet.Tools
 
                 try
                 {
-                    await callback();
+                    await callback().ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

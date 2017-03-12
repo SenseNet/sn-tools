@@ -80,7 +80,7 @@ namespace SenseNet.Diagnostics
         {
             private static long _nextId = 1;
 
-            internal static Operation Null = new Operation(0L);
+            internal static readonly Operation Null = new Operation(0L);
 
             /// <summary>
             /// Gets the operation identifier that is unique in the current AppDomain.
