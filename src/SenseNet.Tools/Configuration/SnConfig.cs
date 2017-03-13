@@ -13,12 +13,12 @@ namespace SenseNet.Configuration
     public abstract class SnConfig
     {
         /// <summary>
-        /// Creates an instance of the SnConfig class.
+        /// Initializes an instance of the SnConfig class.
         /// </summary>
         protected SnConfig()
         {
-            // This technical constructor was created to prevent external code 
-            // from instatiating this utility class using the default public constructor.
+            // This technical constructor was created to prevent external code from
+            // instantiating this utility class using the default public constructor.
         }
 
         //============================================================================== Properties
