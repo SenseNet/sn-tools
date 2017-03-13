@@ -28,7 +28,7 @@ namespace SenseNet.Tools
             {
                 using (partition)
                     while (partition.MoveNext())
-                        await action(partition.Current);
+                        await action(partition.Current).ConfigureAwait(false);
             })));
         }
     }

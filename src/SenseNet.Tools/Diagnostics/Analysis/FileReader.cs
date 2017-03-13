@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 #pragma warning disable 1591
@@ -30,13 +29,10 @@ namespace SenseNet.Diagnostics.Analysis
 
         protected override void Dispose(bool disposing)
         {
-            IDisposable disposable;
             if (!disposing)
                 return;
-            if (_reader == null)
-                return;
-            if ((disposable = _reader as IDisposable) != null)
-                disposable.Dispose();
+
+            _reader?.Dispose();
         }
     }
 }

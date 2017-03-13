@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -114,10 +115,10 @@ namespace SenseNet.Tools
                         {
                             var split = typeName.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                             var tname = split[0];
-                            var asmName = split.Length > 1 ? split[1].ToLower().Trim() : null;
+                            var asmName = split.Length > 1 ? split[1].ToLower(CultureInfo.InvariantCulture).Trim() : null;
                             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                             {
-                                if (asmName != null && asmName != assembly.GetName().Name.ToLower())
+                                if (asmName != null && asmName != assembly.GetName().Name.ToLower(CultureInfo.InvariantCulture))
                                     continue;
                                 try
                                 {
