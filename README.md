@@ -1,11 +1,11 @@
-# Sense/Net Tools
+# sensenet ECM Tools
 
 [![Join the chat at https://gitter.im/SenseNet/sn-tools](https://badges.gitter.im/SenseNet/sn-tools.svg)](https://gitter.im/SenseNet/sn-tools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NuGet](https://img.shields.io/nuget/v/SenseNet.Tools.svg)](https://www.nuget.org/packages/SenseNet.Tools)
 
 This library contains useful tools for developers ranging from tasks as small as retrying an operation multiple times to a robust trace component.
 
-The library is **independent from Sense/Net ECM** and it does not have any Sense/Net-related dependencies. It is the other way around: [Sense/Net ECM](https://github.com/SenseNet/sensenet) relies heavily on the tools published in this library.
+The library is **independent from sensenet ECM** and it does not have any sensenet ECM-related dependencies. It is the other way around: [sensenet ECM](https://github.com/SenseNet/sensenet) relies heavily on the tools published in this library.
 
 You can even use it in your custom project that has nothing to do with Sense/Net ECM!
 
@@ -35,7 +35,7 @@ var result = await Retrier.RetryAsync<int>(3, 10, async () =>
 ````
 
 ## Diagnostics
-In this namespace you'll find easy-to-use and extendable tracing and logging components. We build on them extensively in the core Sense/Net ECM project but they can also be used in any kind of tool or application as a lightweight logging technology.
+In this namespace you'll find easy-to-use and extendable tracing and logging components. We build on them extensively in the core sensenet ECM project but they can also be used in any kind of tool or application as a lightweight logging technology.
 
 ```csharp
 SnLog.WriteInformation("ContentTypeManager loaded.");
