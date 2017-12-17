@@ -395,5 +395,41 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("0124579BCDE", actual);
         }
 
+        /* ================================================== In memory trace */
+
+        [TestMethod]
+        public void SnTrace_InMemoryTrace()
+        {
+            // arrange
+            CleanupAndEnableAll();
+            var trace = new List<string>();
+
+            // action
+            SnTrace.Write("Line#1");
+            SnTrace.Write("Line#2");
+            using (UseTestWriter(trace))
+            {
+                SnTrace.Write("Line#3");
+                SnTrace.Write("Line#4");
+                SnTrace.Write("Line#5");
+            }
+            SnTrace.Write("Line#6");
+            SnTrace.Write("Line#7");
+
+            //  assert
+            Assert.AreEqual(3, trace.Count);
+            Assert.IsTrue(trace[0].EndsWith("Line#3"));
+            Assert.IsTrue(trace[1].EndsWith("Line#4"));
+            Assert.IsTrue(trace[2].EndsWith("Line#5"));
+
+            Assert.IsTrue(trace[0].StartsWith("3\t"));
+            Assert.IsTrue(trace[1].StartsWith("4\t"));
+            Assert.IsTrue(trace[2].StartsWith("5\t"));
+
+            var log = DisableAllAndGetLog();
+            var entries = log.Select(Entry.Parse).Where(e => e != null).ToArray();
+            var msg = string.Join(",", entries.Select(e => e.Message).ToArray());
+            Assert.AreEqual("Line#1,Line#2,Line#6,Line#7", msg);
+        }
     }
 }
