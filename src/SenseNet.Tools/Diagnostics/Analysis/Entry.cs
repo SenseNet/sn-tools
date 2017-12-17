@@ -82,7 +82,7 @@ namespace SenseNet.Diagnostics.Analysis
         /// </summary>
         public string Raw;
 
-        private Entry() { }
+        public Entry() { }
         public Entry(Entry sourceEntry)
         {
             CopyPropertiesFrom(sourceEntry);
@@ -181,7 +181,10 @@ namespace SenseNet.Diagnostics.Analysis
         /// </summary>
         public override string ToString()
         {
-            return Raw;
+            var block = BlockStart ? ">" : "";
+            var time = Time.ToString("yyyy-MM-dd HH:mm:ss.fffff");
+            var op = OpId > 0 ? "Op:" + OpId : "";
+            return $"{block}{LineId}\t{time}\t{Category}\tA:{AppDomain}\tT:{ThreadId}\t{op}\t{Status}\t{Message}";
         }
 
     }
