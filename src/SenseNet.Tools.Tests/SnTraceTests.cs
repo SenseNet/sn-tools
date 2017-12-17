@@ -417,19 +417,20 @@ namespace SenseNet.Tools.Tests
             SnTrace.Write("Line#7");
 
             //  assert
+            var log = DisableAllAndGetLog();
+            var startId = Entry.Parse(log.First()).LineId;
+            var entries = log.Select(Entry.Parse).Where(e => e != null).ToArray();
+            var msg = string.Join(",", entries.Select(e => e.Message).ToArray());
+            Assert.AreEqual("Line#1,Line#2,Line#6,Line#7", msg);
+
             Assert.AreEqual(3, trace.Count);
             Assert.IsTrue(trace[0].EndsWith("Line#3"));
             Assert.IsTrue(trace[1].EndsWith("Line#4"));
             Assert.IsTrue(trace[2].EndsWith("Line#5"));
 
-            Assert.IsTrue(trace[0].StartsWith("3\t"));
-            Assert.IsTrue(trace[1].StartsWith("4\t"));
-            Assert.IsTrue(trace[2].StartsWith("5\t"));
-
-            var log = DisableAllAndGetLog();
-            var entries = log.Select(Entry.Parse).Where(e => e != null).ToArray();
-            var msg = string.Join(",", entries.Select(e => e.Message).ToArray());
-            Assert.AreEqual("Line#1,Line#2,Line#6,Line#7", msg);
+            Assert.IsTrue(trace[0].StartsWith($"{startId + 2}\t"));
+            Assert.IsTrue(trace[1].StartsWith($"{startId + 3}\t"));
+            Assert.IsTrue(trace[2].StartsWith($"{startId + 4}\t"));
         }
     }
 }
