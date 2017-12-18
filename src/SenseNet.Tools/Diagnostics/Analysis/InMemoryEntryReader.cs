@@ -18,7 +18,11 @@ namespace SenseNet.Diagnostics.Analysis
         public override IEnumerator<Entry> GetEnumerator()
         {
             foreach (var item in _entrySource)
-                yield return Entry.Parse(item);
+            {
+                var entry = Entry.Parse(item);
+                if(entry != null)
+                    yield return entry;
+            }
         }
 
         protected override void Dispose(bool disposing)
