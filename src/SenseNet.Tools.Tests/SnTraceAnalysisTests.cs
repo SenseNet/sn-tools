@@ -14,6 +14,47 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnTraceAnalysisTests : SnTraceTestClass
     {
+        #region Logs for SessionReader test
+        string[] _log1ForSessionReaderTest = new[]
+        {
+            "10\t2017-11-13 03:55:40.00000\tTest\tA:AppA\tT:42\t\t\t\tMsg400",
+            "11\t2017-11-13 03:55:42.00000\tTest\tA:AppA\tT:42\t\t\t\tMsg420",
+            "12\t2017-11-13 03:55:44.00000\tTest\tA:AppA\tT:42\t\t\t\tMsg440",
+        };
+        string[] _log2ForSessionReaderTest = new[]
+        {
+            "10\t2017-11-13 03:55:41.00000\tTest\tA:AppB\tT:42\t\t\t\tMsg410",
+            "11\t2017-11-13 03:55:43.00000\tTest\tA:AppB\tT:42\t\t\t\tMsg430",
+            "12\t2017-11-13 03:55:45.00000\tTest\tA:AppB\tT:42\t\t\t\tMsg450",
+        };
+        string[] _log3ForSessionReaderTest = new[]
+        {
+            "10\t2017-11-13 03:55:40.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg405",
+            "11\t2017-11-13 03:55:41.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg415",
+            "12\t2017-11-13 03:55:41.70000\tTest\tA:AppC\tT:42\t\t\t\tMsg417",
+            "13\t2017-11-13 03:55:42.20000\tTest\tA:AppC\tT:42\t\t\t\tMsg422",
+            "14\t2017-11-13 03:55:42.70000\tTest\tA:AppC\tT:42\t\t\t\tMsg427",
+            "15\t2017-11-13 03:55:43.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg435",
+            "16\t2017-11-13 03:55:44.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg445",
+        };
+
+        #endregion
+        [TestMethod]
+        public void SnTrace_Analysis_SessionReader()
+        {
+            var logs = new[] { _log1ForSessionReaderTest, _log2ForSessionReaderTest, _log3ForSessionReaderTest };
+
+            // action
+            string actual;
+            using (var logFlow = Reader.Create(logs))
+                actual = string.Join(",", logFlow.Select(e => e.Message));
+
+            //  assert
+            var expected = "Msg400,Msg405,Msg410,Msg415,Msg417,Msg420,Msg422,Msg427,Msg430,Msg435,Msg440,Msg445,Msg450";
+            Assert.AreEqual(expected, actual);
+        }
+
+
         [TestMethod]
         public void SnTrace_Analysis_Filter()
         {
@@ -154,7 +195,7 @@ namespace SenseNet.Tools.Tests
                 var aps = new AppDomainSimplifier("App{0}");
 
                 var transformedLogFlow = logFlow
-                    .Where(e => e.Category == "Web")
+                    .Where(e => e.Category == Category.Web)
                     .Select(e => { e.AppDomain = aps.Simplify(e.AppDomain); return e; })
                     .Collect<Entry, WebRequestEntryCollection>((e) =>
                     {
