@@ -14,17 +14,68 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnTraceAnalysisTests : SnTraceTestClass
     {
-        [TestMethod]
-        public void SnTrace_Analysis_SimpleApi_Filter()
+        #region Logs for SessionReader test
+        string[] _log1ForSessionReaderTest = new[]
         {
-            CleanupAndEnableAll();
-            WriteStructure1();
+            "10\t2017-11-13 03:55:40.00000\tTest\tA:AppA\tT:42\t\t\t\tMsg400",
+            "11\t2017-11-13 03:55:42.00000\tTest\tA:AppA\tT:42\t\t\t\tMsg420",
+            "12\t2017-11-13 03:55:44.00000\tTest\tA:AppA\tT:42\t\t\t\tMsg440",
+        };
+        string[] _log2ForSessionReaderTest = new[]
+        {
+            "10\t2017-11-13 03:55:41.00000\tTest\tA:AppB\tT:42\t\t\t\tMsg410",
+            "11\t2017-11-13 03:55:43.00000\tTest\tA:AppB\tT:42\t\t\t\tMsg430",
+            "12\t2017-11-13 03:55:45.00000\tTest\tA:AppB\tT:42\t\t\t\tMsg450",
+        };
+        string[] _log3ForSessionReaderTest = new[]
+        {
+            "10\t2017-11-13 03:55:40.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg405",
+            "11\t2017-11-13 03:55:41.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg415",
+            "12\t2017-11-13 03:55:41.70000\tTest\tA:AppC\tT:42\t\t\t\tMsg417",
+            "13\t2017-11-13 03:55:42.20000\tTest\tA:AppC\tT:42\t\t\t\tMsg422",
+            "14\t2017-11-13 03:55:42.70000\tTest\tA:AppC\tT:42\t\t\t\tMsg427",
+            "15\t2017-11-13 03:55:43.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg435",
+            "16\t2017-11-13 03:55:44.50000\tTest\tA:AppC\tT:42\t\t\t\tMsg445",
+        };
 
-            using (var reader = Reader.Create(base.DetailedLogDirectory))
-            using (var statusFilter = new Filter<Entry>(reader, e => e.Status == Status.End))
-            using (var categoryFilter = new Filter<Entry>(statusFilter, e => e.Category == Category.Test))
+        #endregion
+        [TestMethod]
+        public void SnTrace_Analysis_SessionReader()
+        {
+            var logs = new[] { _log1ForSessionReaderTest, _log2ForSessionReaderTest, _log3ForSessionReaderTest };
+
+            // action
+            string actual;
+            using (var logFlow = Reader.Create(logs))
+                actual = string.Join(",", logFlow.Select(e => e.Message));
+
+            //  assert
+            var expected = "Msg400,Msg405,Msg410,Msg415,Msg417,Msg420,Msg422,Msg427,Msg430,Msg435,Msg440,Msg445,Msg450";
+            Assert.AreEqual(expected, actual);
+        }
+
+
+        [TestMethod]
+        public void SnTrace_Analysis_Filter()
+        {
+            // arrange
+            var trace = new List<string>();
+            using (UseTestWriter(trace))
             {
-                var actual = string.Join(", ", categoryFilter.Select(e => e.Message));
+                SnTrace.EnableAll();
+                WriteStructure1();
+                SnTrace.DisableAll();
+            }
+
+            using (var logFlow = Reader.Create(trace))
+            {
+                // action
+                var transformedLogFlow = logFlow
+                    .Where(e => e.Status == Status.End)
+                    .Where(e => e.Category == Category.Test);
+
+                //  assert
+                var actual = string.Join(", ", transformedLogFlow.Select(e => e.Message));
                 Assert.AreEqual("10, 7, 14", actual);
             }
         }
@@ -69,197 +120,126 @@ namespace SenseNet.Tools.Tests
         }
 
 
-        [TestMethod]
-        public void SnTrace_Analysis_FluentApi_FilterLinkTransform()
+        private class AppDomainSimplifier
         {
-            CleanupAndEnableAll();
-            WriteStructure2();
+            private readonly string _format;
+            private List<string> _keys = new List<string>();
 
-            using (var analyzator = Reader.Create(base.DetailedLogDirectory)
-                .Filter<Entry>(e => e.Message.StartsWith("TEST ") || e.Status == Status.End)
-                .Linker<TestEntry>(new TestLinker())
-                .Transformer<TestEntry>(new TestTransformer())
-                )
+            public AppDomainSimplifier(string format = null)
             {
-                var result = analyzator.ToArray();
-
-                Assert.AreEqual(1, result.Length);
-                var times = result[0].Split('\t').Select(TimeSpan.Parse).ToArray();
-                Assert.IsTrue(times[0] + times[1] < times[2]);
+                _format = format ?? "App-{0}";
             }
-        }
-        private void WriteStructure2()
-        {
-            SnTrace.Write("noise"); Wait(1);
-            SnTrace.Write("noise"); Wait(1);
-            SnTrace.Test.Write("noise"); Wait(1);
-            SnTrace.Write("noise"); Wait(1);
 
-            SnTrace.Test.Write("TEST START"); Wait(1);               // relevant
-
-            SnTrace.Write("noise"); Wait(1);
-            SnTrace.Test.Write("noise"); Wait(1);
-            SnTrace.Write("noise"); Wait(1);
-            using (var op1 = SnTrace.Test.StartOperation("Op1"))
+            public string Simplify(string key)
             {
-                SnTrace.Test.Write("noise"); Wait(1);
-                SnTrace.Write("noise"); Wait(1);
-                SnTrace.Test.Write("noise"); Wait(1);
-                op1.Successful = true;
-            }                                                        // relevant
-            SnTrace.Write("noise"); Wait(1);
-            using (var op2 = SnTrace.Test.StartOperation("Op2"))
-            {
-                SnTrace.Test.Write("noise"); Wait(1);
-                SnTrace.Write("noise"); Wait(1);
-                SnTrace.Test.Write("noise"); Wait(1);
-                op2.Successful = true;
-            }                                                        // relevant
-
-            SnTrace.Test.Write("TEST END"); Wait(1);
-
-            SnTrace.Write("noise"); Wait(1);
-            SnTrace.Test.Write("noise"); Wait(1);
-
-            SnTrace.Test.Write("TEST START"); Wait(1); // (irrelevant)
-
-            SnTrace.Flush();
-        }
-        private void Wait(int milleseconds)
-        {
-            System.Threading.Thread.Sleep(milleseconds);
-        }
-
-
-        [TestMethod]
-        public void SnTrace_Analysis_FluentApi_Writer()
-        {
-            CleanupAndEnableAll();
-            WriteStructure2();
-
-            var output = new StringBuilder();
-            using (var writer = new StringWriter(output))
-            using (var analyzator = Reader.Create(base.DetailedLogDirectory)
-                .Filter<Entry>(e => e.Message.StartsWith("TEST ") || e.Status == Status.End)
-                .Linker<TestEntry>(new TestLinker())
-                .Transformer<TestEntry>(new TestTransformer())
-                )
-            {
-                foreach (var line in analyzator)
-                    writer.WriteLine(line);
-            }
-            var times = output.ToString().Split('\t').Select(TimeSpan.Parse).ToArray();
-            Assert.AreEqual(3, times.Length);
-            Assert.IsTrue(times[0] + times[1] < times[2]);
-        }
-
-
-        [TestMethod]
-        public void SnTrace_Analysis_FluentApi_FunctionalStyle()
-        {
-            CleanupAndEnableAll();
-            WriteStructure2();
-
-            var output = new StringBuilder();
-            using (var writer = new StringWriter(output))
-            using (var analyzator = Reader.Create(base.DetailedLogDirectory)
-                .Filter<Entry>(e => e.Message.StartsWith("TEST ") || e.Status == Status.End)
-                .Link<TestEntry>(
-                    rootEntrySelector: input => input.Message == "TEST START" ? new TestEntry(input) : null,
-                    lastEntrySelector: (input, record) =>
-                    {
-                        if (input.Message != "TEST END")
-                            return LinkerState.NotLast;
-                        record.GeneralDuration = input.Time - record.Time;
-                        return LinkerState.LastComplete;
-                    },
-                    associator: (input, record) =>
-                    {
-                        if (input.Status != Status.End)
-                            return;
-                        if (input.Message == "Op1")
-                            record.Op1Duration = input.Duration;
-                        if (input.Message == "Op2")
-                            record.Op2Duration = input.Duration;
-                    },
-                    unfinishedEntrySelector: null
-                )
-                .Transformer<TestEntry>(new TestTransformer())
-                )
-            {
-                foreach (var line in analyzator)
-                    writer.WriteLine(line);
-            }
-            var times = output.ToString().Split('\t').Select(TimeSpan.Parse).ToArray();
-            Assert.AreEqual(3, times.Length);
-            Assert.IsTrue(times[0] + times[1] < times[2]);
-        }
-
-
-        private class TestEntry : Entry
-        {
-            public TimeSpan Op1Duration { get; set; }
-            public TimeSpan Op2Duration { get; set; }
-            public TimeSpan GeneralDuration { get; set; }
-
-            public TestEntry(Entry sourceEntry) : base(sourceEntry) { }
-        }
-
-        private class TestLinker : Linker<TestEntry>
-        {
-            private readonly Dictionary<string, TestEntry> _records = new Dictionary<string, TestEntry>();
-            protected override TestEntry Process(Entry input)
-            {
-                if (input.Category != Category.Test && input.Status != Status.End)
-                    return null;
-
-                var key = input.AppDomain + "_T:" + input.ThreadId;
-
-                TestEntry record = null;
-                if (input.Message == "TEST START")
+                var i = _keys.IndexOf(key);
+                if (i < 0)
                 {
-                    // start new scope: create new entry and override old if exists
-                    record = new TestEntry(input);
-                    _records[key] = record;
+                    i = _keys.Count;
+                    _keys.Add(key);
                 }
-                else
+                return string.Format(_format, (i + 1));
+            }
+        }
+        private class WebRequestEntryCollection : EntryCollection
+        {
+            public static class Q
+            {
+                public const string Start = "start";
+                public const string End = "end";
+            }
+
+            public Entry StartEntry;
+            public Entry EndEntry;
+
+            public override void Add(Entry e, string qualification)
+            {
+                switch (qualification)
                 {
-                    if (!_records.TryGetValue(key, out record))
+                    case Q.Start:
+                        StartEntry = e;
+                        break;
+                    case Q.End:
+                        EndEntry = e;
+                        break;
+                }
+            }
+
+            public override bool Finished()
+            {
+                return StartEntry != null && EndEntry != null;
+            }
+        }
+        #region string[] _logForSimpleCollectTest
+        string[] _logForSimpleCollectTest = new[]
+        {
+            ">60\t2017-11-13 03:55:48.49992\tSystem\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:5\t\t\t\tCPU: 0%, RAM: 680960 KBytes available (working set: 258744320 bytes)",
+            ">61\t2017-11-13 03:55:53.51096\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:18\t\t\t\tPCM.OnEnter GET http://snbweb01.sn.hu/",
+            "62\t2017-11-13 03:55:53.51096\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:18\t\t\t\tHTTP Action.ActionType: DefaultHttpAction, TargetNode: [null], AppNode: [null], RequestUrl:http://snbweb01.sn.hu/",
+            "63\t2017-11-13 03:55:53.52746\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:18\t\t\t\tPortalAuthenticationModule.OnEndRequest. Url:http://snbweb01.sn.hu/, StatusCode:200",
+            "64\t2017-11-13 03:55:53.52746\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:18\t\t\t\tPCM.OnEndRequest GET http://snbweb01.sn.hu/",
+            ">65\t2017-11-13 03:55:53.65160\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:19\t\t\t\tPCM.OnEnter GET http://snbweb01.sn.hu/favicon.ico",
+            "66\t2017-11-13 03:55:53.65160\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:19\t\t\t\tHTTP Action.ActionType: DefaultHttpAction, TargetNode: [null], AppNode: [null], RequestUrl:http://snbweb01.sn.hu/favicon.ico",
+            "67\t2017-11-13 03:55:53.74574\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:19\t\t\t\tPortalAuthenticationModule.OnEndRequest. Url:http://snbweb01.sn.hu/favicon.ico, StatusCode:200",
+            "68\t2017-11-13 03:55:53.74574\tWeb\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:19\t\t\t\tPCM.OnEndRequest GET http://snbweb01.sn.hu/favicon.ico",
+            ">69\t2017-11-13 03:55:58.50896\tSystem\tA:/LM/W3SVC/9/ROOT-1-131550188456390176\tT:9\t\t\t\tCPU: 3,922418%, RAM: 570948 KBytes available (working set: 256319488 bytes)",
+        };
+        #endregion
+        [TestMethod]
+        public void SnTrace_Analysis_SimpleCollect()
+        {
+            var sb = new StringBuilder();
+            using (var writer = new StringWriter(sb))
+            using (var logFlow = Reader.Create(_logForSimpleCollectTest))
+            {
+                var aps = new AppDomainSimplifier("App{0}");
+
+                var transformedLogFlow = logFlow
+                    .Where(e => e.Category == Category.Web)
+                    .Select(e => { e.AppDomain = aps.Simplify(e.AppDomain); return e; })
+                    .Collect<Entry, WebRequestEntryCollection>((e) =>
+                    {
+                        if (e.Message.StartsWith("PCM.OnEnter "))
+                            return new Tuple<string, string>($"{e.AppDomain}|{e.ThreadId}|{e.Message.Substring("PCM.OnEnter ".Length)}", WebRequestEntryCollection.Q.Start);
+                        else if (e.Message.StartsWith("PCM.OnEndRequest "))
+                            return new Tuple<string, string>($"{e.AppDomain}|{e.ThreadId}|{e.Message.Substring("PCM.OnEndRequest ".Length)}", WebRequestEntryCollection.Q.End);
                         return null;
-                }
-
-
-                if (input.Status == Status.End)
+                    })
+                    .Take(50);
+                foreach (var item in transformedLogFlow)
                 {
-                    switch (input.Message)
-                    {
-                        case "Op1":
-                            record.Op1Duration = input.Duration;
-                            return null;
-                        case "Op2":
-                            record.Op2Duration = input.Duration;
-                            return null;
-                        default:
-                            Assert.Inconclusive();
-                            break;
-                    }
+                    var app = item.StartEntry.AppDomain;
+                    var time = item.StartEntry.Time.ToString("HH:mm:ss.fffff");
+                    var req = item.StartEntry.Message.Substring("PCM.OnEnter ".Length);
+                    var dt = item.EndEntry.Time - item.StartEntry.Time;
+                    writer.WriteLine($"{app}\t{time}\t{dt}\t{req}");
                 }
-                else if (input.Message == "TEST END")
-                {
-                    record.GeneralDuration = input.Time - record.Time;
-                    _records.Remove(key);
-                    return record;
-                }
-                return null;
             }
-        }
 
-        private class TestTransformer : Transformer<TestEntry>
-        {
-            public override string Transform(TestEntry entry)
+            // validate
+            var line = new string[3];
+            using (var reader = new StringReader(sb.ToString()))
             {
-                return String.Format("{0}\t{1}\t{2}", entry.Op1Duration, entry.Op2Duration, entry.GeneralDuration);
+                // app   start-time      duration          request
+                // ----  --------------  ----------------  -------------------------------------
+                // App1  03:55:53.51096  00:00:00.0165000  GET http://snbweb01.sn.hu/
+                // App1  03:55:53.65160  00:00:00.0941400  GET http://snbweb01.sn.hu/favicon.ico
+                line[0] = reader.ReadLine();
+                line[1] = reader.ReadLine();
+                line[2] = reader.ReadLine();
             }
+            Assert.IsNull(line[2]);
+            var item0 = line[0].Split('\t');
+            var item1 = line[1].Split('\t');
+
+            Assert.AreEqual("App1", item0[0]);
+            Assert.AreEqual("App1", item1[0]);
+            Assert.AreEqual("03:55:53.51096", item0[1]);
+            Assert.AreEqual("03:55:53.65160", item1[1]);
+            Assert.AreEqual("00:00:00.0165000", item0[2]);
+            Assert.AreEqual("00:00:00.0941400", item1[2]);
+            Assert.AreEqual("GET http://snbweb01.sn.hu/", item0[3]);
+            Assert.AreEqual("GET http://snbweb01.sn.hu/favicon.ico", item1[3]);
         }
 
     }

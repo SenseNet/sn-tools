@@ -12,6 +12,15 @@ using System.Threading;
 
 namespace SenseNet.Diagnostics
 {
+    public interface ISnTraceWriter
+    {
+        void WriteLine(string traceLine);
+    }
+    public interface ISnTraceWriterAccessor
+    {
+        ISnTraceWriter GetWriter();
+    }
+
     /// <summary>
     /// Efficient and scalable tracing component. Provides methods for recording 
     /// verbose information about the running system. Collects messages into a buffer 
@@ -323,6 +332,13 @@ namespace SenseNet.Diagnostics
 
         //====================================================================== Buffer and Operation
 
+        /// <summary>
+        /// Only for tests. Can contain an instance that provides a context sensitive text writer.
+        /// </summary>
+        internal static ISnTraceWriterAccessor WriterAccessor { get; set; }
+
+        //----------------------------------------------------------------------
+
         private static Operation StartOp(string category, string message, params object[] args)
         {
             var op = new Operation(category) {StartedAt = DateTime.UtcNow};
@@ -334,18 +350,13 @@ namespace SenseNet.Diagnostics
             // protection against unprintable characters
             var line = SafeFormatString(category, isError, null, message, args);
 
-            // writing to the buffer
-            var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            _buffer[p % Config.BufferSize] = line;
+            WriteToBuffer(line);
         }
 
         private static void WriteEndToLog(Operation op)
         {
             var line = FinishOperation(op);
-
-            // writing to the buffer
-            var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            _buffer[p % Config.BufferSize] = line;
+            WriteToBuffer(line);
         }
 
         private static readonly string[] _buffer = new string[Config.BufferSize];
@@ -366,9 +377,7 @@ namespace SenseNet.Diagnostics
             // protection against unprintable characters
             var line = SafeFormatString(category, false, op, message, args);
 
-            // writing to the buffer
-            var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            _buffer[p % Config.BufferSize] = line;
+            WriteToBuffer(line);
         }
 
         private static string SafeFormatString(string category, bool isError, Operation op, string message, params object[] args)
@@ -483,6 +492,19 @@ namespace SenseNet.Diagnostics
             return line;
         }
 
+        private static void WriteToBuffer(string traceLine)
+        {
+            // Use the custom writer if exists.
+            if (WriterAccessor != null)
+            {
+                WriterAccessor.GetWriter().WriteLine(traceLine);
+                return;
+            }
+            // Put the line into the buffer.
+            var p = Interlocked.Increment(ref _bufferPosition) - 1;
+            _buffer[p % Config.BufferSize] = traceLine;
+        }
+
         /*================================================================== File writer */
 
         private static int _lineCounter;
@@ -493,6 +515,10 @@ namespace SenseNet.Diagnostics
         private static readonly object WriteSync = new object();
         private static void WriteToFile()
         {
+            // Skip writing if there is a custom writer.
+            if (WriterAccessor != null)
+                return;
+
             lock (WriteSync)
             {
                 _timer.Change(Timeout.Infinite, Timeout.Infinite); //stops the timer

@@ -71,5 +71,41 @@ namespace SenseNet.Tools.Tests
             return fields?[col];
         }
 
+        protected IDisposable UseTestWriter(List<string> lineBuffer)
+        {
+            var writer = new TestWriter(lineBuffer, SnTrace.WriterAccessor);
+            SnTrace.WriterAccessor = writer;
+            return writer;
+        }
+
+        private class TestWriter : ISnTraceWriter, ISnTraceWriterAccessor, IDisposable
+        {
+            private List<string> _lineBuffer;
+            ISnTraceWriterAccessor _savedInstance;
+
+            public TestWriter(List<string> lineBuffer, ISnTraceWriterAccessor savedInstance)
+            {
+                _lineBuffer = lineBuffer;
+                _savedInstance = savedInstance;
+            }
+
+            // ISnTraceWriterAccessor item
+            public ISnTraceWriter GetWriter()
+            {
+                return this;
+            }
+
+            // ISnTraceWriter item
+            public void WriteLine(string traceLine)
+            {
+                _lineBuffer.Add(traceLine);
+            }
+
+            // IDisposable item
+            public void Dispose()
+            {
+                SnTrace.WriterAccessor = _savedInstance;
+            }
+        }
     }
 }

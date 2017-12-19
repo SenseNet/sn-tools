@@ -51,6 +51,9 @@
     <Compile Include="Configuration\IConfigProvider.cs" />
     <Compile Include="Configuration\SnConfig.cs" />
     <Compile Include="Configuration\SnConfigProvider.cs" />
+    <Compile Include="Diagnostics\Analysis\Extensions.cs" />
+    <Compile Include="Diagnostics\Analysis\GenericCollector.cs" />
+    <Compile Include="Diagnostics\Analysis\InMemoryEntryReader.cs" />
     <Compile Include="Tools\CommandLineArguments\Argument.cs" />
     <Compile Include="Tools\CommandLineArguments\NoNameOptionAttribute.cs" />
     <Compile Include="Tools\CommandLineArguments\OptionAttribute.cs" />
@@ -59,17 +62,10 @@
     <Compile Include="Tools\CommandLineArguments\ParsingException.cs" />
     <Compile Include="Diagnostics\Analysis\Category.cs" />
     <Compile Include="Diagnostics\Analysis\DirectoryReader.cs" />
-    <Compile Include="Diagnostics\Analysis\EntryEnumerable.cs" />
     <Compile Include="Diagnostics\Analysis\FileReader.cs" />
-    <Compile Include="Diagnostics\Analysis\Filter.cs" />
-    <Compile Include="Diagnostics\Analysis\GenericLinker.cs" />
-    <Compile Include="Diagnostics\Analysis\GenericTransformer.cs" />
-    <Compile Include="Diagnostics\Analysis\Linker.cs" />
-    <Compile Include="Diagnostics\Analysis\LinkerState.cs" />
     <Compile Include="Diagnostics\Analysis\Reader.cs" />
     <Compile Include="Diagnostics\Analysis\SessionReader.cs" />
     <Compile Include="Diagnostics\Analysis\SessionReaderEnumerator.cs" />
-    <Compile Include="Diagnostics\Analysis\Transformer.cs" />
     <Compile Include="Diagnostics\Analysis\Status.cs" />
     <Compile Include="Diagnostics\DebugEventLogger.cs" />
     <Compile Include="Diagnostics\IAuditEvent.cs" />
