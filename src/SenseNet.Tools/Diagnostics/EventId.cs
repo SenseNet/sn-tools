@@ -1,7 +1,7 @@
 ﻿namespace SenseNet.Diagnostics
 {
     /// <summary>
-    /// Contains all event ids in Sense/Net ECM including satellite applications and external components.
+    /// Contains well-known event ids in sensenet ECM.
     /// In your custom code please consider defining custom event ids and use these built-in values only 
     /// if the event is truly related to the feature it is defined for.
     /// </summary>
@@ -49,6 +49,9 @@
         public static readonly int ClientEvent = 150;
         /// <summary>Preview generation related event. Value: 160</summary>
         public static readonly int Preview = 160;
+
+        /// <summary>Configuration related event.</summary>
+        public static readonly int Configuration = 180;
 
         /// <summary>Contains Task Management related event ids.</summary>
         public static class TaskManagement

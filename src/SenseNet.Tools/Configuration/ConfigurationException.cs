@@ -1,4 +1,6 @@
 ﻿using System;
+using SenseNet.Diagnostics;
+using SenseNet.Tools;
 
 namespace SenseNet.Configuration
 {
@@ -6,20 +8,21 @@ namespace SenseNet.Configuration
     /// The exception that is thrown when a configuration-related error occurs.
     /// </summary>
     [Serializable]
-    public class ConfigurationException : Exception
+    public class ConfigurationException : ExceptionBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationException"/> class.
         /// </summary>
-        public ConfigurationException() { }
+        public ConfigurationException():base(EventId.Configuration) { }
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationException"/> class.
         /// </summary>
-        public ConfigurationException(string message) : base(message) { }
+        public ConfigurationException(string message) : base(EventId.Configuration, message) { }
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationException"/> class.
         /// </summary>
-        public ConfigurationException(string message, Exception inner) : base(message, inner) { }
+        public ConfigurationException(string message, Exception inner) : base(EventId.Configuration, message, inner) { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationException"/> class.
         /// </summary>
