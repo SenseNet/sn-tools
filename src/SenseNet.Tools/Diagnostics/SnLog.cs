@@ -165,7 +165,7 @@ namespace SenseNet.Diagnostics
         {
             while (e != null)
             {
-                if (e is ExceptionBase eb)
+                if (e is SnException eb)
                     return eb.ErrorNumber;
 
                 if (e.Data.Contains(EventIdKey))

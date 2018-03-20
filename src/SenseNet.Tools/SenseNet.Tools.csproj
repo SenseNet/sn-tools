@@ -82,7 +82,7 @@
     <Compile Include="Diagnostics\Analysis\Entry.cs" />
     <Compile Include="Diagnostics\TraceEventLogger.cs" />
     <Compile Include="Diagnostics\EventId.cs" />
-    <Compile Include="Tools\ExceptionBase.cs" />
+    <Compile Include="SnException.cs" />
     <Compile Include="Tools\Extensions.cs" />
     <Compile Include="Tools\Retrier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

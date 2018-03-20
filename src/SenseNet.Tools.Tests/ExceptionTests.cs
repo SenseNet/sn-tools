@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
 
@@ -17,7 +13,7 @@ namespace SenseNet.Tools.Tests
     {
         #region Nested classes
 
-        internal class MyCustomException : ExceptionBase
+        internal class MyCustomException : SnException
         {
             internal static int MyCustomEventId = 1234567;
 
@@ -38,14 +34,14 @@ namespace SenseNet.Tools.Tests
         #endregion
 
         [TestMethod]
-        public void Exceptions_GetEventId_ExceptionBase()
+        public void Exceptions_GetEventId_SnException()
         {
             var eventId = SnLog.GetEventId(new MyCustomException("MSG"));
 
             Assert.AreEqual(MyCustomException.MyCustomEventId, eventId);
         }
         [TestMethod]
-        public void Exceptions_GetEventId_ExceptionBase_Deep()
+        public void Exceptions_GetEventId_SnException_Deep()
         {
             // find event id in inner exception
             var deepException = new Exception("MSG1",

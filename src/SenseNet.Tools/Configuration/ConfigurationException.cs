@@ -8,7 +8,7 @@ namespace SenseNet.Configuration
     /// The exception that is thrown when a configuration-related error occurs.
     /// </summary>
     [Serializable]
-    public class ConfigurationException : ExceptionBase
+    public class ConfigurationException : SnException
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationException"/> class.
