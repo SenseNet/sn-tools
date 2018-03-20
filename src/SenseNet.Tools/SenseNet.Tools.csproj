@@ -52,6 +52,7 @@
     <Compile Include="Configuration\IConfigProvider.cs" />
     <Compile Include="Configuration\SnConfig.cs" />
     <Compile Include="Configuration\SnConfigProvider.cs" />
+    <Compile Include="SnNotSupportedException.cs" />
     <Compile Include="Tools\CommandLineArguments\Argument.cs" />
     <Compile Include="Tools\CommandLineArguments\NoNameOptionAttribute.cs" />
     <Compile Include="Tools\CommandLineArguments\OptionAttribute.cs" />
