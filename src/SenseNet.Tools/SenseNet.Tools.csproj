@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationException.cs" />
+    <Compile Include="Configuration\SnConfigurationException.cs" />
     <Compile Include="Configuration\IConfigProvider.cs" />
     <Compile Include="Configuration\SnConfig.cs" />
     <Compile Include="Configuration\SnConfigProvider.cs" />
