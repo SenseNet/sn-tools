@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Text;
 
 namespace SenseNet.Tools
@@ -85,6 +88,43 @@ namespace SenseNet.Tools
                     sb.AppendLine(fileNotFoundException.FusionLog);
                 }
             }
+        }
+
+        /// <summary>
+        /// Collects the list of types involved in the type load exception. Looks for
+        /// information in the LoaderExceptions property, recognizing <see cref="FileLoadException"/>,
+        /// <see cref="FileNotFoundException"/>, <see cref="BadImageFormatException"/>, 
+        /// <see cref="SecurityException"/> and <see cref="TypeLoadException"/>.
+        /// </summary>
+        public static IEnumerable<string> GetTypeLoadErrorTypes(ReflectionTypeLoadException ex)
+        {
+            var types = new List<string>();
+            if (ex?.LoaderExceptions == null)
+                return types;
+
+            foreach (var item in ex.LoaderExceptions)
+            {
+                switch (item)
+                {
+                    case FileLoadException flo:
+                        types.Add(flo.FileName);
+                        break;
+                    case FileNotFoundException f:
+                        types.Add(f.FileName);
+                        break;
+                    case BadImageFormatException b:
+                        types.Add(b.FileName);
+                        break;
+                    case SecurityException s:
+                        types.Add(s.Url);
+                        break;
+                    case TypeLoadException tl:
+                        types.Add(tl.TypeName);
+                        break;
+                }
+            }
+
+            return types;
         }
     }
 }

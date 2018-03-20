@@ -161,17 +161,19 @@ namespace SenseNet.Diagnostics
         }
 
         private const string EventIdKey = "EventId";
-        private static int GetEventId(Exception e)
+        internal static int GetEventId(Exception e)
         {
             while (e != null)
             {
+                if (e is SnException eb)
+                    return eb.ErrorNumber;
+
                 if (e.Data.Contains(EventIdKey))
                 {
                     var eventIdObject = e.Data[EventIdKey];
                     if (eventIdObject != null)
                     {
-                        int eventId;
-                        if (int.TryParse(eventIdObject.ToString(), out eventId))
+                        if (int.TryParse(eventIdObject.ToString(), out var eventId))
                             return eventId;
                     }
                     return DefaultEventId;
