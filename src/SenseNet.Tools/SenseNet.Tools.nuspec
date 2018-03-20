@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-    <metadata>
-        <id>SenseNet.Tools</id>
-        <version>$version$</version>
-        <title>Sense/Net Tools for .Net</title>
-        <authors>tusmester,kavics</authors>
-        <owners>Sense/Net</owners>
-        <licenseUrl>https://github.com/SenseNet/sn-tools/blob/master/LICENSE</licenseUrl>
-        <projectUrl>https://github.com/SenseNet/sn-tools</projectUrl>
-        <iconUrl>https://raw.githubusercontent.com/SenseNet/sn-resources/master/images/sn-icon/sensenet-icon-64.png</iconUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>General .Net tools that can be used even in projects independent from Sense/Net ECM.</description>
-        <copyright>Copyright © Sense/Net Inc.</copyright>
-        <language>en-US</language>
-        <tags>sensenet tools</tags>
-    </metadata>
+  <metadata>
+    <id>SenseNet.Tools</id>
+    <version>$version$</version>
+    <title>sensenet ECM Tools</title>
+    <authors>tusmester,kavics</authors>
+    <owners>Sense/Net</owners>
+    <licenseUrl>https://github.com/SenseNet/sn-tools/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/SenseNet/sn-tools</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/SenseNet/sn-resources/master/images/sn-icon/sensenet-icon-64.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>General .Net tools that can be used even in projects independent from sensenet ECM.</description>
+    <releaseNotes>See release notes on GitHub.</releaseNotes>
+    <copyright>Copyright © Sense/Net Inc.</copyright>
+    <language>en-US</language>
+    <tags>sensenet tools</tags>
+  </metadata>
 </package>
