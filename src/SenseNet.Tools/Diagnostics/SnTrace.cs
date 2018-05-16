@@ -325,7 +325,12 @@ namespace SenseNet.Diagnostics
         private static Operation StartOp(string category, string message, params object[] args)
         {
             var op = new Operation(category) {StartedAt = DateTime.UtcNow};
-            Log(category, op, message, args);
+
+            // protection against unprintable characters
+            var line = SafeFormatString(category, false, op, message, args);
+
+            WriteToBuffer(line);
+
             return op;
         }
         internal static void Log(string category, bool isError, string message, params object[] args)
@@ -333,18 +338,13 @@ namespace SenseNet.Diagnostics
             // protection against unprintable characters
             var line = SafeFormatString(category, isError, null, message, args);
 
-            // writing to the buffer
-            var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            Buffer[p % Config.BufferSize] = line;
+            WriteToBuffer(line);
         }
 
         private static void WriteEndToLog(Operation op)
         {
             var line = FinishOperation(op);
-
-            // writing to the buffer
-            var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            Buffer[p % Config.BufferSize] = line;
+            WriteToBuffer(line);
         }
 
         private static readonly string[] Buffer = new string[Config.BufferSize];
@@ -361,14 +361,37 @@ namespace SenseNet.Diagnostics
 
         /*================================================================== Logger */
 
-        private static void Log(string category, Operation op, string message, params object[] args)
+        private static void WriteToBuffer(string line)
         {
-            // protection against unprintable characters
-            var line = SafeFormatString(category, false, op, message, args);
-
             // writing to the buffer
             var p = Interlocked.Increment(ref _bufferPosition) - 1;
             Buffer[p % Config.BufferSize] = line;
+        }
+
+        private static string Escape(string input)
+        {
+            var c = input.ToCharArray();
+            for (var i = 0; i < c.Length; i++)
+                if (c[i] < ' ' && c[i] != '\t')
+                    c[i] = '.';
+            return new string(c);
+        }
+
+        private static string FinishOperation(Operation op)
+        {
+            var lineCounter = Interlocked.Increment(ref _lineCounter);
+
+            var line = string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tOp:{5}\t{6}\t{7:hh\':\'mm\':\'ss\'.\'ffffff}\t{8}"
+                , lineCounter
+                , DateTime.UtcNow, op.Category
+                , AppDomainName
+                , Thread.CurrentThread.ManagedThreadId
+                , op.Id
+                , op.Successful ? "End" : "UNTERMINATED"
+                , DateTime.UtcNow - op.StartedAt
+                , op.Message);
+
+            return line;
         }
 
         private static string SafeFormatString(string category, bool isError, Operation op, string message, params object[] args)
@@ -451,32 +474,6 @@ namespace SenseNet.Diagnostics
 
             if (op != null)
                 op.Message = msg;
-
-            return line;
-        }
-
-        private static string Escape(string input)
-        {
-            var c = input.ToCharArray();
-            for (var i = 0; i < c.Length; i++)
-                if (c[i] < ' ' && c[i] != '\t')
-                    c[i] = '.';
-            return new string(c);
-        }
-
-        private static string FinishOperation(Operation op)
-        {
-            var lineCounter = Interlocked.Increment(ref _lineCounter);
-
-            var line = string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tOp:{5}\t{6}\t{7:hh\':\'mm\':\'ss\'.\'ffffff}\t{8}"
-                , lineCounter
-                , DateTime.UtcNow, op.Category
-                , AppDomainName
-                , Thread.CurrentThread.ManagedThreadId
-                , op.Id
-                , op.Successful ? "End" : "UNTERMINATED"
-                , DateTime.UtcNow - op.StartedAt
-                , op.Message);
 
             return line;
         }
