@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -81,6 +82,8 @@ namespace SenseNet.Diagnostics.Analysis
         /// Original line data.
         /// </summary>
         public string Raw;
+
+        public Dictionary<string, Entry> Associations { get; set; }
 
         private Entry() { }
         public Entry(Entry sourceEntry)
