@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -62,7 +61,7 @@ namespace SenseNet.Diagnostics
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException(string.Format("Invalid configuration: key: '{0}', value: '{1}'.", key, value), e);
+                    throw new ApplicationException($"Invalid configuration: key: '{key}', value: '{value}'.", e);
                 }
             }
         }
@@ -336,7 +335,7 @@ namespace SenseNet.Diagnostics
 
             // writing to the buffer
             var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            _buffer[p % Config.BufferSize] = line;
+            Buffer[p % Config.BufferSize] = line;
         }
 
         private static void WriteEndToLog(Operation op)
@@ -345,10 +344,10 @@ namespace SenseNet.Diagnostics
 
             // writing to the buffer
             var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            _buffer[p % Config.BufferSize] = line;
+            Buffer[p % Config.BufferSize] = line;
         }
 
-        private static readonly string[] _buffer = new string[Config.BufferSize];
+        private static readonly string[] Buffer = new string[Config.BufferSize];
 
         private static long _bufferPosition; // this field is incremented by every logger thread.
         private static long _lastBufferPosition; // this field is written by only CollectLines method.
@@ -356,6 +355,7 @@ namespace SenseNet.Diagnostics
         /// <summary>Statistical data: the longest gap between p0 and p1</summary>
         private static long _maxPdiff;
 
+        // ReSharper disable once InconsistentNaming
         private static string __appDomainName;
         private static string AppDomainName => __appDomainName ?? (__appDomainName = AppDomain.CurrentDomain.FriendlyName);
 
@@ -368,24 +368,23 @@ namespace SenseNet.Diagnostics
 
             // writing to the buffer
             var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            _buffer[p % Config.BufferSize] = line;
+            Buffer[p % Config.BufferSize] = line;
         }
 
         private static string SafeFormatString(string category, bool isError, Operation op, string message, params object[] args)
         {
             var lineCounter = Interlocked.Increment(ref _lineCounter);
             var line = op != null
-                ? string.Format("{0}\t{1}\t{2}\tA:{3}\tT:{4}\tOp:{5}\tStart\t\t"
+                ? string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tOp:{5}\tStart\t\t"
                     , lineCounter
-                    , DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fffff")
+                    , DateTime.UtcNow
                     , category
                     , AppDomainName
                     , Thread.CurrentThread.ManagedThreadId
-                    , op.Id
-                    )
-                : string.Format("{0}\t{1}\t{2}\tA:{3}\tT:{4}\t\t{5}\t\t"
+                    , op.Id)
+                : string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\t\t{5}\t\t"
                     , lineCounter
-                    , DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fffff")
+                    , DateTime.UtcNow
                     , category
                     , AppDomainName
                     , Thread.CurrentThread.ManagedThreadId
@@ -399,7 +398,7 @@ namespace SenseNet.Diagnostics
                     var arg = args[i];
                     if (arg is string)
                         continue;
-                    if (arg is System.Collections.IDictionary)
+                    if (arg is IDictionary)
                         continue;
                     if (arg == null)
                     {
@@ -407,7 +406,7 @@ namespace SenseNet.Diagnostics
                         continue;
                     }
 
-                    var enumerable = arg as System.Collections.IEnumerable;
+                    var enumerable = arg as IEnumerable;
                     if (enumerable == null)
                         continue;
 
@@ -469,15 +468,14 @@ namespace SenseNet.Diagnostics
         {
             var lineCounter = Interlocked.Increment(ref _lineCounter);
 
-            var line = string.Format("{0}\t{1}\t{2}\tA:{3}\tT:{4}\tOp:{5}\t{6}\t{7}\t{8}"
+            var line = string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tOp:{5}\t{6}\t{7:hh\':\'mm\':\'ss\'.\'ffffff}\t{8}"
                 , lineCounter
-                , DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fffff")
-                , op.Category
+                , DateTime.UtcNow, op.Category
                 , AppDomainName
                 , Thread.CurrentThread.ManagedThreadId
                 , op.Id
                 , op.Successful ? "End" : "UNTERMINATED"
-                , (DateTime.UtcNow - op.StartedAt).ToString("hh':'mm':'ss'.'ffffff")
+                , DateTime.UtcNow - op.StartedAt
                 , op.Message);
 
             return line;
@@ -488,14 +486,14 @@ namespace SenseNet.Diagnostics
         private static int _lineCounter;
         private static int _lastLineCounter;
 
-        private static readonly Timer _timer = new Timer(_ => WriteToFile(), null, Config.WriteToFileDelay, Config.WriteToFileDelay);
+        private static readonly Timer Timer = new Timer(_ => WriteToFile(), null, Config.WriteToFileDelay, Config.WriteToFileDelay);
 
         private static readonly object WriteSync = new object();
         private static void WriteToFile()
         {
             lock (WriteSync)
             {
-                _timer.Change(Timeout.Infinite, Timeout.Infinite); //stops the timer
+                Timer.Change(Timeout.Infinite, Timeout.Infinite); //stops the timer
 
                 var text = CollectLines();
                 if (text != null)
@@ -506,14 +504,14 @@ namespace SenseNet.Diagnostics
                         var lineCounter = _lineCounter;
                         if (lineCounter - _lastLineCounter > Config.LinesPerTrace)
                         {
-                            var msg = string.Format("MaxPdiff: {0}", _maxPdiff);
+                            var msg = $"MaxPdiff: {_maxPdiff}";
                             writer.WriteLine(msg);
 
                             _lastLineCounter = lineCounter;
                         }
                     }
                 }
-                _timer.Change(Config.WriteToFileDelay, Config.WriteToFileDelay); //restart
+                Timer.Change(Config.WriteToFileDelay, Config.WriteToFileDelay); //restart
             }
         }
         private static StringBuilder CollectLines()
@@ -536,7 +534,7 @@ namespace SenseNet.Diagnostics
             while (p0 < p1)
             {
                 var p = p0 % Config.BufferSize;
-                var line = _buffer[p];
+                var line = Buffer[p];
                 sb.AppendLine(line);
                 p0++;
             }
@@ -546,7 +544,7 @@ namespace SenseNet.Diagnostics
             return sb;
         }
 
-        private static readonly object _sync = new object();
+        private static readonly object Sync = new object();
         private static short _lineCount;
         private static string _logFilePath;
         private static string LogFilePath
@@ -555,7 +553,7 @@ namespace SenseNet.Diagnostics
             {
                 if (_logFilePath == null || _lineCount >= Config.MaxWritesInOneFile)
                 {
-                    lock (_sync)
+                    lock (Sync)
                     {
                         if (_logFilePath == null || _lineCount >= Config.MaxWritesInOneFile)
                         {
@@ -584,6 +582,7 @@ namespace SenseNet.Diagnostics
             return Path.Combine(baseDirectoryPath, "App_Data\\DetailedLog");
         }
 
+        // ReSharper disable once InconsistentNaming
         private static string __logDirectory;
         private static string LogDirectory
         {
