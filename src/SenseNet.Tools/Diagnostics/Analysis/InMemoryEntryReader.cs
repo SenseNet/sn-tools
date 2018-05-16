@@ -20,7 +20,7 @@ namespace SenseNet.Diagnostics.Analysis
             foreach (var item in _entrySource)
             {
                 var entry = Entry.Parse(item);
-                if(entry != null)
+                if (entry != null)
                     yield return entry;
             }
         }

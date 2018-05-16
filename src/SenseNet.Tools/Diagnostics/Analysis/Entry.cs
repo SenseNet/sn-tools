@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -82,7 +83,9 @@ namespace SenseNet.Diagnostics.Analysis
         /// </summary>
         public string Raw;
 
-        public Entry() { }
+        public Dictionary<string, Entry> Associations { get; set; }
+
+        private Entry() { }
         public Entry(Entry sourceEntry)
         {
             CopyPropertiesFrom(sourceEntry);
@@ -181,10 +184,7 @@ namespace SenseNet.Diagnostics.Analysis
         /// </summary>
         public override string ToString()
         {
-            var block = BlockStart ? ">" : "";
-            var time = Time.ToString("yyyy-MM-dd HH:mm:ss.fffff");
-            var op = OpId > 0 ? "Op:" + OpId : "";
-            return $"{block}{LineId}\t{time}\t{Category}\tA:{AppDomain}\tT:{ThreadId}\t{op}\t{Status}\t{Message}";
+            return Raw;
         }
 
     }

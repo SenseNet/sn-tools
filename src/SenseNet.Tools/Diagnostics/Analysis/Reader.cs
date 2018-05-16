@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace SenseNet.Diagnostics.Analysis
     /// <summary>
     /// EXPERIMENTAL FEATURE
     /// </summary>
-    public abstract class Reader : IEnumerable<Entry>, IDisposable
+    public abstract class Reader : EntryEnumerable<Entry>
     {
         public static Reader Create(string path)
         {
@@ -50,17 +49,11 @@ namespace SenseNet.Diagnostics.Analysis
             return new SessionReader(entrySources.Select(e => new InMemoryEntryReader(e)));
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         protected abstract void Dispose(bool disposing);
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        public abstract IEnumerator<Entry> GetEnumerator();
     }
 }
