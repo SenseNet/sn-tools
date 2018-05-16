@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Reflection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Tools.CommandLineArguments;
 // ReSharper disable ArgumentsStyleStringLiteral
 // ReSharper disable ArgumentsStyleLiteral
@@ -191,7 +192,7 @@ namespace SenseNet.Tools.Tests
             Assert.IsTrue(parser.IsHelp);
             var help = parser.GetHelpText();
 
-            Assert.AreEqual(Args2.ExpectedHelpText.Trim(), help.Trim());
+            Assert.AreEqual(Args2.GetExpectedHelpText().Trim(), help.Trim());
         }
 
         [TestMethod]
@@ -342,7 +343,7 @@ namespace SenseNet.Tools.Tests
             }
             catch (ParsingException e)
             {
-                Assert.AreEqual(Args2.ExpectedHelpText.Trim(), e.Result.GetHelpText().Trim());
+                Assert.AreEqual(Args2.GetExpectedHelpText().Trim(), e.Result.GetHelpText().Trim());
             }
         }
     }
@@ -384,7 +385,10 @@ namespace SenseNet.Tools.Tests
         [CommandLineArgument(name: "INT", aliases: "i", helpText: "Description INT")]
         internal int IntParam1 { get; set; }
 
-        internal const string ExpectedHelpText = @"SenseNet.Tools.Tests 2.0.1.0
+        internal static string GetExpectedHelpText()
+        {
+            var asmName = Assembly.GetExecutingAssembly().GetName();
+            return $@"{asmName.Name} {asmName.Version}
 
 Usage:
 SenseNet.Tools.Tests <source> <target> [-A:Boolean] [-B:Boolean] [-C:Boolean] [-INT:Int32] <-STRING:String> [?]
@@ -415,6 +419,7 @@ SenseNet.Tools.Tests <source> <target> [-A:Boolean] [-B:Boolean] [-C:Boolean] [-
 [?, -?, /?, -h, -H, /h /H -help --help] (optional)
     Display this text.
 ";
+        }
     }
     internal class Args3
     {
