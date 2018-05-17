@@ -52,7 +52,10 @@
     <Compile Include="Configuration\IConfigProvider.cs" />
     <Compile Include="Configuration\SnConfig.cs" />
     <Compile Include="Configuration\SnConfigProvider.cs" />
+    <Compile Include="Diagnostics\BufferedSnTraceProvider.cs" />
     <Compile Include="Diagnostics\ISnTraceProvider.cs" />
+    <Compile Include="Diagnostics\SnDebugViewTraceProvider.cs" />
+    <Compile Include="Diagnostics\SnFileSystemTraceProvider.cs" />
     <Compile Include="SnNotSupportedException.cs" />
     <Compile Include="Tools\CommandLineArguments\Argument.cs" />
     <Compile Include="Tools\CommandLineArguments\NoNameOptionAttribute.cs" />
