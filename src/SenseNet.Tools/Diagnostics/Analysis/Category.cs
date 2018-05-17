@@ -25,7 +25,7 @@
         /// <summary>SecurityQueue category</summary>
         public static readonly string SecurityQueue = "SecurityQueue";
         /// <summary>System category</summary>
-        public static readonly string System =  "System";
+        public static readonly string System = "System";
         /// <summary>Web category</summary>
         public static readonly string Web = "Web";
         /// <summary>Workflow category</summary>
