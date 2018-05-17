@@ -21,51 +21,6 @@ namespace SenseNet.Diagnostics
     {
         //====================================================================== Nested classess
 
-        private static class Config
-        {
-            public static readonly long BufferSize;
-            public static readonly int WriteToFileDelay;
-            public static readonly short MaxWritesInOneFile;
-            public static readonly int LinesPerTrace;
-
-            private static readonly string[] AvailableSections = { "detailedLogger", "sensenet/detailedLogger" };
-
-            static Config()
-            {
-                NameValueCollection collection = null;
-                foreach (var availableSection in AvailableSections)
-                {
-                    collection = ConfigurationManager.GetSection(availableSection) as NameValueCollection;
-                    if (collection != null)
-                        break;
-                }
-
-                BufferSize = Parse<long>(collection, "BufferSize", 10000);
-                WriteToFileDelay = Parse(collection, "WriteToFileDelay", 1000);
-                MaxWritesInOneFile = Parse<short>(collection, "MaxWritesInOneFile", 100);
-                LinesPerTrace = Parse(collection, "LinesPerTrace", 1000);
-            }
-
-            private static T Parse<T>(NameValueCollection collection, string key, T defaultValue)
-            {
-                if (collection == null)
-                    return defaultValue;
-
-                var value = collection.Get(key);
-                if (string.IsNullOrEmpty(value))
-                    return defaultValue;
-
-                try
-                {
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
-                catch (Exception e)
-                {
-                    throw new ApplicationException($"Invalid configuration: key: '{key}', value: '{value}'.", e);
-                }
-            }
-        }
-
         /// <summary>
         /// Represents an execution block that needs a start and finish log message
         /// regardless of whether the execution was successful or not. The two
@@ -320,6 +275,12 @@ namespace SenseNet.Diagnostics
             }
         }
 
+        public static void Flush()
+        {
+            foreach (var provider in SnTraceProviders)
+                provider.Flush();
+        }
+
         //====================================================================== Buffer and Operation
 
         private static Operation StartOp(string category, string message, params object[] args)
@@ -329,7 +290,7 @@ namespace SenseNet.Diagnostics
             // protection against unprintable characters
             var line = SafeFormatString(category, false, op, message, args);
 
-            WriteToBuffer(line);
+            WriteToProviders(line);
 
             return op;
         }
@@ -338,22 +299,15 @@ namespace SenseNet.Diagnostics
             // protection against unprintable characters
             var line = SafeFormatString(category, isError, null, message, args);
 
-            WriteToBuffer(line);
+            WriteToProviders(line);
         }
 
         private static void WriteEndToLog(Operation op)
         {
             var line = FinishOperation(op);
-            WriteToBuffer(line);
+            WriteToProviders(line);
         }
 
-        private static readonly string[] Buffer = new string[Config.BufferSize];
-
-        private static long _bufferPosition; // this field is incremented by every logger thread.
-        private static long _lastBufferPosition; // this field is written by only CollectLines method.
-
-        /// <summary>Statistical data: the longest gap between p0 and p1</summary>
-        private static long _maxPdiff;
 
         // ReSharper disable once InconsistentNaming
         private static string __appDomainName;
@@ -361,12 +315,13 @@ namespace SenseNet.Diagnostics
 
         /*================================================================== Logger */
 
-        private static void WriteToBuffer(string line)
+        public static ISnTraceProvider[] SnTraceProviders { get; set; } = {new SnFileSystemTraceProvider()};
+        private static void WriteToProviders(string line)
         {
-            // writing to the buffer
-            var p = Interlocked.Increment(ref _bufferPosition) - 1;
-            Buffer[p % Config.BufferSize] = line;
+            foreach (var provider in SnTraceProviders)
+                provider.Write(line);
         }
+
 
         private static string Escape(string input)
         {
@@ -376,6 +331,8 @@ namespace SenseNet.Diagnostics
                     c[i] = '.';
             return new string(c);
         }
+
+        private static int _lineCounter;
 
         private static string FinishOperation(Operation op)
         {
@@ -476,133 +433,6 @@ namespace SenseNet.Diagnostics
                 op.Message = msg;
 
             return line;
-        }
-
-        /*================================================================== File writer */
-
-        private static int _lineCounter;
-        private static int _lastLineCounter;
-
-        private static readonly Timer Timer = new Timer(_ => WriteToFile(), null, Config.WriteToFileDelay, Config.WriteToFileDelay);
-
-        private static readonly object WriteSync = new object();
-        private static void WriteToFile()
-        {
-            lock (WriteSync)
-            {
-                Timer.Change(Timeout.Infinite, Timeout.Infinite); //stops the timer
-
-                var text = CollectLines();
-                if (text != null)
-                {
-                    using (var writer = new StreamWriter(LogFilePath, true))
-                    {
-                        writer.Write(text);
-                        var lineCounter = _lineCounter;
-                        if (lineCounter - _lastLineCounter > Config.LinesPerTrace)
-                        {
-                            var msg = $"MaxPdiff: {_maxPdiff}";
-                            writer.WriteLine(msg);
-
-                            _lastLineCounter = lineCounter;
-                        }
-                    }
-                }
-                Timer.Change(Config.WriteToFileDelay, Config.WriteToFileDelay); //restart
-            }
-        }
-        private static StringBuilder CollectLines()
-        {
-            var p0 = _lastBufferPosition;
-            var p1 = Interlocked.Read(ref _bufferPosition);
-
-            if (p0 == p1)
-                return null;
-
-            var sb = new StringBuilder(">"); // the '>' sign means: block writing start.
-            var pdiff = p1 - p0;
-            if (pdiff > _maxPdiff)
-                _maxPdiff = pdiff;
-            if (pdiff > Config.BufferSize)
-            {
-                sb.AppendFormat("BUFFER OVERRUN ERROR: Buffer size is {0}, unwritten lines : {1}", Config.BufferSize, pdiff).AppendLine();
-            }
-
-            while (p0 < p1)
-            {
-                var p = p0 % Config.BufferSize;
-                var line = Buffer[p];
-                sb.AppendLine(line);
-                p0++;
-            }
-
-            _lastBufferPosition = p1;
-
-            return sb;
-        }
-
-        private static readonly object Sync = new object();
-        private static short _lineCount;
-        private static string _logFilePath;
-        private static string LogFilePath
-        {
-            get
-            {
-                if (_logFilePath == null || _lineCount >= Config.MaxWritesInOneFile)
-                {
-                    lock (Sync)
-                    {
-                        if (_logFilePath == null || _lineCount >= Config.MaxWritesInOneFile)
-                        {
-                            var logFilePath = Path.Combine(LogDirectory, "detailedlog_" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "Z.log");
-                            if (!File.Exists(logFilePath))
-                                using (var fs = new FileStream(logFilePath, FileMode.Create))
-                                using (var wr = new StreamWriter(fs))
-                                    wr.WriteLine("----");
-                            _lineCount = 0;
-                            Trace.WriteLine("SenseNet.Diagnostic.SnTrace file:" + logFilePath);
-                            _logFilePath = logFilePath;
-                        }
-                    }
-                }
-                _lineCount++;
-                return _logFilePath;
-            }
-        }
-
-        /// <summary>
-        /// Extends the given directory with the partial path of the detailed log directory ("App_Data\DetailedLog")
-        /// </summary>
-        /// <param name="baseDirectoryPath">Directory that will contain the log directory</param>
-        public static string GetRelativeLogDirectory(string baseDirectoryPath)
-        {
-            return Path.Combine(baseDirectoryPath, "App_Data\\DetailedLog");
-        }
-
-        // ReSharper disable once InconsistentNaming
-        private static string __logDirectory;
-        private static string LogDirectory
-        {
-            get
-            {
-                if (__logDirectory != null)
-                    return __logDirectory;
-
-                var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data\\DetailedLog");
-                if (!Directory.Exists(logDirectory))
-                    Directory.CreateDirectory(logDirectory);
-                __logDirectory = logDirectory;
-                Trace.WriteLine($"SenseNet.Diagnostic.SnTrace directory: {logDirectory}");
-                return __logDirectory;
-            }
-        }
-
-        /// <summary>
-        /// Writes any buffered data to the underlying device and empties the internal buffer.
-        /// </summary>
-        public static void Flush()
-        {
-            WriteToFile();
         }
     }
 }
