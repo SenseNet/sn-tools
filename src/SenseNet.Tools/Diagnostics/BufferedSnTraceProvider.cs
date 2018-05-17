@@ -10,11 +10,11 @@ namespace SenseNet.Diagnostics
     /// </summary>
     public abstract class BufferedSnTraceProvider : ISnTraceProvider
     {
-        private const int DefaultGufferSize = 10000;
+        private const int DefaultBufferSize = 10000;
         private const int DefaultWriteDelay = 1000;
 
-        private string[] _buffer = new string[DefaultGufferSize];
-        private long _bufferSize = DefaultGufferSize;
+        private string[] _buffer = new string[DefaultBufferSize];
+        private long _bufferSize = DefaultBufferSize;
         private long _bufferPosition; // this field is incremented by every logger thread.
         private long _lastBufferPosition; // this field is written by only CollectLines method.
         private long _writeDelay = DefaultWriteDelay;
