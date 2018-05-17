@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Specialized;
-using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+// ReSharper disable UseStringInterpolation
 
 namespace SenseNet.Diagnostics
 {
@@ -275,6 +273,9 @@ namespace SenseNet.Diagnostics
             }
         }
 
+        /// <summary>
+        /// Clears all buffers in the providers and causes any buffered data to be written to the underlying devices.
+        /// </summary>
         public static void Flush()
         {
             foreach (var provider in SnTraceProviders)
@@ -315,6 +316,9 @@ namespace SenseNet.Diagnostics
 
         /*================================================================== Logger */
 
+        /// <summary>
+        /// Gets or sets the trace provider implementation instances.
+        /// </summary>
         public static ISnTraceProvider[] SnTraceProviders { get; set; } = {new SnFileSystemTraceProvider()};
         private static void WriteToProviders(string line)
         {
