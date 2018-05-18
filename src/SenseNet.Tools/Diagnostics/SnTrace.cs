@@ -278,7 +278,7 @@ namespace SenseNet.Diagnostics
         /// </summary>
         public static void Flush()
         {
-            foreach (var provider in SnTraceProviders)
+            foreach (var provider in SnTracers)
                 provider.Flush();
         }
 
@@ -319,10 +319,10 @@ namespace SenseNet.Diagnostics
         /// <summary>
         /// Gets or sets the trace provider implementation instances.
         /// </summary>
-        public static ISnTraceProvider[] SnTraceProviders { get; set; } = {new SnFileSystemTraceProvider()};
+        public static ISnTracer[] SnTracers { get; set; } = {new SnFileSystemTracer()};
         private static void WriteToProviders(string line)
         {
-            foreach (var provider in SnTraceProviders)
+            foreach (var provider in SnTracers)
                 provider.Write(line);
         }
 

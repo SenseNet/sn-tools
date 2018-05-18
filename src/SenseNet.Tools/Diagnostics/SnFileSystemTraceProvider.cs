@@ -7,9 +7,9 @@ using System.IO;
 namespace SenseNet.Diagnostics
 {
     /// <summary>
-    /// An ISnTraceProvider implementation that persists the SnTrace output to the file system. 
+    /// An ISnTracer implementation that persists the SnTrace output to the file system. 
     /// </summary>
-    public class SnFileSystemTraceProvider : BufferedSnTraceProvider
+    public class SnFileSystemTracer : BufferedSnTracer
     {
         internal class Config
         {
@@ -57,9 +57,9 @@ namespace SenseNet.Diagnostics
         private readonly Config _config;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SnFileSystemTraceProvider"/> class.
+        /// Initializes a new instance of the <see cref="SnFileSystemTracer"/> class.
         /// </summary>
-        public SnFileSystemTraceProvider()
+        public SnFileSystemTracer()
         {
             _config = new Config();
             Initialize(_config.BufferSize, _config.WriteToFileDelay);

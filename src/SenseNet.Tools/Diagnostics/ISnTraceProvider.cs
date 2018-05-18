@@ -3,7 +3,7 @@
     /// <summary>
     /// Defines an API for verbose logging / tracing implementations.
     /// </summary>
-    public interface ISnTraceProvider
+    public interface ISnTracer
     {
         /// <summary>
         /// Writes a single line message.

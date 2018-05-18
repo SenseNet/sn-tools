@@ -6,9 +6,9 @@ namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// Defines a base class for the buffered SnTrace writers.
-    /// Implements the ISnTraceProvider.
+    /// Implements the ISnTracer.
     /// </summary>
-    public abstract class BufferedSnTraceProvider : ISnTraceProvider
+    public abstract class BufferedSnTracer : ISnTracer
     {
         private const int DefaultBufferSize = 10000;
         private const int DefaultWriteDelay = 1000;

@@ -3,10 +3,10 @@
 namespace SenseNet.Diagnostics
 {
     /// <summary>
-    /// An ISnTraceProvider implementation that enables monitoring the SnTrace output
+    /// An ISnTracer implementation that enables monitoring the SnTrace output
     /// (sensenet's verbose log) with the DebugView tool of the Sysinternals. 
     /// </summary>
-    public class SnDebugViewTraceProvider : ISnTraceProvider
+    public class SnDebugViewTracer : ISnTracer
     {
         /// <summary>
         /// Writes the given line to the global Trace channel.
