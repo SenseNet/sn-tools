@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -319,7 +320,7 @@ namespace SenseNet.Diagnostics
         /// <summary>
         /// Gets or sets the trace provider implementation instances.
         /// </summary>
-        public static ISnTracer[] SnTracers { get; set; } = {new SnFileSystemTracer()};
+        public static List<ISnTracer> SnTracers { get; } = new List<ISnTracer>(new[] { new SnFileSystemTracer() });
         private static void WriteToProviders(string line)
         {
             foreach (var provider in SnTracers)
