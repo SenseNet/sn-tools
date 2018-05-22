@@ -5,8 +5,8 @@ using System.Threading;
 namespace SenseNet.Diagnostics
 {
     /// <summary>
-    /// Defines a base class for the buffered SnTrace writers.
-    /// Implements the ISnTracer.
+    /// Defines a base class for buffered SnTrace writers.
+    /// Implements the ISnTracer interface.
     /// </summary>
     public abstract class BufferedSnTracer : ISnTracer
     {
@@ -16,7 +16,7 @@ namespace SenseNet.Diagnostics
         private string[] _buffer = new string[DefaultBufferSize];
         private long _bufferSize = DefaultBufferSize;
         private long _bufferPosition; // this field is incremented by every logger thread.
-        private long _lastBufferPosition; // this field is written by only CollectLines method.
+        private long _lastBufferPosition; // this field is written only by the CollectLines method.
         private long _writeDelay = DefaultWriteDelay;
         private long _blockSizeWarning;
 
@@ -28,9 +28,9 @@ namespace SenseNet.Diagnostics
         /// <summary>
         /// Initializes the buffer and the timer.
         /// </summary>
-        /// <param name="bufferSize">Defines what count of lines can be buffered. If the buffers full,
-        /// the new line overrides the oldest line and "BUFFER OVERRUN ERROR" message will be written. Default value is 10000.</param>
-        /// <param name="writeDelay">Time between two writing in milliseconds. Default value is 1000.</param>
+        /// <param name="bufferSize">Defines the number of lines that can be buffered. If the buffer is full,
+        /// new lines override the oldest ones and a "BUFFER OVERRUN ERROR" message will be written to the log. Default value is 10000.</param>
+        /// <param name="writeDelay">Time between two write operations in milliseconds. Default value is 1000.</param>
         protected void Initialize(long bufferSize, int writeDelay)
         {
             _bufferSize = bufferSize;

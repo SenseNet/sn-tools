@@ -1,35 +1,35 @@
 ---
 title: "Tracing"
-source_url: 'https://github.com/SenseNet/sensenet/blob/master/docs/sntrace.md'
+source_url: 'https://github.com/SenseNet/sn-tools/blob/master/docs/sntrace.md'
 category: Development
 version: v1.0
 tags: [trace, verbose log, detailed log, debug]
-description: Tracing is an important toolset of a complex system that enables to explore bugs, performance problems or any other operational anomalies.
+description: Tracing is an important toolset of a complex system that enables exploring bugs, performance problems or other operational anomalies.
 ---
 
 # SnTrace
-Every advanced software needs a tool that provides information about the state of the application and what is happening inside. Another important maintenance capability is to measure performance, e.g. the duration of key operations. In Sense/Net ECMS the new SnTrace component is a base of an easy-to-use tracing tool and measuring instrument in one.
+Every advanced software needs a tool that provides information about the state of the application and what is happening inside. Another important maintenance capability is to measure performance, e.g. the duration of key operations. In sensenet the SnTrace component is a base of an easy-to-use tracing tool and measuring instrument in one.
 
 For details about logging in general please visit the main [Logging article](http://wiki.sensenet.com/Logging).
 
 ## Details
-First of all, SnTrace is a quick *verbose logger*. This feature is different from event logging such as writing errors and warnings or audit events. Verbose logging needs to be as fast as possible regardless of whether the feature is turned on or off. It is designed to be able to handle even a huge load of concurrent events and is usually used to monitor the behavior of the system when there are lots of things going on. For example tracing is reponsible for marking all important points of a content life cycle (e.g. saving the data to the Content Repository, than to the security db, than indexing, etc.), while an audit log entry is a single record in the audit log about a content that was created. The main features of the tracing in *sensenet*:
+First of all, SnTrace is a quick *verbose logger*. This feature is different from event logging such as writing errors and warnings or audit events. Verbose logging needs to be as fast as possible regardless of whether the feature is turned on or off. It is designed to be able to handle even a huge load of concurrent events and is usually used to monitor the behavior of the system when there are lots of things going on. For example tracing is reponsible for marking all important points of a content life cycle (e.g. saving the data to the Content Repository, than to the security db, than indexing, etc.), while an audit log entry is a single record in the audit log about a content that was created. The main features of the tracing in sensenet:
 - Writing trace with the SnTrace API
   - Writing **single line** entries to read and process easy way.
   - Using **operations** to measure logical business steps.
   - Using **categories** to reduct the noise.
-- Developing trace provider or use our built-in tracers
+- Developing a custom trace provider or using our built-in tracers
   - Implementing **ISnTracer** or **BufferedSnTracer**.
   - Built-in tracers: **SnFileSystemTracer**, **SnDebugViewTracer**.
-- Analyzing traces.
+- Analyzing traces
   - Parsing, filtering, associating, transforming entries (coming soon).
-- Monitoring trace.
+- Monitoring trace
   - Using **SnDebugViewTracer** and **[DebugView](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview#introduction)** of *[Sysinternals](https://docs.microsoft.com/en-us/sysinternals/)* ([download](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview)).
 
 ### The data we collect
-Every calling of SnTrace.Write method records a simple text line containing the target message extended by TAB separated generalized sytem information. This line is called Trace Entry (see below).
+Calling the *SnTrace.Write* method records a simple text line containing the target message extended by TAB separated generalized sytem information. This line is called a *Trace Entry* (see below).
 
-We try to place SnTrace.Write calls on every important point in the system: subsystem events (e.g. messaging or security), content life cycle (milestones of content creation like indexing), executed queries, db operations, etc. We organized these events into different categories that can be switched on or off individually. For details see the Categories section below.
+We try to place SnTrace.Write calls on every important point in the system: subsystem events (e.g. messaging or security), content life cycle (milestones of content creation like indexing), executed queries, db operations, etc. We organized these events into different categories that can be switched on or off individually. For details see the *Categories* section below.
 
 Another important task of SnTrace is **performance measurement**. It is based on a very simple API that is able to write the start and finish time of an operation (e.g. Save) as two separate lines to the trace. Both lines contain a correlation id and the finish line contains the **duration** too.
 
@@ -38,10 +38,10 @@ This technique is quick enough, the log lines are human readable and the generat
 > According to our measurements, the system deceleration rate is 1% on a loaded web server and high verbosity logging. Still, it is advisable to switch tracing on when needed and switch it off after.
 
 ### Where does the data go
-The trace entries are written to various targets depends on the trace providers that are currently active. A provider needs to implement the very simple **ISnTracer** interface. More than one provider can be used simultaneously. See details of implementation below. The default SnTrace provider setting is the only one **SnFileSystemTracer** that persists the entries to the file system, with buffered way as fast as possible.
+The trace entries are written to various targets depending on the trace providers that are currently active. A provider needs to implement the very simple **ISnTracer** interface. Multiple providers can be used simultaneously. See details of implementation below. The default SnTrace provider is the **SnFileSystemTracer** that persists the entries to the file system (using a buffer) as fast as possible.
 
 ## Trace entry
-A trace stream contains single line entries. An entry has TAB separated fields in fixed order. This format ensures that these lines can be quickly processed for example a table if them pasted into a new Excel worksheet.
+A trace stream contains single line entries. An entry has TAB separated fields in fixed order. This format ensures that these lines can be quickly processed if they are placed into a new Excel worksheet.
 
 ```text
 Line  Time                       Category  ApplicationName          Thread  Op      State  Duration         Message
@@ -51,9 +51,9 @@ Line  Time                       Category  ApplicationName          Thread  Op  
 2463  2016-04-25 07:07:10.73960  Database  A:/LM/W3SVC/2/ROOT-2...  T:357   Op:725  End    00:00:00.021022  SqlProcedure.ExecuteNonQuery...
 ```
 
-A line of the trace has strict format. This is a TAB separated fields of the followings:
-1. **LineId**: Identifier number of the line. Unique is in the AppDomain. If the line starts with '>' character, this line is the first in the block that written to disk in one step.
-2. **Time**: Creation time of the line in ISO 8601 like format with this specifier: yyyy-MM-dd HH:mm:ss.ffffff.
+A trace line has a strict format which is a TAB separated list of fields:
+1. **LineId**: Identifier number of the line. Unique in the AppDomain. If the line starts with the '>' character, this is the first line in the block that was written to the disk in one step.
+2. **Time**: Creation time of the line in ISO 8601 format with this specifier: `yyyy-MM-dd HH:mm:ss.ffffff`.
 3. **Category**: Trace category (see below).
 4. **ApplicationName**: AppDomain name: **"A:UnitTestAdapter"**. Helps identifying the Application if more trace streams are merged and sorted by time.
 5. **ThreadId**: Current thread id: **"T:9856"**.
@@ -63,19 +63,19 @@ A line of the trace has strict format. This is a TAB separated fields of the fol
 9. **Message**: The subject of the line. Raw message provided by the developer.
 
 ### Writing messsages
-Writing as simple as possible messages. Use format strings and parameters.
+Writing messages as simply as possible. Use format strings and parameters.
 Use correlation data (e.g. #id, @user etc.).
 ```csharp
 var content = Content.CreateNew("TestContent", TestRoot, "test-content-1");
 content.Save();
 SnTrace.Write("Test content created. Id: {0}", content.Id);
 ```
-Newlines and any other unprintable characters except tabs are replaced to "." character. Tab character is not forbidden in the message but it should be uset carefully. If the log lines are pasted into a spreadsheet software (e.g. MS Excel) the tabs can cause unwanted columns in the table.
+Newlines and any other unprintable characters except tabs are replaced with the "." character. Tab character is not forbidden in the message but it should be used carefully. If the log lines are pasted into a spreadsheet software (e.g. MS Excel) the tabs can cause unwanted columns in the table.
 
-The Write method uses smart formatting: enumerable arguments appears json array like format:
+The Write method uses smart formatting: enumerable arguments appear in a json array like format:
 ```csharp
 SnTrace.Write("Values: {0}", new List<int>(new[] { 1, 2, 3, 4 }));
-SnTrace.Write("Values: {0}", new List<int>(new[] { "one", "two", "three" }));
+SnTrace.Write("Values: {0}", new List<string>(new[] { "one", "two", "three" }));
 ```
 ```
 Line Time            Message
@@ -84,8 +84,8 @@ Line Time            Message
 2    2018-05-18 ...  Values: [one, two, three]
 ```
 
-### Writing error
-Write error messages if the line refers a mistake. In this case the status field of the trace entry will be "ERROR".
+### Writing errors
+Write error messages if the line contains details about a mistake. In this case the status field of the trace entry will be "ERROR".
 ```csharp
 try
 {
@@ -104,7 +104,8 @@ Line   Time    Category  App  Thr  Op  State  Duration  Message
 ### Measuring operations
 An incredibly useful feature of tracing is that it contains a simple API for measuring how much time it takes to execute a block of code (not necessarily a whole method).
 
-In the code , the operation is often an "using" block:
+In the code, the operation is usually represented by a `using` block:
+
 ```csharp
 using (var op = SnTrace.StartOperation("Operation-1"))
 {
@@ -113,7 +114,7 @@ using (var op = SnTrace.StartOperation("Operation-1"))
 }
 ```
 
-In the trace the operation manifested by two lines: operation start and end. The state column differentiates the lines with "Start" or "End" words. The duration field in the operation end line contains the elapsed time since the start line. Both lines contain the same operation id (OpId) and message. The id is an integer number that is unique in the appdomain's lifecycle. Because the end line duplicates the start line's message, it is recommended to the operation's message should be a short-logical description of the program execution step, for example: "Save Content #1234", "Load MyFeature's configuration", etc.
+In the trace the operation will manifest as two lines: operation start and end. The state column differentiates the lines by the "Start" or "End" words. The duration field in the operation end line contains the elapsed time since the start line. Both lines contain the *same operation id* (OpId) and message. The id is an integer number that is unique in the appdomain's lifecycle. Because the end line duplicates the start line's message, operation messages should be a short description of the program execution step, for example: "Save Content #1234", "Load MyFeature's configuration", etc.
 ```text
 Line Time  Category App Thr  Op    State         Duration         Message
 ---- ----- -------- --- ---- ----  ------------  ---------------  ---------------------
@@ -121,10 +122,9 @@ Line Time  Category App Thr  Op    State         Duration         Message
 2    2016- Custom   A:. T:6  Op:1  End	         00:00:00.000007  Operation-1
 ```
 
-Operations can be nested. The levels of operations are not appeared in the trace lines (the good operation message is a developer's task).
+Operations can be nested. The levels of operations will not appear in the trace so please make sure you use easy to understand operation messages.
 
-Operation's start line contains "Start" in the state field.
-If the operation is successfully finished, the operation-end line has "End" state and contains the duration of the operation. Otherwise the state is "UNTERMINATED".
+An operation's start line contains "Start" in the state field. If the operation is successfully finished, the end line contains the "End" state and the duration of the operation. Otherwise the state is "UNTERMINATED".
 
 ```csharp
 using (var op = SnTrace.StartOperation("Measured outer block"))
@@ -139,7 +139,7 @@ using (var op = SnTrace.StartOperation("Measured outer block"))
     op.Successful = true;
 }
 ```
-As you can see, developers have to explicitly state that the operation was successful by setting the Successful flag on the operation object. If this does not happen (as in case of the inner block in the code above - see the commented line), the operation is considered unsuccessful and this gets written into the log. This technique helps the system work even in case of 'hidden' program flows (e.g. exceptions or returns from middle of a method). Result of the code above likes this:
+As you can see, developers have to explicitly state that the operation was successful by **setting the Successful flag on the operation object**. If this does not happen (as in case of the inner block in the code above - see the commented line), the operation is considered unsuccessful and this gets written into the log. This technique helps the system work even in case of 'hidden' program flows (e.g. exceptions or returns from the middle of a method). The result of the code above will be this:
 ```text
 Line Time  Category App Thr  Op    State         Duration         Message
 ---- ----- -------- --- ---- ----  ------------  ---------------  ---------------------
@@ -149,18 +149,18 @@ Line Time  Category App Thr  Op    State         Duration         Message
 4    2016- Custom   A:. T:6  Op:1  End	         00:00:00.130007  Measured outer block
 ```
 ## Categories
-Every line is categorized. There are three kinds of categories:
+Every trace line is categorized. There are three kinds of categories:
 - Default
 - Built-in
 - User defined
 
-Every category can be switched on or off from the code.
+Every category can be switched on or off from code.
 ```csharp
 SnTrace.Web.Enabled = true;
 SnTrace.EnableAll();
 SnTrace.DisableAll();
 ```
-The built-in categories can be also managed via the trace-setting content. The path of the settings content: `/Root/System/Settings/Logging.settings`. Defauét content of this setting:
+The built-in categories can be managed also via the trace setting content (`/Root/System/Settings/Logging.settings`). Default content of this setting:
 ```javascript
 Trace: {
     ContentOperation: false,
@@ -182,12 +182,8 @@ Trace: {
 }
 ```
 
-Modifying this content needs administrator privileges. For example modify this content via OData request:
+Modifying this content needs administrator privileges. To modify this content via an OData request (instead of the user interface) log in as an administrator and send the following request:
 
-PATCH https://example.com/odata.svc/Root/System/Settings('Logging.settings')
-[models={"Trace.Web": "true"}]
-
-Use the following code in the web browser's console on the main page after logged in as admin:
 ```javascript
 $.ajax({
     url: "odata.svc/Root/System/Settings('Logging.settings')",
@@ -201,29 +197,29 @@ $.ajax({
 ```
 
 #### Default category
-Implicit category that really is the "Custom" built-in category.
-Using in the code:
+If you do not specify a category, it will be written to the "Custom" built-in category.
+
 ```csharp
 SnTrace.Write("Not categorized message");
 ```
-In ths case the category column shows the "Custom" word.
+In this case the category column shows the "Custom" word.
 ```text
 12345   2018-05-17 23:20:16.57025   Custom        ....  Not categorized message
 ```
 #### Built-in categories
-These categories are designed for coding with fluent mode. For example using the "Test" category: 
+There are a nuber of built-in categories used by the system. For example using the "Test" category: 
 ```csharp
 SnTrace.Test.Write("Message for a test purpose.");
 ```
-And the line:
+...will write the following line:
 ```text
 12346   2018-05-17 23:20:16.57025   Test          ....  Message for a test purpose.
 ```
-The list of built-in categories maybe extendig (but not shrinking) in the future. In this version we use these (ABC order):
+The list of built-in categories may grow in the future. In this version we use these:
 - **ContentOperation**: Records content related operations e.g. content saving, templated creation, checkout etc.
 - **Database**: Many sql procedures and transactions are measured. Deadlocks are also logged.
 - **Event**: Includes events sent through the regular Logging API (see the Event logging section below).
-- **Index**: Traces the indexing process including indexing activity queue.
+- **Index**: Traces the indexing process.
 - **IndexQueue**: Traces the indexing activity flow.
 - **Messaging**: Helps monitoring the messaging subsystem (e.g. receiving and sending messages).
 - **Query**: Measures content queries and writes some kernel information.
@@ -231,7 +227,7 @@ The list of built-in categories maybe extendig (but not shrinking) in the future
 - **Security**: Security related operations and events.
 - **SecurityQueue**: Traces the security activity flow.
 - **System**: Traces the start-stop sequences and system composition messages.
-- **TaskManagement**: Records any operations in connection with the TaskManagement subsystem including the TaskManagementWeb, Service and Agent too.
+- **TaskManagement**: Records operations in connection with the TaskManagement subsystem including the TaskManagementWeb, Service and Agent too.
 - **Test**: Unit testing uses this category. Measures the execution time of every test method and the whole test session.
 - **Web**: Writes the requested url and HTTP method.
 - **Workflow**: Records background operations of the workflow subsystem.
@@ -262,7 +258,7 @@ MyCategory.Enabled = false; // or true
 #### Event logging
 When you want to monitor an application, errors and warnings are among the most important information so these log entries should not be missing from the detailed log. You can include these entries in the verbose log by switching on the Event category (see above).
 
-Because these events may contain a huge amount of text, SnTrace saves only the message of the log entry. If you want to connect the trace line to the full event message (that can be found in the Event log), use the GUID added to every event line in the trace. The same GUID is also included in the related event data (extended properties section, SnTrace property).
+Because these events may contain a huge amount of text, SnTrace saves only the message of the log entry. If you want to connect the trace line to the full event message (that can be found in the Event log), use the **GUID** added to every event line in the trace. The same GUID is also included in the related event data (extended properties section, SnTrace property).
 ```text
 SnTrace - '''#01d500aa-b8c8-423e-8a4a-ecedafd0c936'''
 ```
@@ -274,16 +270,15 @@ Line Time   Cat.. ... Message
 ```
 
 ## Customizing trace providers
-The SnTrace API is responsible for managing categories, formatting the final trace message and calling one or more tracer. Persisting, visualizing these messages or sending them to other places are the trace provider responsibilities. These providers need to be fast, fault-tolerant components.
+The SnTrace API is responsible for managing categories, formatting the final trace message and calling one or more tracer. Persisting, visualizing these messages or sending them to other places are the responsibilities of trace providers. These providers need to be fast, fault-tolerant components.
 
-The active providers can be adjusten by a static list. In this version we use this setting:
+The active providers can be configured by a static list. In this version we use this default setting:
 ```csharp
-public static List<ISnTracer> SnTracers { get; } =
-    new List<ISnTracer>(new[] { new SnFileSystemTracer() });
+SnTracers = new List<ISnTracer>(new[] { new SnFileSystemTracer() });
 ```
-The list cannot be changed but items are freely changeable.
+The list cannot be changed but items are freely changeable and replaceable.
 
-A trace writer need to implemet the **ISnTracer** interface that has only two simple method:
+A trace writer needs to implemet the **ISnTracer** interface that defines only two simple methods:
 ```csharp
 public interface ISnTracer
 {
@@ -298,32 +293,32 @@ Other customization possibility is developing an inherited class from the **Buff
 ```csharp
 protected abstract void WriteBatch(string message);
 ```
-The **BufferedSnTracer** provides base functionality for the buffered writing. The main feature of such writer is the less frequent writing but more data per one writing. The writes happen periodically, every writing transfer the whole content of the buffer. This is an advantage if the writing needs any other costly operation (for example opening a database connection or a file). The buffering may be a disadvantage in a special case of the accidental system shutdown or killing the current process because the last content of the buffer can be lost. Fortunately, these cases occur quite rarely in the modern systems.
+The **BufferedSnTracer** provides base functionality for buffered writing. The main feature of such writer is *less frequent writing* but writing more data in batch. The writes happen periodically, every writing transfers the whole content of the buffer. This is an advantage if writing requires an expensive operation (for example opening a database connection or a file). Buffering may be a disadvantage in case of an accidental system shutdown or killing the current process because the last content of the buffer can be lost. Fortunately, these cases occur quite rarely in modern systems.
 
-The **BufferedSnTracer** needs to be initialized with two important parameter:
+The **BufferedSnTracer** needs to be initialized with two important parameters:
 ```csharp
 protected void Initialize(long bufferSize, int writeDelay)
 ```
-The `bufferSize` defines what count of lines can be buffered. If the buffers full, the new line overrides the oldest line and "BUFFER OVERRUN ERROR" message will be written. Default value is 10000. The `writeDelay` is the time between two writing in milliseconds. Default value is 1000. If the currently written block size is greater than 20% of the buffer size, the special message will be written in the block (only the maximum values are written), for example:
+The `bufferSize` defines the count of lines that can be buffered. If the buffer is full, the next line overrides the oldest line and the "BUFFER OVERRUN ERROR" message will be written to the log. Default value is 10000. The `writeDelay` is the time between two writing operations in milliseconds. Default value is 1000. If the currently written block size is greater than 20% of the buffer size, a special message will be written in the block (only the maximum values are written), for example:
 ```text
 MaxPdiff: 4289
 ```
 
 ### Built-in trace providers
-In this version there are 2 trace provider. One for the tracing production webservers with persisted logs and one for the monitoring developer's local webserver instances.
+In this version there are 2 trace provider. One for tracing production webservers with persisted logs and one for monitoring developer's local webserver instances.
 
 ### SnFileSystemTracer
-This is the default trace provider of the sensenet that is inherited from the abstract **BufferedSnTracer**. This trace writer persist the trace data to physical files to the file system. To ensure the velocity this module does the followings:
+This is the default trace provider of sensenet that is inherited from the abstract **BufferedSnTracer**. This trace writer persists the trace data to physical files in the file system. To ensure the velocity this module does the followings:
 
 - Buffered writing: the provider does not write every single line when they come in (see details above).
-- After a configured number of lines new files are opened to ensure that they do not become too big.
+- After a configured number of lines **new files are opened** to ensure that they do not become too big.
 - Files are written locally on every web server instead of a shared drive. We use a very simple data structure.
 
 The files are written into the following directory: `.\App_Data\DetailedLog`. File names contain the UTC creation date of the file: `detailedlog_20160424-144300Z.log`.
 
 This provider's behavior can be fine-tuned by modifying the values of the following configuration items in the web.config:
 - **BufferSize**: Allocated line buffer. Default: 10000.
-- **WriteToFileDelay**: Time between end of previous and start of next writing in milliseconds. Default: 1000.
+- **WriteToFileDelay**: Time between the end of the previous and start of the next writing in milliseconds. Default: 1000.
 - **MaxWritesInOneFile**: Number of writes into a single file. Default: 100. After this a new log file will be created.
 ```xml
 <sensenet>
@@ -336,19 +331,19 @@ This provider's behavior can be fine-tuned by modifying the values of the follow
 ```
 
 ### SnDebugViewTracer
-Sometimes - especially developer time - can be useful that the trace entries are displayed immediately when it comes up. This trace writer transfers the trace entries to the standard trace channel of the Windows and the cannel can be monitored with the **[DebugView](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview#introduction)** of *[Sysinternals](https://docs.microsoft.com/en-us/sysinternals/)* ([download](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview)). This channel sometimes very noisy but can be filtered. Open the filter/highligt dialog from the Edit menu (or press ctrl-L) and set the value of the `Include` textbox to "SnTrace:".
+Sometimes - especially developer time - can be useful if trace entries are displayed immediately when they come up. This trace writer transfers the trace entries to the standard trace channel of Windows and the channel can be monitored using the **[DebugView](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview#introduction)** of *[Sysinternals](https://docs.microsoft.com/en-us/sysinternals/)* ([download](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview)). This channel can be very noisy sometimes but can be filtered. Open the filter/highligt dialog from the Edit menu (or press ctrl-L) and set the value of the `Include` textbox to "SnTrace:".
 
-To activate this provider an instance have to be included to the provider-list. The following code removes the persistent trace writer and adds a monitoring provider one. 
+To activate this provider an instance have to be included in the provider-list when the application starts. The following code removes the persistent trace writer and adds the monitoring provider.
 ```csharp
 SnTrace.SnTracers.Clear();
 SnTrace.SnTracers.Add(new SnDebugViewTracer());
 ```
 
 ## Performance considerations
-There are couple of things to consider when using SnTrace as a developer or operator:
+There are a couple of things to consider when using SnTrace as a developer or operator:
 
 - Do not keep all categories switched on for a long time (it generates to much data anyway that will be hard to process).
-- Do not use complex information gathering when you write to the trace, it may effect time measurement and slow down the portal. If it is necessary, test whether the category (Custom) is enabled or not.
+- Do not use complex information gathering when you write to the trace, it may effect time measurement and slow down the portal. If it is necessary, test whether the category (Custom) is enabled or not before collecting the data.
 - Delete log files on the server from time to time, they may take up a lot of space.
 - Do not open an active file (during measuring) to prevent IO errors.
 ## Known issues

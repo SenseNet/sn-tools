@@ -122,6 +122,5 @@ namespace SenseNet.Diagnostics
                 return __logDirectory;
             }
         }
-
     }
 }

@@ -4,7 +4,8 @@ namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// An ISnTracer implementation that enables monitoring the SnTrace output
-    /// (sensenet's verbose log) with the DebugView tool of the Sysinternals. 
+    /// (sensenet's verbose log) using a debug viewer of your choice - for example 
+    /// DebugView in the Sysinternals package.
     /// </summary>
     public class SnDebugViewTracer : ISnTracer
     {
