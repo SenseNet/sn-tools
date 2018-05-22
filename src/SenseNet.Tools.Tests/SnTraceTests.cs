@@ -12,15 +12,13 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnTraceTests : SnTraceTestClass
     {
-        private void AssertOneErrorLine(List<string> log, string callerMethodName)
+        private void AssertOneErrorLine(List<string> log, string expectedSubstring)
         {
             var msg = GetMessageFromLine(log[0]);
 
             Assert.AreEqual(1, log.Count);
             Assert.IsTrue(msg.StartsWith("SNTRACE ERROR:"));
-            Assert.IsTrue(msg.Contains(callerMethodName));
-            Assert.IsTrue(msg.Contains("SenseNet.Tools.Tests.SnTraceTests"));
-            Assert.IsTrue(msg.Contains("SenseNet.Tools.Tests.dll"));
+            Assert.IsTrue(msg.Contains(expectedSubstring));
         }
 
         [TestMethod]
@@ -61,7 +59,7 @@ namespace SenseNet.Tools.Tests
             SnTrace.Write(null);
 
             var log = DisableAllAndGetLog();
-            AssertOneErrorLine(log, "SnTrace_WriteEmpty_WithoutParams");
+            AssertOneErrorLine(log, "Value cannot be null");
         }
 
         [TestMethod]
@@ -72,7 +70,7 @@ namespace SenseNet.Tools.Tests
             SnTrace.Write(null, 1, "asdf");
 
             var log = DisableAllAndGetLog();
-            AssertOneErrorLine(log, "SnTrace_WriteEmpty_WithParams");
+            AssertOneErrorLine(log, "Value cannot be null");
         }
         [TestMethod]
         public void SnTrace_WriteNotEmpty_NullParams()
@@ -82,7 +80,7 @@ namespace SenseNet.Tools.Tests
             SnTrace.Write("asdf: {0}", null);
 
             var log = DisableAllAndGetLog();
-            AssertOneErrorLine(log, "SnTrace_WriteNotEmpty_NullParams");
+            AssertOneErrorLine(log, "asdf: {0}");
         }
         [TestMethod]
         public void SnTrace_WriteNotEmpty_NullValue()

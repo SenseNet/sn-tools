@@ -16,7 +16,7 @@ namespace SenseNet.Tools.Tests
 
         private string __detailedLogDirectory;
         protected string DetailedLogDirectory => __detailedLogDirectory ??
-                                                 (__detailedLogDirectory = SnTrace.GetRelativeLogDirectory(AppDomain.CurrentDomain.BaseDirectory));
+                                                 (__detailedLogDirectory = SnFileSystemTracer.GetRelativeLogDirectory(AppDomain.CurrentDomain.BaseDirectory));
 
         protected void ResetOperationId()
         {
