@@ -1,101 +1,38 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9C2FA8D5-65F8-4CAD-A65D-B7CC804A821F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SenseNet</RootNamespace>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>SenseNet.Tools</RootNamespace>
     <AssemblyName>SenseNet.Tools</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>2.9.100</Version>
+    <Title>sensenet Tools</Title>
+    <Authors>tusmester,kavics</Authors>
+    <Company>Sense/Net Inc.</Company>
+    <Product>sensenet Tools</Product>
+    <Description>General .Net tools that can be used even in projects independent from the sensenet platform.</Description>
+    <Copyright>Copyright © Sense/Net Inc.</Copyright>
+    <PackageLicenseUrl>https://github.com/SenseNet/sn-tools/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SenseNet/sn-tools</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/SenseNet/sn-resources/master/images/sn-icon/sensenet-icon-64.png</PackageIconUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <RepositoryType></RepositoryType>
+    <PackageTags>sensenet tools</PackageTags>
+    <PackageReleaseNotes>See release notes on GitHub.</PackageReleaseNotes>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Language>en-US</Language>
+    <AssemblyVersion>2.9.100.0</AssemblyVersion>
+    <FileVersion>2.9.100.0</FileVersion>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\SenseNet.Tools.XML</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\SenseNet.Tools.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\SenseNet.Tools.XML</DocumentationFile>
-  </PropertyGroup>
+  
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Configuration\SnConfigurationException.cs" />
-    <Compile Include="Configuration\IConfigProvider.cs" />
-    <Compile Include="Configuration\SnConfig.cs" />
-    <Compile Include="Configuration\SnConfigProvider.cs" />
-    <Compile Include="Diagnostics\BufferedSnTracer.cs" />
-    <Compile Include="Diagnostics\ISnTracer.cs" />
-    <Compile Include="Diagnostics\SnDebugViewTracer.cs" />
-    <Compile Include="Diagnostics\SnFileSystemTracer.cs" />
-    <Compile Include="SnNotSupportedException.cs" />
-    <Compile Include="Tools\CommandLineArguments\Argument.cs" />
-    <Compile Include="Tools\CommandLineArguments\NoNameOptionAttribute.cs" />
-    <Compile Include="Tools\CommandLineArguments\OptionAttribute.cs" />
-    <Compile Include="Tools\CommandLineArguments\ArgumentParser.cs" />
-    <Compile Include="Tools\CommandLineArguments\ParserContext.cs" />
-    <Compile Include="Tools\CommandLineArguments\ParsingException.cs" />
-    <Compile Include="Diagnostics\Analysis\Category.cs" />
-    <Compile Include="Diagnostics\Analysis\Status.cs" />
-    <Compile Include="Diagnostics\DebugEventLogger.cs" />
-    <Compile Include="Diagnostics\IAuditEvent.cs" />
-    <Compile Include="Diagnostics\IEventLogger.cs" />
-    <Compile Include="Diagnostics\IEventTypeProvider.cs" />
-    <Compile Include="Diagnostics\SnEventLogger.cs" />
-    <Compile Include="Diagnostics\SnLog.cs" />
-    <Compile Include="Diagnostics\SnTrace.cs" />
-    <Compile Include="Diagnostics\Analysis\Entry.cs" />
-    <Compile Include="Diagnostics\TraceEventLogger.cs" />
-    <Compile Include="Diagnostics\EventId.cs" />
-    <Compile Include="SnException.cs" />
-    <Compile Include="Tools\Extensions.cs" />
-    <Compile Include="Tools\Retrier.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tools\TypeNotFoundException.cs" />
-    <Compile Include="Tools\TypeResolver.cs" />
-    <Compile Include="Tools\Utility.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Configuration\Readme.md" />
-    <None Include="SenseNet.Tools.nuspec" />
-    <None Include="Tools\CommandLineArguments\Readme.md" />
-    <None Include="Diagnostics\Analysis\Readme.md" />
-    <None Include="Diagnostics\Readme.md" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
