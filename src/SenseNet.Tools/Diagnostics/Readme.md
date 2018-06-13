@@ -38,6 +38,4 @@ We have a predefined list of categories and you can either use the Custom catego
 
 The trace lines will be written to the file system in a buffered way so that it does not take too much resources.
 
-For details please visit the following article.
-
-[SnTrace wiki article](http://wiki.sensenet.com/SnTrace)
+For details please visit [this article](/docs/sntrace.md).
