@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +16,6 @@ namespace SenseNet.Diagnostics
     {
         private const int DefaultEventId = 1;
 
-        private static readonly IDictionary<string, object> EmptyProperties = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
         private const int DefaultPriority = -1;
         private static readonly string[] AuditCategory = { "Audit" };
 
@@ -28,11 +25,21 @@ namespace SenseNet.Diagnostics
         /// </summary>
         public static IEventLogger Instance { get; set; } = new TraceEventLogger();
 
+        private static bool _isPpropertyCollectorErrorEventWritten;
+        private static IEventPropertyCollector _propertyCollector = new BuiltInEventPropertyCollector();
         /// <summary>
         /// Gets or sets the event property collector instance used by the logger methods.
         /// Set this property once when your application starts.
         /// </summary>
-        public static IEventPropertyCollector PropertyCollector { get; set; } = new BuiltInEventPropertyCollector();
+        public static IEventPropertyCollector PropertyCollector
+        {
+            get => _propertyCollector;
+            set
+            {
+                _propertyCollector = value;
+                _isPpropertyCollectorErrorEventWritten = false;
+            }
+        }
 
         /// <summary>
         /// Writes an exception to the log. All the inner exceptions will be extracted and logged too.
@@ -53,6 +60,19 @@ namespace SenseNet.Diagnostics
             string title = null,
             IDictionary<string, object> properties = null)
         {
+            WriteExceptionPrivate(exception, message, eventId, categories, priority, title, properties);
+        }
+
+        private static void WriteExceptionPrivate(
+            Exception exception,
+            string message = null,
+            int eventId = DefaultEventId,
+            IEnumerable<string> categories = null,
+            int priority = DefaultPriority,
+            string title = null,
+            IDictionary<string, object> properties = null,
+            bool collectProperties = true)
+        {
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
@@ -65,7 +85,7 @@ namespace SenseNet.Diagnostics
             var msg = message == null
                 ? exception.Message
                 : message + Environment.NewLine + exception.Message;
-            Write(eventType, msg, categories, priority, eventId, title, props);
+            Write(eventType, msg, categories, priority, eventId, title, props, collectProperties);
         }
 
         /// <summary>
@@ -140,7 +160,8 @@ namespace SenseNet.Diagnostics
             IDictionary<string, object> properties = null)
         {
             Write(TraceEventType.Verbose, auditEvent.Message, AuditCategory,
-                eventId: auditEvent.EventId, title: auditEvent.Title, properties: properties);
+                eventId: auditEvent.EventId, title: auditEvent.Title, properties: properties,
+                collectProperties: false);
         }
 
         private static void Write(
@@ -150,17 +171,25 @@ namespace SenseNet.Diagnostics
             int priority = DefaultPriority,
             int eventId = 0,
             string title = null,
-            IDictionary<string, object> properties = null)
+            IDictionary<string, object> properties = null,
+            bool collectProperties = true
+            )
         {
             var eventProperties = properties ?? new Dictionary<string, object>();
-            try
+            if (collectProperties)
             {
-                eventProperties = PropertyCollector?.Collect(eventProperties);
-            }
-            catch
-            {
-                //UNDONE: Write direct error message once per PropertyCollector change.
-                // do nothing
+                try
+                {
+                    eventProperties = PropertyCollector?.Collect(eventProperties);
+                }
+                catch (Exception e)
+                {
+                    if (!_isPpropertyCollectorErrorEventWritten)
+                    {
+                        WriteExceptionPrivate(e, collectProperties: false);
+                        _isPpropertyCollectorErrorEventWritten = true;
+                    }
+                }
             }
 
             Instance.Write(message, new List<string>(categories ?? new string[0]), priority, eventId, severity,
