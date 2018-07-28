@@ -25,7 +25,7 @@ namespace SenseNet.Diagnostics
         /// </summary>
         public static IEventLogger Instance { get; set; } = new TraceEventLogger();
 
-        private static bool _isPpropertyCollectorErrorEventWritten;
+        private static bool _isPropertyCollectorErrorEventWritten;
         private static IEventPropertyCollector _propertyCollector = new BuiltInEventPropertyCollector();
         /// <summary>
         /// Gets or sets the event property collector instance used by the logger methods.
@@ -37,7 +37,7 @@ namespace SenseNet.Diagnostics
             set
             {
                 _propertyCollector = value;
-                _isPpropertyCollectorErrorEventWritten = false;
+                _isPropertyCollectorErrorEventWritten = false;
             }
         }
 
@@ -184,10 +184,10 @@ namespace SenseNet.Diagnostics
                 }
                 catch (Exception e)
                 {
-                    if (!_isPpropertyCollectorErrorEventWritten)
+                    if (!_isPropertyCollectorErrorEventWritten)
                     {
                         WriteExceptionPrivate(e, collectProperties: false);
-                        _isPpropertyCollectorErrorEventWritten = true;
+                        _isPropertyCollectorErrorEventWritten = true;
                     }
                 }
             }
