@@ -160,8 +160,7 @@ namespace SenseNet.Diagnostics
             IDictionary<string, object> properties = null)
         {
             Write(TraceEventType.Verbose, auditEvent.Message, AuditCategory,
-                eventId: auditEvent.EventId, title: auditEvent.Title, properties: properties,
-                collectProperties: false);
+                eventId: auditEvent.EventId, title: auditEvent.Title, properties: properties);
         }
 
         private static void Write(

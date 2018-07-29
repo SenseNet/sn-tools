@@ -107,6 +107,19 @@ namespace SenseNet.Tools.Tests
                 });
             }
         }
+        private class TestAuditEvent : IAuditEvent
+        {
+            public int EventId { get; }
+            public string Message { get; }
+            public string Title { get; }
+            public TestAuditEvent(string message, string title = null, int eventId = 42)
+            {
+                EventId = eventId;
+                Message = message;
+                Title = title ?? "TestAuditEvent";
+            }
+        }
+
         #endregion
 
         [TestMethod]
@@ -339,6 +352,41 @@ namespace SenseNet.Tools.Tests
                 .Substring(0, entries[5].IndexOf("(", StringComparison.Ordinal)));
             Assert.AreEqual("Information: Msg5 (a:b)", entries[6]);
             Assert.AreEqual("Information: Msg6 (a:b)", entries[7]);
+        }
+
+        [TestMethod]
+        public void SnLog_Write_AllWriteMethodCollectProperties()
+        {
+            var commonProperties = new Dictionary<string, object> { { "a", "b" } };
+
+            var loggerBackup = SnLog.Instance;
+            var logger = new TestEventEntryLogger();
+            SnLog.Instance = logger;
+
+            var propertyCollectorBackup = SnLog.PropertyCollector;
+            SnLog.PropertyCollector = new TestEventPropertyCollector(new Dictionary<string, object> { { "x", "y" } });
+
+            try
+            {
+                SnLog.WriteInformation("Msg1", properties: commonProperties);
+                SnLog.WriteWarning("Msg2", properties: commonProperties);
+                SnLog.WriteAudit(new TestAuditEvent("Msg3"), properties: commonProperties);
+                SnLog.WriteError("Msg4", properties: commonProperties);
+                SnLog.WriteException(new Exception("Msg5"), properties: commonProperties);
+            }
+            finally
+            {
+                SnLog.Instance = loggerBackup;
+                SnLog.PropertyCollector = propertyCollectorBackup;
+            }
+
+            var entries = logger.LogEntries.Select(e => e.ToString()).ToArray();
+            Assert.AreEqual(5, entries.Length);
+            Assert.AreEqual("Information: Msg1 (a:b, x:y)", entries[0]);
+            Assert.AreEqual("Warning: Msg2 (a:b, x:y)", entries[1]);
+            Assert.AreEqual("Verbose: Msg3 (a:b, x:y)", entries[2]);
+            Assert.AreEqual("Error: Msg4 (a:b, x:y)", entries[3]);
+            Assert.AreEqual("Error: Msg5 (a:b, x:y,", entries[4].Substring(0, 8 + entries[2].IndexOf("(", StringComparison.Ordinal)));
         }
     }
 }
