@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SenseNet.Tools;
+using SenseNet.Tools.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>
@@ -15,15 +16,30 @@ namespace SenseNet.Diagnostics
     {
         private const int DefaultEventId = 1;
 
-        private static readonly IDictionary<string, object> EmptyProperties = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
         private const int DefaultPriority = -1;
         private static readonly string[] AuditCategory = { "Audit" };
 
         /// <summary>
-        /// Logger instance used by the dedicated static methods. Set this property
-        /// once when your application starts.
+        /// Gets or sets the logger instance used by the dedicated static methods.
+        /// Set this property once when your application starts.
         /// </summary>
         public static IEventLogger Instance { get; set; } = new TraceEventLogger();
+
+        private static bool _isPropertyCollectorErrorEventWritten;
+        private static IEventPropertyCollector _propertyCollector = new BuiltInEventPropertyCollector();
+        /// <summary>
+        /// Gets or sets the event property collector instance used by the logger methods.
+        /// Set this property once when your application starts.
+        /// </summary>
+        public static IEventPropertyCollector PropertyCollector
+        {
+            get => _propertyCollector;
+            set
+            {
+                _propertyCollector = value;
+                _isPropertyCollectorErrorEventWritten = false;
+            }
+        }
 
         /// <summary>
         /// Writes an exception to the log. All the inner exceptions will be extracted and logged too.
@@ -44,6 +60,19 @@ namespace SenseNet.Diagnostics
             string title = null,
             IDictionary<string, object> properties = null)
         {
+            WriteExceptionPrivate(exception, message, eventId, categories, priority, title, properties);
+        }
+
+        private static void WriteExceptionPrivate(
+            Exception exception,
+            string message = null,
+            int eventId = DefaultEventId,
+            IEnumerable<string> categories = null,
+            int priority = DefaultPriority,
+            string title = null,
+            IDictionary<string, object> properties = null,
+            bool collectProperties = true)
+        {
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
@@ -56,7 +85,7 @@ namespace SenseNet.Diagnostics
             var msg = message == null
                 ? exception.Message
                 : message + Environment.NewLine + exception.Message;
-            Write(eventType, msg, categories, priority, eventId, title, props);
+            Write(eventType, msg, categories, priority, eventId, title, props, collectProperties);
         }
 
         /// <summary>
@@ -141,10 +170,29 @@ namespace SenseNet.Diagnostics
             int priority = DefaultPriority,
             int eventId = 0,
             string title = null,
-            IDictionary<string, object> properties = null)
+            IDictionary<string, object> properties = null,
+            bool collectProperties = true
+            )
         {
+            var eventProperties = properties ?? new Dictionary<string, object>();
+            if (collectProperties)
+            {
+                try
+                {
+                    eventProperties = PropertyCollector?.Collect(eventProperties);
+                }
+                catch (Exception e)
+                {
+                    if (!_isPropertyCollectorErrorEventWritten)
+                    {
+                        WriteExceptionPrivate(e, collectProperties: false);
+                        _isPropertyCollectorErrorEventWritten = true;
+                    }
+                }
+            }
+
             Instance.Write(message, new List<string>(categories ?? new string[0]), priority, eventId, severity,
-                title ?? string.Empty, properties ?? EmptyProperties);
+                title ?? string.Empty, eventProperties);
         }
 
         private static TraceEventType GetEventType(Exception e)
@@ -152,8 +200,7 @@ namespace SenseNet.Diagnostics
             var ee = e;
             while (ee != null)
             {
-                var eventTypeProvider = ee as IEventTypeProvider;
-                if (eventTypeProvider != null)
+                if (ee is IEventTypeProvider eventTypeProvider)
                     return eventTypeProvider.EventType;
                 ee = ee.InnerException;
             }
@@ -194,8 +241,7 @@ namespace SenseNet.Diagnostics
                 foreach (var key in data.Keys)
                     props.Add(epath + key, data[key]);
 
-                var rtle = e as ReflectionTypeLoadException;
-                if (rtle != null)
+                if (e is ReflectionTypeLoadException rtle)
                     props.Add("Types", string.Join(", ", rtle.Types.Select(x => x.FullName)));
 
                 e = e.InnerException;
