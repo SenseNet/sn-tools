@@ -29,6 +29,18 @@ namespace SenseNet.Tools.Tests
             }
         }
 
+        private class TestTracer : ISnTracer
+        {
+            public List<string> Lines { get; } = new List<string>();
+
+            public void Write(string line)
+            {
+                Lines.Add(line);
+            }
+
+            public void Flush() { /* do nothing */ }
+        }
+
         private class TestException_Warning : Exception, IEventTypeProvider
         {
             public TraceEventType EventType => TraceEventType.Warning;
@@ -387,6 +399,88 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("Verbose: Msg3 (a:b, x:y)", entries[2]);
             Assert.AreEqual("Error: Msg4 (a:b, x:y)", entries[3]);
             Assert.AreEqual("Error: Msg5 (a:b, x:y,", entries[4].Substring(0, 8 + entries[2].IndexOf("(", StringComparison.Ordinal)));
+        }
+
+        [TestMethod]
+        public void SnLog_Write_BindToSnTrace()
+        {
+            var commonProperties = new Func<Dictionary<string, object>>(() => new Dictionary<string, object> {{"a", "b"}});
+
+            var loggerBackup = SnLog.Instance;
+            var logger = new TestEventEntryLogger();
+            SnLog.Instance = logger;
+
+            var propertyCollectorBackup = SnLog.PropertyCollector;
+            SnLog.PropertyCollector = new TestEventPropertyCollector(new Dictionary<string, object> { { "x", "y" } });
+
+            var tracersBackup = SnTrace.SnTracers.ToArray();
+            SnTrace.SnTracers.Clear();
+            var tracer = new TestTracer();
+            SnTrace.SnTracers.Add(tracer);
+
+            var eventEnabledBackup = SnTrace.Event.Enabled;
+            SnTrace.Event.Enabled = true;
+
+            // action 
+            try
+            {
+                SnLog.WriteInformation("Msg1", properties: commonProperties());
+                SnLog.WriteWarning("Msg2", properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg3"), properties: commonProperties());
+                SnLog.WriteError("Msg4", properties: commonProperties());
+                SnLog.WriteException(new Exception("Msg5"), properties: commonProperties());
+            }
+            finally
+            {
+                SnLog.Instance = loggerBackup;
+                SnLog.PropertyCollector = propertyCollectorBackup;
+
+                SnTrace.SnTracers.Clear();
+                SnTrace.SnTracers.AddRange(tracersBackup);
+
+                SnTrace.Event.Enabled = eventEnabledBackup;
+            }
+
+            var entries = logger.LogEntries; //.Select(e => e.ToString()).ToArray();
+            var traceLines = tracer.Lines;
+
+            Assert.AreEqual(5, entries.Count);
+            Assert.AreEqual(5, traceLines.Count);
+
+            for (int i = 0; i < entries.Count; i++)
+                CheckBinding(entries[i], traceLines[i], i);
+            // Information: Msg1 (a:b, x:y, SnTrace:#b18b0463-45c1-4e72-8882-8837df131556)
+            // 1	2018-08-01 00:15:33.85820	Event	A:UnitTestAdapter: Running test	T:9				INFORMATION #b18b0463-45c1-4e72-8882-8837df131556: Msg1
+        }
+
+        private void CheckBinding(TestEventEntry logEntry, string traceLine, int testCase)
+        {
+            var log = GetGuidAndMessageFromLog(logEntry, testCase);
+            var trace = GetGuidAndMessageFromTrace(traceLine, testCase);
+            Assert.AreEqual(log, trace);
+        }
+
+        private string GetGuidAndMessageFromLog(TestEventEntry logEntry, int testCase)
+        {
+            // a:b, x:y, SnTrace:#b18b0463-45c1-4e72-8882-8837df131556
+            var bindingInfo = logEntry.Properties.Split(',')
+                .Select(x => x.Trim())
+                .FirstOrDefault(x => x.StartsWith("SnTrace:#"));
+            Assert.IsNotNull(bindingInfo, "Binding info not found in test case " + testCase);
+
+            var guid = bindingInfo.Substring("SnTrace:#".Length);
+            if(logEntry.EventType == TraceEventType.Verbose)
+                return $"{guid}|{logEntry.Message}";
+            return $"{logEntry.EventType.ToString().ToUpperInvariant()}|{guid}|{logEntry.Message}";
+        }
+        private string GetGuidAndMessageFromTrace(string line, int testCase)
+        {
+            // 1	2018-08-01 00:15:33.85820	Event	A:UnitTestAdapter: Running test	T:9				INFORMATION #b18b0463-45c1-4e72-8882-8837df131556: Msg1
+            var bindingInfo = line.Split('\t').Last();
+
+            // INFORMATION #b18b0463-45c1-4e72-8882-8837df131556: Msg1
+            // AUDIT #3b3f725e-5f4e-4ce4-89a9-fd780c70a7d9: Msg3, Id:[null], Path:[null]
+            return bindingInfo.Replace("AUDIT ", "").Replace(", Id:-, Path:-", "").Replace("#", "").Replace(":", "").Replace(" ", "|");
         }
     }
 }

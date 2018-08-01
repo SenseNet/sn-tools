@@ -191,8 +191,32 @@ namespace SenseNet.Diagnostics
                 }
             }
 
-            Instance.Write(message, new List<string>(categories ?? new string[0]), priority, eventId, severity,
-                title ?? string.Empty, eventProperties);
+            var eventCategories = new List<string>(categories ?? new string[0]);
+            if (SnTrace.Event.Enabled)
+                BindLogEntryAndTrace(message.ToString(), severity, eventProperties, eventCategories);
+
+            Instance.Write(message, eventCategories, priority, eventId, severity, title ?? string.Empty, eventProperties);
+        }
+
+        private static void BindLogEntryAndTrace(string message, TraceEventType severity, IDictionary<string, object> properties, List<string> categories)
+        {
+            var eventTypeName = severity.ToString().ToUpper();
+            var traceId = "#" + Guid.NewGuid();
+            properties["SnTrace"] = traceId;
+            if (severity <= TraceEventType.Information) // Critical = 1, Error = 2, Warning = 4, Information = 8
+            {
+                SnTrace.Event.Write("{0} {1}: {2}", eventTypeName, traceId, message);
+            }
+            else
+            {
+                properties.TryGetValue("Id", out var contentId);
+                properties.TryGetValue("Path", out var path);
+
+                if (categories.Count == 1 && categories[0] == "Audit")
+                    eventTypeName = "AUDIT";
+
+                SnTrace.Event.Write("{0} {1}: {2}, Id:{3}, Path:{4}", eventTypeName, traceId, message, contentId ?? "-", path ?? "-");
+            }
         }
 
         private static TraceEventType GetEventType(Exception e)
