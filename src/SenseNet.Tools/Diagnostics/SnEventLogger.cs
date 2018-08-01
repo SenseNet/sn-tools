@@ -75,7 +75,8 @@ namespace SenseNet.Diagnostics
                     break;
             }
 
-            _eventLog.WriteEntry(FormatMessage(message, categories, priority, eventId, severity, title, properties), entryType, eventId);
+            lock (_eventLog)
+                _eventLog.WriteEntry(FormatMessage(message, categories, priority, eventId, severity, title, properties), entryType, eventId);
         }
 
         private readonly string _cr = Environment.NewLine;
