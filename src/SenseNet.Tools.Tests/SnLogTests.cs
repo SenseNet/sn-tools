@@ -165,6 +165,15 @@ namespace SenseNet.Tools.Tests
             }
         }
 
+        private class TestAuditEventWriter : IAuditEventWriter
+        {
+            public List<IAuditEvent> Entries { get; }= new List<IAuditEvent>();
+
+            public void Write(IAuditEvent auditEvent, IDictionary<string, object> properties)
+            {
+                Entries.Add(auditEvent);
+            }
+        }
         #endregion
 
         [TestMethod]
@@ -631,6 +640,47 @@ namespace SenseNet.Tools.Tests
             var entryData = string.Join(", ", allEntries);
 
             Assert.AreEqual("Msg0:0, Msg1:1, Msg2:2, Msg3:3, Msg4:4", entryData);
+        }
+
+        [TestMethod]
+        public void SnLog_AuditEventWriter()
+        {
+            var commonProperties = new Func<Dictionary<string, object>>(() => new Dictionary<string, object> { { "a", "b" } });
+
+            var loggerBackup = SnLog.Instance;
+            var logger = new TestEventEntryLogger();
+            SnLog.Instance = logger;
+
+            var propertyCollectorBackup = SnLog.PropertyCollector;
+            SnLog.PropertyCollector = new TestEventPropertyCollector(new Dictionary<string, object> { { "x", "y" } });
+
+            var auditEventWriterBackup = SnLog.AuditEventWriter;
+            var auditEventWriter = new TestAuditEventWriter();
+
+            // action 
+            try
+            {
+                SnLog.AuditEventWriter = null;
+                SnLog.WriteAudit(new TestAuditEvent("Msg1"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg2"), properties: commonProperties());
+                SnLog.AuditEventWriter = auditEventWriter;
+                SnLog.WriteAudit(new TestAuditEvent("Msg3"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg4"), properties: commonProperties());
+                SnLog.AuditEventWriter = null;
+                SnLog.WriteAudit(new TestAuditEvent("Msg5"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg6"), properties: commonProperties());
+            }
+            finally
+            {
+                SnLog.Instance = loggerBackup;
+                SnLog.PropertyCollector = propertyCollectorBackup;
+                SnLog.AuditEventWriter = auditEventWriterBackup;
+            }
+
+            var logEntries = string.Join(", ", logger.LogEntries.Select(e=>e.Message).ToArray());
+            var writerEntries = string.Join(", ", auditEventWriter.Entries.Select(e => e.Message).ToArray());
+            Assert.AreEqual("Msg1, Msg2, Msg5, Msg6", logEntries);
+            Assert.AreEqual("Msg3, Msg4", writerEntries);
         }
 
     }
