@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using SenseNet.Tools.Diagnostics;
 
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
@@ -47,6 +44,7 @@ namespace SenseNet.Diagnostics
             _eventLog = new EventLog(logName) {Source = logSourceName};
         }
 
+        /// <inheritdoc />
         public override void Write(object message, ICollection<string> categories, int priority, int eventId, TraceEventType severity, string title,
             IDictionary<string, object> properties)
         {
@@ -54,12 +52,11 @@ namespace SenseNet.Diagnostics
                 base.Write(message, categories, priority, eventId, severity, title, properties);
         }
 
+        /// <inheritdoc />
         protected override void WriteEntry(string entry, EventLogEntryType entryType, int eventId)
         {
             lock (_eventLog)
                 _eventLog.WriteEntry(entry, entryType, eventId);
         }
-
     }
-
 }

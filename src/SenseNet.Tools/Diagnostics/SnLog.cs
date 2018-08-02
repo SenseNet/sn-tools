@@ -42,7 +42,7 @@ namespace SenseNet.Diagnostics
         }
 
         /// <summary>
-        /// Gets or sets an IAuditEventWriter instance. Default null that means
+        /// Gets or sets the IAuditEventWriter instance. Default is null that means
         /// the audit event is a standard Verbose event in the "Audit" category.
         /// </summary>
         public static IAuditEventWriter AuditEventWriter { get; set; }

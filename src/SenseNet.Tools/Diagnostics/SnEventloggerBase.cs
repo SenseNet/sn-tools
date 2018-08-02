@@ -7,21 +7,15 @@ using System.Threading;
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
-    public abstract class SnEventloggerBase
+    /// <summary>
+    /// Abstract base class for defining general event logger behavior.
+    /// </summary>
+    public abstract class SnEventloggerBase : IEventLogger
     {
         private readonly string _cr = Environment.NewLine;
         private readonly string _defaultCategories = "General";
 
-        /// <summary>
-        /// Writes a message and its properties to the log.
-        /// </summary>
-        /// <param name="message">A message to log.</param>
-        /// <param name="categories">List of log categories.</param>
-        /// <param name="priority">Event priority.</param>
-        /// <param name="eventId">Event id.</param>
-        /// <param name="severity">Event type.</param>
-        /// <param name="title">Event title.</param>
-        /// <param name="properties">Event properties.</param>
+        /// <inheritdoc />
         public virtual void Write(object message, ICollection<string> categories, int priority, int eventId, TraceEventType severity, string title,
             IDictionary<string, object> properties)
         {
@@ -45,6 +39,12 @@ namespace SenseNet.Diagnostics
             WriteEntry(FormatMessage(message, categories, priority, eventId, severity, title, properties), entryType, eventId);
         }
 
+        /// <summary>
+        /// Writes a message to the event log.
+        /// </summary>
+        /// <param name="entry">Message text.</param>
+        /// <param name="entryType">Type of the entry.</param>
+        /// <param name="eventId">Event identifier.</param>
         protected abstract void WriteEntry(
             string entry,
             EventLogEntryType entryType,
