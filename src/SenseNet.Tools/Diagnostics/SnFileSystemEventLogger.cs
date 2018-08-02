@@ -34,29 +34,6 @@ namespace SenseNet.Diagnostics
         private readonly object _sync = new object();
         private short _entryCount;
         private string _logFilePath;
-        private string LogFilePath
-        {
-            get
-            {
-                if (_logFilePath == null || _entryCount >= MaxWritesPerFile)
-                {
-                    lock (_sync)
-                    {
-                        if (_logFilePath == null || _entryCount >= MaxWritesPerFile)
-                        {
-                            var logFilePath = Path.Combine(LogDirectory, "eventlog_" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "Z.log");
-                            if (!FileExists(logFilePath))
-                                CreateFile(logFilePath);
-                            _entryCount = 0;
-                            Trace.WriteLine("SenseNet.Diagnostic.SnLog file:" + logFilePath);
-                            _logFilePath = logFilePath;
-                        }
-                    }
-                }
-                _entryCount++;
-                return _logFilePath;
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SnFileSystemEventLogger"/> class.
@@ -75,7 +52,22 @@ namespace SenseNet.Diagnostics
         /// </summary>
         protected override void WriteEntry(string entry, EventLogEntryType entryType, int eventId)
         {
-            WriteToFile(entry, LogFilePath);
+            lock (_sync)
+            {
+                if (_logFilePath == null || _entryCount >= MaxWritesPerFile)
+                {
+                    var logFilePath = Path.Combine(LogDirectory,
+                        "eventlog_" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "Z.log");
+                    if (!FileExists(logFilePath))
+                        CreateFile(logFilePath);
+                    _entryCount = 0;
+                    Trace.WriteLine("SenseNet.Diagnostic.SnLog file:" + logFilePath);
+                    _logFilePath = logFilePath;
+                }
+                _entryCount++;
+
+                WriteToFile(entry, _logFilePath);
+            }
         }
 
         /// <summary>
@@ -108,7 +100,7 @@ namespace SenseNet.Diagnostics
             using (var wr = new StreamWriter(fs))
                 wr.WriteLine("----");
         }
-        
+
         /// <summary>
         /// Writes a log entry to the specified file.
         /// </summary>
