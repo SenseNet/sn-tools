@@ -42,6 +42,12 @@ namespace SenseNet.Diagnostics
         }
 
         /// <summary>
+        /// Gets or sets the IAuditEventWriter instance. Default is null that means
+        /// the audit event is a standard Verbose event in the "Audit" category.
+        /// </summary>
+        public static IAuditEventWriter AuditEventWriter { get; set; }
+
+        /// <summary>
         /// Writes an exception to the log. All the inner exceptions will be extracted and logged too.
         /// </summary>
         /// <param name="exception">The exception to log.</param>
@@ -159,8 +165,11 @@ namespace SenseNet.Diagnostics
             IAuditEvent auditEvent,
             IDictionary<string, object> properties = null)
         {
-            Write(TraceEventType.Verbose, auditEvent.Message, AuditCategory,
-                eventId: auditEvent.EventId, title: auditEvent.Title, properties: properties);
+            if (AuditEventWriter != null)
+                AuditEventWriter.Write(auditEvent, CollectProperties(properties));
+            else
+                Write(TraceEventType.Verbose, auditEvent.Message, AuditCategory,
+                    eventId: auditEvent.EventId, title: auditEvent.Title, properties: properties);
         }
 
         private static void Write(
@@ -174,25 +183,52 @@ namespace SenseNet.Diagnostics
             bool collectProperties = true
             )
         {
+            var eventProperties = collectProperties ? CollectProperties(properties) : properties;
+
+            var eventCategories = new List<string>(categories ?? new string[0]);
+            if (SnTrace.Event.Enabled)
+                BindLogEntryAndTrace(message.ToString(), severity, eventProperties, eventCategories);
+
+            Instance.Write(message, eventCategories, priority, eventId, severity, title ?? string.Empty, eventProperties);
+        }
+
+        private static IDictionary<string, object> CollectProperties(IDictionary<string, object> properties)
+        {
             var eventProperties = properties ?? new Dictionary<string, object>();
-            if (collectProperties)
+            try
             {
-                try
+                eventProperties = PropertyCollector?.Collect(eventProperties);
+            }
+            catch (Exception e)
+            {
+                if (!_isPropertyCollectorErrorEventWritten)
                 {
-                    eventProperties = PropertyCollector?.Collect(eventProperties);
-                }
-                catch (Exception e)
-                {
-                    if (!_isPropertyCollectorErrorEventWritten)
-                    {
-                        WriteExceptionPrivate(e, collectProperties: false);
-                        _isPropertyCollectorErrorEventWritten = true;
-                    }
+                    WriteExceptionPrivate(e, collectProperties: false);
+                    _isPropertyCollectorErrorEventWritten = true;
                 }
             }
+            return eventProperties;
+        }
 
-            Instance.Write(message, new List<string>(categories ?? new string[0]), priority, eventId, severity,
-                title ?? string.Empty, eventProperties);
+        private static void BindLogEntryAndTrace(string message, TraceEventType severity, IDictionary<string, object> properties, List<string> categories)
+        {
+            var eventTypeName = severity.ToString().ToUpper();
+            var traceId = "#" + Guid.NewGuid();
+            properties["SnTrace"] = traceId;
+            if (severity <= TraceEventType.Information) // Critical = 1, Error = 2, Warning = 4, Information = 8
+            {
+                SnTrace.Event.Write("{0} {1}: {2}", eventTypeName, traceId, message);
+            }
+            else
+            {
+                properties.TryGetValue("Id", out var contentId);
+                properties.TryGetValue("Path", out var path);
+
+                if (categories.Count == 1 && categories[0] == "Audit")
+                    eventTypeName = "AUDIT";
+
+                SnTrace.Event.Write("{0} {1}: {2}, Id:{3}, Path:{4}", eventTypeName, traceId, message, contentId ?? "-", path ?? "-");
+            }
         }
 
         private static TraceEventType GetEventType(Exception e)
