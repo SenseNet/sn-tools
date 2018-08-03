@@ -524,57 +524,6 @@ namespace SenseNet.Tools.Tests
         }
 
         [TestMethod]
-        public void SnLog_WriteAndReload_SnEventLogger()
-        {
-            var testValue = Guid.NewGuid().ToString();
-
-            // action
-            new SnEventLogger("SenseNet", "SenseNetInstrumentation")
-                .Write(testValue, null, 0, 0, TraceEventType.Information, null,
-                    new Dictionary<string, object> { { "a", "b" }, { "x", "y" } });
-
-            // assert
-            var logs = EventLog.GetEventLogs();
-            var log = logs.FirstOrDefault(l => l.LogDisplayName == "SenseNet");
-            Assert.IsNotNull(log);
-            var entries = new List<EventLogEntry>();
-            foreach (EventLogEntry entry in log.Entries)
-                entries.Add(entry);
-            var lastEntry = entries.Last();
-
-            var entryData = ParseEventlogEntryData(lastEntry.Message);
-
-            Assert.AreEqual(testValue, entryData["Message"]);
-            Assert.AreEqual("Information", entryData["Severity"]);
-            Assert.AreEqual(Environment.MachineName, entryData["Machine"]);
-            Assert.AreEqual("a - b, x - y", entryData["Extended Properties"]);
-        }
-        private Dictionary<string, string> ParseEventlogEntryData(string text)
-        {
-            var result = new Dictionary<string, string>();
-            var fields = text.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
-            var index = 0;
-            while (true)
-            {
-                var field = fields[index++];
-                var p = field.IndexOf(':');
-                var name = field.Substring(0, p);
-                var value = field.Length > p ? field.Substring(p + 1).Trim() : string.Empty;
-                if (name != "Extended Properties")
-                {
-                    result.Add(name, value);
-                    continue;
-                }
-                var extendedValue = new StringBuilder(value);
-                for (int i = index; i < fields.Length; i++)
-                    extendedValue.Append(", ").Append(fields[i]);
-                result.Add(name, extendedValue.ToString());
-                break;
-            }
-            return result;
-        }
-
-        [TestMethod]
         public void SnLog_WriteAndReload_SnSnFileSystemEventLogger()
         {
             var testValue = Guid.NewGuid().ToString();
@@ -683,5 +632,31 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("Msg3, Msg4", writerEntries);
         }
 
+        /* ========================================================================= */
+
+        private Dictionary<string, string> ParseEventlogEntryData(string text)
+        {
+            var result = new Dictionary<string, string>();
+            var fields = text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var index = 0;
+            while (true)
+            {
+                var field = fields[index++];
+                var p = field.IndexOf(':');
+                var name = field.Substring(0, p);
+                var value = field.Length > p ? field.Substring(p + 1).Trim() : string.Empty;
+                if (name != "Extended Properties")
+                {
+                    result.Add(name, value);
+                    continue;
+                }
+                var extendedValue = new StringBuilder(value);
+                for (int i = index; i < fields.Length; i++)
+                    extendedValue.Append(", ").Append(fields[i]);
+                result.Add(name, extendedValue.ToString());
+                break;
+            }
+            return result;
+        }
     }
 }
