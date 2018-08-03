@@ -19,9 +19,6 @@ namespace SenseNet.Diagnostics
         public virtual void Write(object message, ICollection<string> categories, int priority, int eventId, TraceEventType severity, string title,
             IDictionary<string, object> properties)
         {
-            if (severity == TraceEventType.Verbose)
-                return;
-
             EventLogEntryType entryType;
             switch (severity)
             {
