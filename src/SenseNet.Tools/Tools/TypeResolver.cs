@@ -247,20 +247,10 @@ namespace SenseNet.Tools
                                 list.AddRange(asm.GetTypes().Where(type =>
                                     type.GetInterfaces().Any(interf => interf == interfaceType)));
                             }
-                            catch (ReflectionTypeLoadException rtle)
-                            {
-                                SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", asm.FullName } });
-
-                                // Logging each exception
-                                foreach (var exc in rtle.LoaderExceptions)
-                                {
-                                    SnLog.WriteError(exc);
-                                }
-
-                                throw;
-                            }
                             catch (Exception e)
                             {
+                                LogReflectionTypeLoadException(e, asm);
+
                                 if (!IgnorableException(e))
                                     throw;
                             }
@@ -312,20 +302,10 @@ namespace SenseNet.Tools
                                     }
                                 }
                             }
-                            catch (ReflectionTypeLoadException rtle)
-                            {
-                                SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", asm.FullName } });
-
-                                // Logging each exception
-                                foreach (var exc in rtle.LoaderExceptions)
-                                {
-                                    SnLog.WriteError(exc);
-                                }
-
-                                throw;
-                            }
                             catch (Exception e)
                             {
+                                LogReflectionTypeLoadException(e, asm);
+
                                 if (!IgnorableException(e))
                                     throw TypeDiscoveryError(e, null, asm);
                             }
@@ -341,6 +321,20 @@ namespace SenseNet.Tools
             var result = new Type[temp.Length];
             temp.CopyTo(result, 0);
             return result;
+        }
+
+        private static void LogReflectionTypeLoadException(Exception ex, Assembly asm)
+        {
+            if (ex is ReflectionTypeLoadException rtle)
+            {
+                SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", asm.FullName } });
+
+                // Logging each exception
+                foreach (var exc in rtle.LoaderExceptions)
+                {
+                    SnLog.WriteError(exc);
+                }
+            }
         }
 
         private static bool IgnorableException(Exception e)
