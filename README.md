@@ -2,6 +2,7 @@
 
 [![Join the chat at https://gitter.im/SenseNet/sn-tools](https://badges.gitter.im/SenseNet/sn-tools.svg)](https://gitter.im/SenseNet/sn-tools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NuGet](https://img.shields.io/nuget/v/SenseNet.Tools.svg)](https://www.nuget.org/packages/SenseNet.Tools)
+[![Build Status](https://dev.azure.com/sensenetplatform/sensenet/_apis/build/status/SenseNet.sn-tools)](https://dev.azure.com/sensenetplatform/sensenet/_build/latest?definitionId=4)
 
 This library contains useful tools for developers ranging from tasks as small as retrying an operation multiple times to a robust trace component.
 
