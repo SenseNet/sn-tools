@@ -190,17 +190,19 @@ namespace SenseNet.Tools
                 {
                     try
                     {
-                        var asmName = AssemblyName.GetAssemblyName(dllPath).Name;
-                        if (!assemblyNames.Contains(asmName))
+                        var asmName = AssemblyName.GetAssemblyName(dllPath);
+                        var asmFullName = asmName.FullName;
+                        var asmNameName = asmName.Name;
+                        if (!assemblyNames.Contains(asmNameName))
                         {
                             Assembly.LoadFrom(dllPath);
-                            assemblyNames.Add(asmName);
+                            assemblyNames.Add(asmNameName);
                             loaded.Add(Path.GetFileName(dllPath));
-                            SnTrace.Repository.Write("Loaded: {0}, {1}", asmName, dllPath);
+                            SnTrace.Repository.Write("ASM Loaded: {0}, {1}", asmFullName, dllPath);
                         }
                         else
                         {
-                            SnTrace.Repository.Write("Skipped: {0}, {1}", asmName, dllPath);
+                            SnTrace.Repository.Write("ASM Skipped: {0}, {1}", asmFullName, dllPath);
                         }
                     }
                     catch (BadImageFormatException e) //logged
