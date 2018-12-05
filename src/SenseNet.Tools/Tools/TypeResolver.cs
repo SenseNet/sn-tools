@@ -181,8 +181,8 @@ namespace SenseNet.Tools
             {
                 _pluginsLoaded = true;
 
-                var assemblyNames = AppDomain.CurrentDomain.GetAssemblies()
-                    .Select(asm => new AssemblyName(asm.FullName).Name).ToList();
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                    .ToDictionary(a => new AssemblyName(a.FullName).Name, a => a);
 
                 var dllPaths = Directory.GetFiles(path, "*.dll");
 
@@ -193,16 +193,16 @@ namespace SenseNet.Tools
                         var asmName = AssemblyName.GetAssemblyName(dllPath);
                         var asmFullName = asmName.FullName;
                         var asmNameName = asmName.Name;
-                        if (!assemblyNames.Contains(asmNameName))
+                        if (assemblies.TryGetValue(asmNameName, out var origAsm))
                         {
-                            Assembly.LoadFrom(dllPath);
-                            assemblyNames.Add(asmNameName);
-                            loaded.Add(Path.GetFileName(dllPath));
-                            SnTrace.Repository.Write("ASM Loaded: {0}, {1}", asmFullName, dllPath);
+                            SnTrace.Repository.Write("ASM Skipped: {0}, {1}", asmFullName, origAsm.Location);
                         }
                         else
                         {
-                            SnTrace.Repository.Write("ASM Skipped: {0}, {1}", asmFullName, dllPath);
+                            var loadedAsm = Assembly.LoadFrom(dllPath);
+                            assemblies.Add(asmNameName, loadedAsm);
+                            loaded.Add(Path.GetFileName(dllPath));
+                            SnTrace.Repository.Write("ASM Loaded: {0}, {1}", asmFullName, dllPath);
                         }
                     }
                     catch (BadImageFormatException e) //logged
