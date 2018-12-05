@@ -162,6 +162,7 @@ namespace SenseNet.Tools
         }
 
         private static bool _pluginsLoaded;
+
         /// <summary>
         /// Loads all assemblies from the specified file system path.
         /// </summary>
@@ -174,35 +175,47 @@ namespace SenseNet.Tools
             if (path.Length == 0)
                 throw new ArgumentException("Path cannot be empty.", nameof(path));
 
-            _pluginsLoaded = true;
-
-            var assemblyNames = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(asm => new AssemblyName(asm.FullName).Name).ToList();
-
             var loaded = new List<string>();
-            var dllPaths = Directory.GetFiles(path, "*.dll");
             var badImageFormatMessages = new List<string>();
-
-            foreach (var dllPath in dllPaths)
+            using (var op = SnTrace.Repository.StartOperation("Loading assemblies from: " + path))
             {
-                try
+                _pluginsLoaded = true;
+
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                    .ToDictionary(a => new AssemblyName(a.FullName).Name, a => a);
+
+                var dllPaths = Directory.GetFiles(path, "*.dll");
+
+                foreach (var dllPath in dllPaths)
                 {
-                    var asmName = AssemblyName.GetAssemblyName(dllPath).Name;
-                    if (!assemblyNames.Contains(asmName))
+                    try
                     {
-                        Assembly.LoadFrom(dllPath);
-                        assemblyNames.Add(asmName);
-                        loaded.Add(Path.GetFileName(dllPath));
+                        var asmName = AssemblyName.GetAssemblyName(dllPath);
+                        var asmFullName = asmName.FullName;
+                        var asmNameName = asmName.Name;
+                        if (assemblies.TryGetValue(asmNameName, out var origAsm))
+                        {
+                            SnTrace.Repository.Write("ASM Skipped: {0}, {1}", asmFullName, origAsm.Location);
+                        }
+                        else
+                        {
+                            var loadedAsm = Assembly.LoadFrom(dllPath);
+                            assemblies.Add(asmNameName, loadedAsm);
+                            loaded.Add(Path.GetFileName(dllPath));
+                            SnTrace.Repository.Write("ASM Loaded: {0}, {1}", asmFullName, dllPath);
+                        }
+                    }
+                    catch (BadImageFormatException e) //logged
+                    {
+                        badImageFormatMessages.Add(e.Message);
                     }
                 }
-                catch (BadImageFormatException e) //logged
-                {
-                    badImageFormatMessages.Add(e.Message);
-                }
+
+                op.Successful = true;
             }
             if (badImageFormatMessages.Count > 0)
-                SnLog.WriteInformation($"Skipped assemblies from {path} on start: {Environment.NewLine}{string.Join(Environment.NewLine, badImageFormatMessages)}");
-
+                SnLog.WriteInformation(
+                    $"Skipped assemblies from {path} on start: {Environment.NewLine}{string.Join(Environment.NewLine, badImageFormatMessages)}");
             return loaded.ToArray();
         }
 
