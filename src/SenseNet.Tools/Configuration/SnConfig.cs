@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using SenseNet.Tools;
+using Microsoft.Extensions.Configuration;
 
 namespace SenseNet.Configuration
 {
     /// <summary>
     /// Base class for handling configuration values. Derived classes should expose 
-    /// static, strongly typed properties for well-known configuration values.
+    /// strongly typed properties for well-known configuration values.
     /// </summary>
     public abstract class SnConfig
     {
         /// <summary>
         /// Initializes an instance of the SnConfig class.
         /// </summary>
+        // ReSharper disable once EmptyConstructor
         protected SnConfig()
         {
             // This technical constructor was created to prevent external code from
@@ -24,14 +25,14 @@ namespace SenseNet.Configuration
         //============================================================================== Properties
 
         /// <summary>
-        /// Current configuration instance that serves the actual values internally. Created for testing purposes.
+        /// Current configuration instance that serves the actual values internally.
         /// </summary>
-        internal static IConfigProvider Instance { get; set; } = new SnConfigProvider();
+        internal static IConfiguration Instance { get; set; } = new SnLegacyConfiguration();
 
         //============================================================================== GetValue
 
         /// <summary>
-        /// Gets a configuration value from the specified section, with a fallback to the appSettings section.
+        /// Gets a configuration value from the specified section.
         /// </summary>
         /// <param name="sectionName">Section name (e.g. examplecompany/feature1)</param>
         /// <param name="key">Configuration key name.</param>
@@ -52,7 +53,7 @@ namespace SenseNet.Configuration
         }
 
         /// <summary>
-        /// Gets a string configuration value from the specified section, with a fallback to the appSettings section.
+        /// Gets a string configuration value from the specified section.
         /// </summary>
         /// <param name="sectionName">Section name (e.g. examplecompany/feature1)</param>
         /// <param name="key">Configuration key name.</param>
@@ -60,12 +61,16 @@ namespace SenseNet.Configuration
         /// <returns>The value found in the configuration or the provided default value.</returns>
         protected internal static string GetString(string sectionName, string key, string defaultValue = null)
         {
-            var configValue = Instance.GetString(sectionName, key);
+            // if the section path contains a legacy separator ('/'), replace it with the new one (':')
+            var configValue = string.IsNullOrEmpty(sectionName)
+                ? Instance[key]
+                : Instance.GetSection(sectionName.Replace('/', ':'))?[key];
+
             return configValue ?? defaultValue;
         }
 
         /// <summary>
-        /// Gets an integer configuration value from the specified section, with a fallback to the appSettings section.
+        /// Gets an integer configuration value from the specified section.
         /// </summary>
         /// <param name="sectionName">Section name (e.g. examplecompany/feature1)</param>
         /// <param name="key">Configuration key name.</param>
@@ -81,7 +86,7 @@ namespace SenseNet.Configuration
         }
 
         /// <summary>
-        /// Gets a double configuration value from the specified section, with a fallback to the appSettings section.
+        /// Gets a double configuration value from the specified section.
         /// </summary>
         /// <param name="sectionName">Section name (e.g. examplecompany/feature1)</param>
         /// <param name="key">Configuration key name.</param>
@@ -99,7 +104,7 @@ namespace SenseNet.Configuration
         private static readonly char[] SplitSeparatorChars = {';', ','};
 
         /// <summary>
-        /// Gets a list of values from the specified section and key, with a fallback to the appSettings section.
+        /// Gets a list of values from the specified section and key.
         /// The value found in config will be split by the ; and , characters with removing empty entries.
         /// This method returns the provided default value (which may be null!) if the key was not found. It 
         /// returns an empty list, if the key was found but the value is an empty string.
@@ -120,7 +125,7 @@ namespace SenseNet.Configuration
         }
 
         /// <summary>
-        /// Gets a list of values from the specified section and key, with a fallback to the appSettings section.
+        /// Gets a list of values from the specified section and key.
         /// The value found in config will be split by the ; and , characters with removing empty entries. 
         /// This method does not return null, ever. It returns an empty list, if the key was not found, 
         /// or a meaningful default value was not provided. If you want to distinguish a missing key
