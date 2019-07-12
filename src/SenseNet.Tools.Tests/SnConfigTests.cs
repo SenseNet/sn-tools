@@ -51,7 +51,14 @@ namespace SenseNet.Tools.Tests
                 Assert.IsTrue(SnConfig.GetListOrEmpty<string>("feature1", "key7").SequenceEqual(new List<string>()));
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+            {
+                Test();
+
+                // In new environments there should be no fallback: keyX does not exist under feature1.
+                Assert.IsNull(SnConfig.GetValue<string>("feature1", "keyX"));
+            }
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
             {
                 Test();
 
@@ -91,7 +98,9 @@ namespace SenseNet.Tools.Tests
                 Assert.IsTrue(SnConfig.GetListOrEmpty<string>("feature1", "NO-KEY").SequenceEqual(new List<string>()));
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
                 Test();
             using (new ConfigurationSwindler(new SnLegacyConfiguration()))
                 Test();
@@ -113,7 +122,9 @@ namespace SenseNet.Tools.Tests
                 Assert.IsTrue(a2.SequenceEqual(new[] { 7, 8, 9 }));
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
                 Test();
             using (new ConfigurationSwindler(new SnLegacyConfiguration()))
                 Test();
@@ -139,7 +150,9 @@ namespace SenseNet.Tools.Tests
                 Assert.AreEqual(2.3, b2);
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
                 Test();
             using (new ConfigurationSwindler(new SnLegacyConfiguration()))
                 Test();
@@ -154,7 +167,7 @@ namespace SenseNet.Tools.Tests
                 Assert.AreEqual("subvalue1", SnConfig.GetValue<string>("sensenet:subsection", "key1"));
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
                 Test();
             using (new ConfigurationSwindler(new SnLegacyConfiguration()))
                 Test();
@@ -172,7 +185,7 @@ namespace SenseNet.Tools.Tests
                 SnConfig.GetValue<int>("feature1", "key1");
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
                 Test();
         }
         [TestMethod]
@@ -185,14 +198,22 @@ namespace SenseNet.Tools.Tests
                 SnConfig.GetList<int>("feature1", "key4");
             }
 
-            using (new ConfigurationSwindler(CreateTestConfiguration()))
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
                 Test();
         }
 
-        private static IConfiguration CreateTestConfiguration()
+        private static IConfiguration CreateTestConfigurationForMemory()
         {
+            // creates an in-memory config instance
             return new ConfigurationBuilder()
                 .AddInMemoryCollection(TestConfigData)
+                .Build();
+        }
+        private static IConfiguration CreateTestConfigurationForJson()
+        {
+            // creates a config instance from a json source
+            return new ConfigurationBuilder()
+                .AddJsonFile("testsettings.json")
                 .Build();
         }
     }

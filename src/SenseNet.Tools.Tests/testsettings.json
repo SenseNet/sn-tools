@@ -1,0 +1,25 @@
+{
+  "key1": "value1",
+  "key2": "123",
+  "key3": "1.2",
+  "key4": "a,b,c",
+  "keyX": "qwe",
+  "feature1": 
+  {
+    "key1": "value999",
+    "key2": "456",
+    "key3": "3.4",
+    "key4": "d,e;f",
+    "key5": "7,8,9",
+    "key6": "Value2",
+    "key7": "",
+    "key8": "true"
+  },
+  "sensenet":
+  {
+    "subsection":
+    {
+      "key1": "subvalue1"
+    }
+  }
+}
