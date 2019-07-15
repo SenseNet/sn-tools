@@ -173,6 +173,21 @@ namespace SenseNet.Tools.Tests
                 Test();
         }
 
+        //============================================================================== Legacy tests
+
+        [TestMethod]
+        public void SnConfig_Legacy_ConnectionString()
+        {
+            void Test()
+            {
+                Assert.AreEqual("csvalue1", SnConfig.GetValue<string>("connectionStrings", "cs1"));
+                Assert.AreEqual("csvalue1", SnConfig.GetValue<string>("ConnectionStrings", "cs1"));
+            }
+
+            using (new ConfigurationSwindler(new SnLegacyConfiguration()))
+                Test();
+        }
+
         //============================================================================== Error tests
 
         [TestMethod]

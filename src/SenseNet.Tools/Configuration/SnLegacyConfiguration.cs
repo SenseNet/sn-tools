@@ -78,6 +78,10 @@ namespace SenseNet.Configuration
         {
             get
             {
+                // special section in old configuration files
+                if (string.Compare(Key, "connectionStrings", StringComparison.InvariantCultureIgnoreCase) == 0)
+                    return ConfigurationManager.ConnectionStrings[key]?.ConnectionString;
+
                 var configValue = _configValues?[key];
 
                 // backward compatibility: fallback to the appsettings section
