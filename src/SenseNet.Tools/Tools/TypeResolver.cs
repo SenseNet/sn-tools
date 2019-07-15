@@ -182,7 +182,8 @@ namespace SenseNet.Tools
                 _pluginsLoaded = true;
 
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                    .ToDictionary(a => new AssemblyName(a.FullName).Name, a => a);
+                    .GroupBy(a => new AssemblyName(a.FullName).Name)
+                    .ToDictionary(grp => grp.Key, grp => grp.Last());
 
                 var dllPaths = Directory.GetFiles(path, "*.dll");
 

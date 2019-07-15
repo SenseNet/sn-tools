@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Configuration;
 
@@ -11,116 +12,78 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnConfigTests
     {
-        #region Test infrsatructure
-
-        /// <summary>
-        /// Test config provider that serves values from an in-memory store.
-        /// </summary>
-        private class InMemoryConfigProvider : IConfigProvider, IDisposable
-        {
-            private readonly Dictionary<string, string> _appSettings = new Dictionary<string, string>();
-
-            private readonly Dictionary<string, Dictionary<string, string>> _sections =
-                new Dictionary<string, Dictionary<string, string>>();
-
-            private readonly IConfigProvider _originalConfigProvider = SnConfig.Instance;
-
-            private InMemoryConfigProvider(Dictionary<string, string> appSettings,
-                Dictionary<string, Dictionary<string, string>> sections)
-            {
-                if (appSettings != null)
-                    _appSettings = appSettings;
-                if (sections != null)
-                    _sections = sections;
-            }
-
-            public string GetString(string sectionName, string key)
-            {
-                Dictionary<string, string> source;
-                string configValue = null;
-
-                if (!string.IsNullOrEmpty(sectionName) && _sections.TryGetValue(sectionName, out source) && source != null && source.ContainsKey(key))
-                    configValue = source[key];
-
-                if (configValue == null && _appSettings.ContainsKey(key))
-                    configValue = _appSettings[key];
-
-                return configValue;
-            }
-
-            internal static InMemoryConfigProvider Create(Dictionary<string, string> appSettings,
-                Dictionary<string, Dictionary<string, string>> sections = null)
-            {
-                // Set this as the current config provider - we will switch back 
-                // to the original when disposing this instance.
-                var cp = new InMemoryConfigProvider(appSettings, sections);
-                SnConfig.Instance = cp;
-
-                return cp;
-            }
-
-            public void Dispose()
-            {
-                SnConfig.Instance = _originalConfigProvider;
-            }
-        }
-        
-        #endregion
-
-        private static readonly Dictionary<string, Dictionary<string, string>> TestConfigSections = new Dictionary
-            <string, Dictionary<string, string>>
-        {
-            {
-                "feature1", new Dictionary<string, string>
-                {
-                    {"key1", "value999"},
-                    {"key2", "456"},
-                    {"key3", "3.4"},
-                    {"key4", "d,e;f"}, // note the two different separators
-                    {"key5", "7,8,9"},
-                    {"key6", "Value2"},
-                    {"key7", ""},
-                    {"key8", "true"}
-                }
-            }
-        };
-
-        private static readonly Dictionary<string, string> TestAppSettings = new Dictionary<string, string>
+        #region Test data
+        private static readonly Dictionary<string, string> TestConfigData = new Dictionary<string, string>
         {
             {"key1", "value1"},
             {"key2", "123"},
             {"key3", "1.2"},
             {"key4", "a,b,c"},
-            {"keyX", "qwe"}
+            {"keyX", "qwe"},
+
+            // section
+            {"feature1:key1", "value999"},
+            {"feature1:key2", "456"},
+            {"feature1:key3", "3.4"},
+            {"feature1:key4", "d,e;f"}, // note the two different separators
+            {"feature1:key5", "7,8,9"},
+            {"feature1:key6", "Value2"},
+            {"feature1:key7", ""},
+            {"feature1:key8", "true"},
+
+            //subsection
+            {"sensenet:subsection:key1", "subvalue1"}
         };
+        #endregion
 
         [TestMethod]
         public void SnConfig_SectionName_ExistingValue()
         {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
+            void Test()
             {
                 // from section
                 Assert.AreEqual("value999", SnConfig.GetValue<string>("feature1", "key1"));
-                // from appSettings directly
-                Assert.AreEqual("value1", SnConfig.GetValue<string>((string)null, "key1"));
-                // from appSettings fallback
-                Assert.AreEqual("qwe", SnConfig.GetValue<string>("feature1", "keyX"));
-
+                // from root settings directly
+                Assert.AreEqual("value1", SnConfig.GetValue<string>(null, "key1"));
+                
                 // empty, but existing key
                 Assert.IsTrue(SnConfig.GetList<string>("feature1", "key7").SequenceEqual(new List<string>()));
                 Assert.IsTrue(SnConfig.GetListOrEmpty<string>("feature1", "key7").SequenceEqual(new List<string>()));
+            }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+            {
+                Test();
+
+                // In new environments there should be no fallback: keyX does not exist under feature1.
+                Assert.IsNull(SnConfig.GetValue<string>("feature1", "keyX"));
+            }
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
+            {
+                Test();
+
+                // In new environments there should be no fallback: keyX does not exist under feature1.
+                Assert.IsNull(SnConfig.GetValue<string>("feature1", "keyX"));
+            }
+
+            using (new ConfigurationSwindler(new SnLegacyConfiguration()))
+            {
+                Test();
+
+                // legacy behavior in old environments: appSettings fallback
+                Assert.AreEqual("qwe", SnConfig.GetValue<string>("feature1", "keyX"));
             }
         }
         [TestMethod]
         public void SnConfig_SectionName_NonExistingValue()
         {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
+            void Test()
             {
                 // existing section, no key
                 Assert.IsNull(SnConfig.GetValue<string>("feature1", "NO-KEY"));
                 // no section, no key
                 Assert.IsNull(SnConfig.GetValue<string>("NO-feature", "NO-KEY"));
-                Assert.IsNull(SnConfig.GetValue<string>((string)null, "NO-KEY"));
+                Assert.IsNull(SnConfig.GetValue<string>(null, "NO-KEY"));
 
                 // default values
                 Assert.AreEqual("DEFAULT", SnConfig.GetValue("feature1", "NO-KEY", "DEFAULT"));
@@ -134,12 +97,19 @@ namespace SenseNet.Tools.Tests
                 Assert.IsTrue(SnConfig.GetList("feature1", "NO-KEY", new List<string>(0)).SequenceEqual(new List<string>()));
                 Assert.IsTrue(SnConfig.GetListOrEmpty<string>("feature1", "NO-KEY").SequenceEqual(new List<string>()));
             }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
+                Test();
+            using (new ConfigurationSwindler(new SnLegacyConfiguration()))
+                Test();
         }
 
         [TestMethod]
         public void SnConfig_SectionName_TypeConversion()
         {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
+            void Test()
             {
                 Assert.AreEqual(456, SnConfig.GetValue<int>("feature1", "key2"));
                 Assert.AreEqual(3.4, SnConfig.GetValue<double>("feature1", "key3"));
@@ -151,12 +121,19 @@ namespace SenseNet.Tools.Tests
                 var a2 = SnConfig.GetList<int>("feature1", "key5");
                 Assert.IsTrue(a2.SequenceEqual(new[] { 7, 8, 9 }));
             }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
+                Test();
+            using (new ConfigurationSwindler(new SnLegacyConfiguration()))
+                Test();
         }
 
         [TestMethod]
         public void SnConfig_SectionName_Boundaries()
         {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
+            void Test()
             {
                 var b1 = SnConfig.GetInt("feature1", "key2", 0, 400);
                 Assert.AreEqual(456, b1);
@@ -172,6 +149,28 @@ namespace SenseNet.Tools.Tests
                 b2 = SnConfig.GetDouble("feature1", "key3", 0, 1, 2.3);
                 Assert.AreEqual(2.3, b2);
             }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(CreateTestConfigurationForJson()))
+                Test();
+            using (new ConfigurationSwindler(new SnLegacyConfiguration()))
+                Test();
+        }
+
+        [TestMethod]
+        public void SnConfig_SectionName_Subsection()
+        {
+            void Test()
+            {
+                Assert.AreEqual("subvalue1", SnConfig.GetValue<string>("sensenet/subsection", "key1"));
+                Assert.AreEqual("subvalue1", SnConfig.GetValue<string>("sensenet:subsection", "key1"));
+            }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+            using (new ConfigurationSwindler(new SnLegacyConfiguration()))
+                Test();
         }
 
         //============================================================================== Error tests
@@ -180,21 +179,58 @@ namespace SenseNet.Tools.Tests
         [ExpectedException(typeof(FormatException))]
         public void SnConfig_TypeConversion_Error1()
         {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
+            void Test()
             {
                 // type conversion error
                 SnConfig.GetValue<int>("feature1", "key1");
             }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
         }
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void SnConfig_TypeConversion_Error2()
         {
-            using (InMemoryConfigProvider.Create(TestAppSettings, TestConfigSections))
+            void Test()
             {
                 // type conversion error
                 SnConfig.GetList<int>("feature1", "key4");
             }
+
+            using (new ConfigurationSwindler(CreateTestConfigurationForMemory()))
+                Test();
+        }
+
+        private static IConfiguration CreateTestConfigurationForMemory()
+        {
+            // creates an in-memory config instance
+            return new ConfigurationBuilder()
+                .AddInMemoryCollection(TestConfigData)
+                .Build();
+        }
+        private static IConfiguration CreateTestConfigurationForJson()
+        {
+            // creates a config instance from a json source
+            return new ConfigurationBuilder()
+                .AddJsonFile("testsettings.json")
+                .Build();
+        }
+    }
+
+    internal class ConfigurationSwindler : IDisposable
+    {
+        private readonly IConfiguration _originalConfig;
+
+        public ConfigurationSwindler(IConfiguration configuration)
+        {
+            _originalConfig = SnConfig.Instance;
+            SnConfig.Instance = configuration;
+        }
+
+        public void Dispose()
+        {
+            SnConfig.Instance = _originalConfig;
         }
     }
 }
