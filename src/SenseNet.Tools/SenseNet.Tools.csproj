@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>SenseNet.Tools</RootNamespace>
     <AssemblyName>SenseNet.Tools</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
     <Title>sensenet Tools</Title>
     <Authors>tusmester,kavics</Authors>
     <Company>Sense/Net Inc.</Company>
@@ -21,8 +21,6 @@
     <PackageReleaseNotes>See release notes on GitHub.</PackageReleaseNotes>
     <NeutralLanguage>en</NeutralLanguage>
     <Language>en-US</Language>
-    <AssemblyVersion>3.1.0.0</AssemblyVersion>
-    <FileVersion>3.1.0.0</FileVersion>
     <DebugType>Full</DebugType>
   </PropertyGroup>
 
