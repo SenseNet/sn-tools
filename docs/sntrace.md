@@ -8,12 +8,12 @@ description: Tracing is an important toolset of a complex system that enables ex
 ---
 
 # SnTrace
-Every advanced software needs a tool that provides information about the state of the application and what is happening inside. Another important maintenance capability is to measure performance, e.g. the duration of key operations. In sensenet the SnTrace component is a base of an easy-to-use tracing tool and measuring instrument in one.
+Every advanced software needs a tool that provides information about the state of the application and what is happening inside. Another important maintenance capability is to measure performance, e.g. the duration of key operations. In sensenet the SnTrace component is the base of an easy-to-use tracing tool and performance measuring instrument.
 
 For details about logging in general please visit the main [Logging article](http://wiki.sensenet.com/Logging).
 
 ## Details
-First of all, SnTrace is a quick *verbose logger*. This feature is different from event logging such as writing errors and warnings or audit events. Verbose logging needs to be as fast as possible regardless of whether the feature is turned on or off. It is designed to be able to handle even a huge load of concurrent events and is usually used to monitor the behavior of the system when there are lots of things going on. For example tracing is reponsible for marking all important points of a content life cycle (e.g. saving the data to the Content Repository, than to the security db, than indexing, etc.), while an audit log entry is a single record in the audit log about a content that was created. The main features of the tracing in sensenet:
+First of all, SnTrace is a quick *verbose logger*. This feature is different from event logging such as writing errors and warnings or audit events. Verbose logging needs to be as fast as possible regardless of whether the feature is turned on or off. It is designed to be able to handle even a huge load of concurrent events and is usually used to monitor the behavior of the system when there are lots of things going on. For example tracing is reponsible for marking all important points of a content life cycle (e.g. saving the data to the Content Repository, then to the security db, then indexing, etc.), while an audit log entry is a single record in the audit log about a content that was created. The main features of the tracing in sensenet:
 - Writing trace with the SnTrace API
   - Writing **single line** entries to read and process easy way.
   - Using **operations** to measure logical business steps.
@@ -35,7 +35,7 @@ Another important task of SnTrace is **performance measurement**. It is based on
 
 This technique is quick enough, the log lines are human readable and the generator code is very simple (see the examples below).
 
-> According to our measurements, the system deceleration rate is 1% on a loaded web server and high verbosity logging. Still, it is advisable to switch tracing on when needed and switch it off after.
+> According to our measurements, the system deceleration rate is 1% on a loaded web server and high verbosity logging. Still, it is advisable to switch tracing on **only** when needed.
 
 ### Where does the data go
 The trace entries are written to various targets depending on the trace providers that are currently active. A provider needs to implement the very simple **ISnTracer** interface. Multiple providers can be used simultaneously. See details of implementation below. The default SnTrace provider is the **SnFileSystemTracer** that persists the entries to the file system (using a buffer) as fast as possible.
@@ -149,7 +149,7 @@ Line Time  Category App Thr  Op    State         Duration         Message
 4    2016- Custom   A:. T:6  Op:1  End	         00:00:00.130007  Measured outer block
 ```
 ## Categories
-Every trace line is categorized. There are three kinds of categories:
+Every trace line is categorized. There are three categories:
 - Default
 - Built-in
 - User defined
@@ -207,7 +207,7 @@ In this case the category column shows the "Custom" word.
 12345   2018-05-17 23:20:16.57025   Custom        ....  Not categorized message
 ```
 #### Built-in categories
-There are a nuber of built-in categories used by the system. For example using the "Test" category: 
+There are a number of built-in categories used by the system. For example using the "Test" category: 
 ```csharp
 SnTrace.Test.Write("Message for a test purpose.");
 ```
@@ -270,7 +270,7 @@ Line Time   Cat.. ... Message
 ```
 
 ## Customizing trace providers
-The SnTrace API is responsible for managing categories, formatting the final trace message and calling one or more tracer. Persisting, visualizing these messages or sending them to other places are the responsibilities of trace providers. These providers need to be fast, fault-tolerant components.
+The SnTrace API is responsible for managing categories, formatting the final trace message and calling one or more tracers. Persisting, visualizing these messages or sending them to other places are the responsibilities of trace providers. These providers need to be fast, fault-tolerant components.
 
 The active providers can be configured by a static list. In this version we use this default setting:
 ```csharp
@@ -278,7 +278,7 @@ SnTracers = new List<ISnTracer>(new[] { new SnFileSystemTracer() });
 ```
 The list cannot be changed but items are freely changeable and replaceable.
 
-A trace writer needs to implemet the **ISnTracer** interface that defines only two simple methods:
+A trace writer needs to implement the **ISnTracer** interface that defines only two simple methods:
 ```csharp
 public interface ISnTracer
 {
@@ -305,10 +305,10 @@ MaxPdiff: 4289
 ```
 
 ### Built-in trace providers
-In this version there are 2 trace provider. One for tracing production webservers with persisted logs and one for monitoring developer's local webserver instances.
+In this version there are 2 trace providers. One for tracing production webservers with persisted logs and one for monitoring developer's local webserver instances.
 
 ### SnFileSystemTracer
-This is the default trace provider of sensenet that is inherited from the abstract **BufferedSnTracer**. This trace writer persists the trace data to physical files in the file system. To ensure the velocity this module does the followings:
+This is the default trace provider of sensenet that is inherited from the abstract **BufferedSnTracer**. This trace writer persists the trace data to physical files in the file system. To ensure the velocity this module does the following:
 
 - Buffered writing: the provider does not write every single line when they come in (see details above).
 - After a configured number of lines **new files are opened** to ensure that they do not become too big.
@@ -333,7 +333,7 @@ This provider's behavior can be fine-tuned by modifying the values of the follow
 ### SnDebugViewTracer
 Sometimes - especially developer time - can be useful if trace entries are displayed immediately when they come up. This trace writer transfers the trace entries to the standard trace channel of Windows and the channel can be monitored using the **[DebugView](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview#introduction)** of *[Sysinternals](https://docs.microsoft.com/en-us/sysinternals/)* ([download](https://docs.microsoft.com/en-us/sysinternals/downloads/debugview)). This channel can be very noisy sometimes but can be filtered. Open the filter/highligt dialog from the Edit menu (or press ctrl-L) and set the value of the `Include` textbox to "SnTrace:".
 
-To activate this provider an instance have to be included in the provider-list when the application starts. The following code removes the persistent trace writer and adds the monitoring provider.
+To activate this provider an instance has to be included in the provider-list when the application starts. The following code removes the persistent trace writer and adds the monitoring provider.
 ```csharp
 SnTrace.SnTracers.Clear();
 SnTrace.SnTracers.Add(new SnDebugViewTracer());
@@ -342,8 +342,8 @@ SnTrace.SnTracers.Add(new SnDebugViewTracer());
 ## Performance considerations
 There are a couple of things to consider when using SnTrace as a developer or operator:
 
-- Do not keep all categories switched on for a long time (it generates to much data anyway that will be hard to process).
-- Do not use complex information gathering when you write to the trace, it may effect time measurement and slow down the portal. If it is necessary, test whether the category (Custom) is enabled or not before collecting the data.
+- Do not keep all categories switched on for a long time (it generates too much data anyway that will be hard to process).
+- Do not use complex information gathering when you write to the trace, it may affect time measurement and slow down the portal. If it is necessary, test whether the category (Custom) is enabled or not before collecting the data.
 - Delete log files on the server from time to time, they may take up a lot of space.
 - Do not open an active file (during measuring) to prevent IO errors.
 ## Known issues
