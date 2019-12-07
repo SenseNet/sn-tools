@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>

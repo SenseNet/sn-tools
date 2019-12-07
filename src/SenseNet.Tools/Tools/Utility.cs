@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools
 {
     /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools.CommandLineArguments
 {
     /// <summary>

@@ -1,4 +1,5 @@
-﻿namespace SenseNet.Diagnostics
+﻿// ReSharper disable once CheckNamespace
+namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// Contains well-known event ids in sensenet ECM.

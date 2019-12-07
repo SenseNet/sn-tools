@@ -5,6 +5,7 @@ using System.Linq;
 
 #pragma warning disable 1591
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics.Analysis
 {
     /// <summary>

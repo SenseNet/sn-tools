@@ -5,6 +5,7 @@ using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Configuration
 {
     /// <summary>

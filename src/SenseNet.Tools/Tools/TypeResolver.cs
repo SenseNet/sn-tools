@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using SenseNet.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools
 {
     /// <summary>

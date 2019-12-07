@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 // ReSharper disable UseStringInterpolation
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>

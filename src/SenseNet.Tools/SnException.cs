@@ -1,6 +1,7 @@
 ﻿using System;
 using SenseNet.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet
 {
     /// <summary>
