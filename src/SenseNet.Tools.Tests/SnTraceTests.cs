@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
