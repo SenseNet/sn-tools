@@ -26,6 +26,7 @@ namespace SenseNet.Tools
         /// <typeparam name="T">Type of the object to create.</typeparam>
         /// <param name="typeName">Name of the type to use.</param>
         /// <returns>A newly created object of type T.</returns>
+        // ReSharper disable once UnusedMember.Global
         public static T CreateInstance<T>(string typeName) where T : new()
         {
             return (T)CreateInstance(typeName);
@@ -38,6 +39,7 @@ namespace SenseNet.Tools
         /// <param name="args">An array of arguments that match in number, order, and type the parameters 
         /// of the constructor to invoke.</param>
         /// <returns>A newly created object of type T.</returns>
+        // ReSharper disable once UnusedMember.Global
         public static T CreateInstance<T>(string typeName, params object[] args)
         {
             return (T)CreateInstance(typeName, args);

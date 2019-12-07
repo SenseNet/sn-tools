@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Tools.CommandLineArguments;
 // ReSharper disable ArgumentsStyleStringLiteral
 // ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable UnusedMember.Global
 
 namespace SenseNet.Tools.Tests
 {

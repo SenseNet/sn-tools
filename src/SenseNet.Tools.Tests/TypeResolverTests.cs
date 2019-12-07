@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+// ReSharper disable UnusedMember.Global
 
 namespace SenseNet.Tools.Tests
 {

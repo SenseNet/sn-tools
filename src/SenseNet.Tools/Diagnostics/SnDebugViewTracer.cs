@@ -8,6 +8,7 @@ namespace SenseNet.Diagnostics
     /// (sensenet's verbose log) using a debug viewer of your choice - for example 
     /// DebugView in the Sysinternals package.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class SnDebugViewTracer : ISnTracer
     {
         /// <summary>

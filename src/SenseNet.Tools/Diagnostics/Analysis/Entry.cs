@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+// ReSharper disable UnusedMember.Global
 
 #pragma warning disable 1591
 

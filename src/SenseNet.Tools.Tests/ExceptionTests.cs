@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Security;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
+// ReSharper disable UnusedMember.Global
 
 namespace SenseNet.Tools.Tests
 {

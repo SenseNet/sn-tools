@@ -24,6 +24,7 @@ namespace SenseNet.Tools.CommandLineArguments
         /// <summary>
         /// Error message to write to the console.
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public string FormattedMessage => GetFormattedMessage();
 
         private string GetFormattedMessage()

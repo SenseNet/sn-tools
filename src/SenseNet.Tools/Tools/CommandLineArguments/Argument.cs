@@ -20,6 +20,7 @@ namespace SenseNet.Tools.CommandLineArguments
             this.HelpText = helpText;
         }
 
+        // ReSharper disable once UnusedMemberInSuper.Global
         public abstract string GetUsageHead();
     }
 

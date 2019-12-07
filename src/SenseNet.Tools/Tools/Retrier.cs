@@ -59,6 +59,7 @@ namespace SenseNet.Tools
         /// <param name="caughtExceptionType">Type of exception that is suppressed and triggers the next attempt.</param>
         /// <param name="callback">Parameterless method with T return type.</param>
         /// <returns>Result of the callback method.</returns>
+        // ReSharper disable once UnusedMember.Global
         public static T Retry<T>(int count, int waitMilliseconds, Type caughtExceptionType, Func<T> callback)
         {
             var retryCount = count;
@@ -194,6 +195,7 @@ namespace SenseNet.Tools
         /// Otherwise the next attempt will be performed.
         /// </param>
         /// <returns>Result of the callback method.</returns>
+        // ReSharper disable once UnusedMember.Global
         public static async Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> callback, Func<T, int, Exception, bool> checkCondition)
         {
             var retryCount = count;

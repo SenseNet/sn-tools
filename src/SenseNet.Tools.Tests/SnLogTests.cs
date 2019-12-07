@@ -14,6 +14,7 @@ using SenseNet.Tools.Diagnostics;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
+// ReSharper disable UnusedMember.Global
 
 namespace SenseNet.Tools.Tests
 {

@@ -7,6 +7,7 @@ namespace SenseNet.Diagnostics
     /// <summary>
     /// Logger implementation for writing messages to the debug trace.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class DebugEventLogger : TraceEventLogger
     {
         /// <summary>

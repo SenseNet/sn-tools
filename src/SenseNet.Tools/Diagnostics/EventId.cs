@@ -1,4 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
 namespace SenseNet.Diagnostics
 {
     /// <summary>

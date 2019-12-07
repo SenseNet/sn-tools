@@ -8,9 +8,6 @@ namespace SenseNet.Tools.Tests
 {
     public abstract class SnTraceTestClass
     {
-        public TestContext TestContext { get; set; }
-
-
         // ReSharper disable once InconsistentNaming
         private string __detailedLogDirectory;
         protected string DetailedLogDirectory => __detailedLogDirectory ??

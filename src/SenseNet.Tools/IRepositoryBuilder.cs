@@ -1,4 +1,5 @@
-﻿namespace SenseNet.Tools
+﻿// ReSharper disable UnusedMember.Global
+namespace SenseNet.Tools
 {
     /// <summary>
     /// Defines methods for adding or modifying providers loaded when the repository starts.
