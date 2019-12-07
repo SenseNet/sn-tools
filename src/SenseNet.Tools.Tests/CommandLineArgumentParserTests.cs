@@ -213,7 +213,7 @@ namespace SenseNet.Tools.Tests
             var args = new string[0];
             var settings = new Args2();
 
-            ArgumentParser parser = null;
+            ArgumentParser parser;
             try
             {
                 parser = ArgumentParser.Parse(args, settings);

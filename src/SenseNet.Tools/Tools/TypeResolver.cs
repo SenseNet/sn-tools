@@ -91,8 +91,7 @@ namespace SenseNet.Tools
         /// <param name="throwOnError">Whether to throw an error when a type is not found.</param>
         public static Type FindTypeInAppDomain(string typeName, bool throwOnError = true)
         {
-            Type type;
-            if (!TypecacheByName.TryGetValue(typeName, out type))
+            if (!TypecacheByName.TryGetValue(typeName, out var type))
             {
                 lock (TypeCacheSync)
                 {
@@ -243,8 +242,7 @@ namespace SenseNet.Tools
         /// <param name="interfaceType">Interface type to look for.</param>
         public static Type[] GetTypesByInterface(Type interfaceType)
         {
-            Type[] temp;
-            if (!TypecacheByBase.TryGetValue(interfaceType, out temp))
+            if (!TypecacheByBase.TryGetValue(interfaceType, out var temp))
             {
                 lock (TypeCacheSync)
                 {
@@ -294,8 +292,7 @@ namespace SenseNet.Tools
         /// <param name="baseType">Base type to look for.</param>
         public static Type[] GetTypesByBaseType(Type baseType)
         {
-            Type[] temp;
-            if (!TypecacheByBase.TryGetValue(baseType, out temp))
+            if (!TypecacheByBase.TryGetValue(baseType, out var temp))
             {
                 lock (TypeCacheSync)
                 {

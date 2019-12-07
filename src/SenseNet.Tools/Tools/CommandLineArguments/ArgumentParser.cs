@@ -242,7 +242,7 @@ namespace SenseNet.Tools.CommandLineArguments
             var asmName = assembly.GetName();
             var name = asmName.Name;
             var version = asmName.Version;
-            return string.Format("{0} {1}", name, version);
+            return $"{name} {version}";
         }
         /// <summary>
         /// Returns detailed information about how to use the tool.

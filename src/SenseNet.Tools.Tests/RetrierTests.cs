@@ -25,7 +25,7 @@ namespace SenseNet.Tools.Tests
                 Interlocked.Increment(ref RetryCallCounter);
             });
 
-            Assert.AreEqual(1, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(1, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace SenseNet.Tools.Tests
                     throw new InvalidOperationException();
             });
 
-            Assert.AreEqual(2, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -67,7 +67,7 @@ namespace SenseNet.Tools.Tests
             }
             
             Assert.IsTrue(exceptionThrown, "Exception was not thrown.");
-            Assert.AreEqual(1, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(1, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace SenseNet.Tools.Tests
             }
 
             Assert.IsTrue(exceptionThrown, "Exception was not thrown.");
-            Assert.AreEqual(3, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(3, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         //====================================================================================== Functions with return value
@@ -112,7 +112,7 @@ namespace SenseNet.Tools.Tests
             (r, i, e) => e == null);
 
             Assert.AreEqual(123, result, "Wrong result: " + result);
-            Assert.AreEqual(1, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(1, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -133,7 +133,7 @@ namespace SenseNet.Tools.Tests
             (r, i, e) => e == null && r == 123);
 
             Assert.AreEqual(123, result, "Wrong result: " + result);
-            Assert.AreEqual(2, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -150,7 +150,7 @@ namespace SenseNet.Tools.Tests
             (r, i, e) => e == null && r == 456);
 
             Assert.AreEqual(123, result, "Wrong result: " + result);
-            Assert.AreEqual(3, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(3, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -166,7 +166,7 @@ namespace SenseNet.Tools.Tests
             (r, i, e) => e == null);
 
             Assert.AreEqual(default, result, "Wrong result: " + result);
-            Assert.AreEqual(3, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(3, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -187,8 +187,8 @@ namespace SenseNet.Tools.Tests
             },
             (i, e) => e == null);
 
-            Assert.AreEqual(1, RetryTestValue, string.Format("#1 RetryTestValue contains a wrong value: {0}.", RetryTestValue));
-            Assert.AreEqual(2, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(1, RetryTestValue, $"#1 RetryTestValue contains a wrong value: {RetryTestValue}.");
+            Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
         [TestMethod]
@@ -212,8 +212,8 @@ namespace SenseNet.Tools.Tests
             },
             (i, e) => e == null);
 
-            Assert.AreEqual(1, RetryTestValue, string.Format("#1 RetryTestValue contains a wrong value: {0}.", RetryTestValue));
-            Assert.AreEqual(2, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
+            Assert.AreEqual(1, RetryTestValue, $"#1 RetryTestValue contains a wrong value: {RetryTestValue}.");
+            Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
     }
 }

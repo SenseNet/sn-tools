@@ -102,6 +102,7 @@ namespace SenseNet.Tools.Tests
 
             using (var op1 = SnTrace.StartOperation("Op1"))
             {
+                // ReSharper disable once UnusedVariable
                 using (var op2 = SnTrace.StartOperation("Op2"))
                 {
                     SnTrace.Write("asdf");
@@ -213,14 +214,13 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void SnTrace_CategoriesContainsAll()
         {
-            string[] names;
-            var categoryFields = GetCategoryFields(out names);
+            var categoryFields = GetCategoryFields(out var names).ToArray();
             Assert.AreEqual("", string.Join(", ", SnTrace.Categories.Except(categoryFields).Select(x => x.Name)));
             Assert.AreEqual("", string.Join(", ", categoryFields.Except(SnTrace.Categories).Select(x => x.Name)));
             Assert.AreEqual("", string.Join(", ", names.Except(SnTrace.Categories.Select(x => x.Name))));
             Assert.AreEqual("", string.Join(", ", SnTrace.Categories.Select(x => x.Name).Except(names)));
 
-            var categoryNames = SnTrace.Categories.Select(c=>c.Name);
+            var categoryNames = SnTrace.Categories.Select(c=>c.Name).ToArray();
             var analysisCategoryNames = GetAnalysisCategoryFields(out names);
             Assert.AreEqual("", string.Join(", ", categoryNames.Except(analysisCategoryNames)));
             Assert.AreEqual("", string.Join(", ", analysisCategoryNames.Except(categoryNames)));
@@ -272,6 +272,7 @@ namespace SenseNet.Tools.Tests
 
             using (var op1 = SnTrace.StartOperation("Op1"))
             {
+                // ReSharper disable once UnusedVariable
                 using (var op2 = SnTrace.StartOperation("Op2"))
                 {
                     SnTrace.Write("asdf");
