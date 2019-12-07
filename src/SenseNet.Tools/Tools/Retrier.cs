@@ -86,7 +86,7 @@ namespace SenseNet.Tools
                 throw lastException;
 
             // unreachable code: the last exception above is never null
-            return default(T);
+            return default;
         }
 
         /// <summary>

@@ -165,7 +165,7 @@ namespace SenseNet.Tools.Tests
             },
             (r, i, e) => e == null);
 
-            Assert.AreEqual(default(int), result, "Wrong result: " + result);
+            Assert.AreEqual(default, result, "Wrong result: " + result);
             Assert.AreEqual(3, RetryCallCounter, string.Format("#1 Callback called {0} times.", RetryCallCounter));
         }
 

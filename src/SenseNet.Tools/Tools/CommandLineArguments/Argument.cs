@@ -5,11 +5,11 @@ namespace SenseNet.Tools.CommandLineArguments
 {
     internal abstract class Argument
     {
-        public PropertyInfo Property { get; private set; }
-        public bool Required { get; private set; }
-        public bool HasName { get; private set; }
-        public bool HasValue { get; private set; }
-        public string HelpText { get; private set; }
+        public PropertyInfo Property { get; }
+        public bool Required { get; }
+        public bool HasName { get; }
+        public bool HasValue { get; }
+        public string HelpText { get; }
 
         protected Argument(PropertyInfo property, bool required, bool hasName, bool hasValue, string helpText)
         {
@@ -25,8 +25,8 @@ namespace SenseNet.Tools.CommandLineArguments
 
     internal class NamedArgument : Argument
     {
-        public string Name { get; private set; }
-        public string[] Aliases { get; private set; } //UNDONE: check all aliases vs name violation
+        public string Name { get; }
+        public string[] Aliases { get; } //UNDONE: check all aliases vs name violation
 
         public NamedArgument(CommandLineArgumentAttribute attribute, PropertyInfo property)
             : base(property, attribute.Required, true, property.PropertyType != typeof(bool), attribute.HelpText)
@@ -45,8 +45,8 @@ namespace SenseNet.Tools.CommandLineArguments
 
     internal class NoNameArgument : Argument
     {
-        public int Order { get; private set; }
-        public string NameInHelp { get; private set; }
+        public int Order { get; }
+        public string NameInHelp { get; }
 
         public NoNameArgument(NoNameOptionAttribute attribute, PropertyInfo property)
             : base(property, attribute.Required, false, true, attribute.HelpText)

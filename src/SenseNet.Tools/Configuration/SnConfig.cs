@@ -40,7 +40,7 @@ namespace SenseNet.Configuration
         /// <param name="defaultValue">Optional default value.</param>
         /// <typeparam name="T">Type of the value to load.</typeparam>
         /// <returns>The value found in the configuration converted to the target type, or the provided default value.</returns>
-        protected internal static T GetValue<T>(string sectionName, string key, T defaultValue = default(T))
+        protected internal static T GetValue<T>(string sectionName, string key, T defaultValue = default)
         {
             var configString = GetString(sectionName, key);
 

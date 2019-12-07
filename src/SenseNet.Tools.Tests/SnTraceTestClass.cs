@@ -11,6 +11,7 @@ namespace SenseNet.Tools.Tests
         public TestContext TestContext { get; set; }
 
 
+        // ReSharper disable once InconsistentNaming
         private string __detailedLogDirectory;
         protected string DetailedLogDirectory => __detailedLogDirectory ??
                                                  (__detailedLogDirectory = SnFileSystemTracer.GetRelativeLogDirectory(AppDomain.CurrentDomain.BaseDirectory));

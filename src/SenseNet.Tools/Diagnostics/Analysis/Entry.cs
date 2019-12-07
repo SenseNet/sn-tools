@@ -151,17 +151,17 @@ namespace SenseNet.Diagnostics.Analysis
         {
             if (src.StartsWith("T:"))
                 src = src.Substring(2);
-            return src.Length == 0 ? default(int) : int.Parse(src);
+            return src.Length == 0 ? default : int.Parse(src);
         }
         private static int ParseOperationId(string src)
         {
             if (src.StartsWith("Op:"))
                 src = src.Substring(3);
-            return src.Length == 0 ? default(int) : int.Parse(src);
+            return src.Length == 0 ? default : int.Parse(src);
         }
         private static TimeSpan ParseDuration(string src)
         {
-            return src.Length == 0 ? default(TimeSpan) : TimeSpan.Parse(src, CultureInfo.InvariantCulture);
+            return src.Length == 0 ? default : TimeSpan.Parse(src, CultureInfo.InvariantCulture);
         }
 
         protected void CopyPropertiesFrom(Entry fromEntry)
