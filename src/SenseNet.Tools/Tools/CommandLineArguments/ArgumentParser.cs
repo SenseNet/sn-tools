@@ -125,8 +125,7 @@ namespace SenseNet.Tools.CommandLineArguments
                 }
                 else
                 {
-                    var namedArg = argument as NamedArgument;
-                    if (namedArg != null)
+                    if (argument is NamedArgument namedArg)
                         existingArguments.Add(namedArg.Name);
                     SetProperty(target, argument, value);
                 }

@@ -82,8 +82,7 @@ namespace SenseNet.Tools
                 sb.Append(": ");
                 sb.AppendLine(e.Message);
 
-                var fileNotFoundException = e as FileNotFoundException;
-                if (fileNotFoundException != null)
+                if (e is FileNotFoundException fileNotFoundException)
                 {
                     sb.AppendLine("FUSION LOG:");
                     sb.AppendLine(fileNotFoundException.FusionLog);

@@ -39,8 +39,7 @@ namespace SenseNet.Tools.CommandLineArguments
         {
             if (this.Argument == null)
                 return "??";
-            var named = this.Argument as NamedArgument;
-            return named != null ? named.Name : "<noname>";
+            return this.Argument is NamedArgument named ? named.Name : "<noname>";
         }
 
         internal ParsingException(ResultState errorCode, Argument arg, string currentInput, ArgumentParser parser)

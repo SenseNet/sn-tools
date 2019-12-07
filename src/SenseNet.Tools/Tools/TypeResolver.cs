@@ -364,9 +364,7 @@ namespace SenseNet.Tools
             var rte = e as ReflectionTypeLoadException;
             if (rte?.LoaderExceptions.Length == 2)
             {
-                var te0 = rte.LoaderExceptions[0] as TypeLoadException;
-                var te1 = rte.LoaderExceptions[1] as TypeLoadException;
-                if (te0 != null && te1 != null)
+                if (rte.LoaderExceptions[0] is TypeLoadException te0 && rte.LoaderExceptions[1] is TypeLoadException te1)
                 {
                     if (te0.TypeName == "System.Web.Mvc.CompareAttribute" && te1.TypeName == "System.Web.Mvc.RemoteAttribute")
                         return true;
