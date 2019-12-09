@@ -210,7 +210,8 @@ namespace SenseNet.Diagnostics
             return eventProperties;
         }
 
-        private static void BindLogEntryAndTrace(string message, TraceEventType severity, IDictionary<string, object> properties, List<string> categories)
+        private static void BindLogEntryAndTrace(string message, TraceEventType severity,
+            IDictionary<string, object> properties, IReadOnlyList<string> categories)
         {
             var eventTypeName = severity.ToString().ToUpper();
             var traceId = "#" + Guid.NewGuid();

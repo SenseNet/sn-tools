@@ -12,7 +12,7 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnTraceTests : SnTraceTestClass
     {
-        private void AssertOneErrorLine(List<string> log, string expectedSubstring)
+        private void AssertOneErrorLine(IReadOnlyList<string> log, string expectedSubstring)
         {
             var msg = GetMessageFromLine(log[0]);
 

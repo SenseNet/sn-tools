@@ -27,7 +27,7 @@ namespace SenseNet.Tools.CommandLineArguments
     internal class NamedArgument : Argument
     {
         public string Name { get; }
-        public string[] Aliases { get; } //UNDONE: check all aliases vs name violation
+        public string[] Aliases { get; } //TODO: check all aliases vs name violation
 
         public NamedArgument(CommandLineArgumentAttribute attribute, PropertyInfo property)
             : base(property, attribute.Required, true, property.PropertyType != typeof(bool), attribute.HelpText)

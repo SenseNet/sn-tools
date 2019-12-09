@@ -363,11 +363,15 @@ namespace SenseNet.Tools.Tests
         [CommandLineArgument(helpText: "Description B")]
         internal bool B { get; set; }
         [CommandLineArgument(helpText: "Description C")]
+#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
         private bool C { get; set; }
+#pragma warning restore IDE0051
         [CommandLineArgument(name: "STRING", aliases: "s", helpText: "Description STRING")]
+#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
         private string StringParam1 { get; set; }
+#pragma warning restore IDE0051
         [CommandLineArgument(name: "INT", aliases: "i", helpText: "Description INT")]
         internal int IntParam1 { get; set; }
     }
@@ -382,8 +386,10 @@ namespace SenseNet.Tools.Tests
         [CommandLineArgument(helpText: "Description B")]
         internal bool B { get; set; }
         [CommandLineArgument(helpText: "Description C")]
+#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
         private bool C { get; set; }
+#pragma warning restore IDE0051
         [CommandLineArgument(name: "STRING", aliases: "s", required: true, helpText: "Description STRING")]
         public string StringParam1 { get; set; }
         [CommandLineArgument(name: "INT", aliases: "i", helpText: "Description INT")]

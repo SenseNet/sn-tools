@@ -14,7 +14,7 @@ namespace SenseNet.Tools.CommandLineArguments
     public enum ResultState
     {
         /// <summary>Successfully parsed.</summary>
-        Succesful = 0, //UNDONE:? BUG: typo
+        Succesful = 0,
         /// <summary>Unknown error occured.</summary>
         UnknownError,
         /// <summary>Unknown argument in the argument array.</summary>
@@ -210,6 +210,7 @@ namespace SenseNet.Tools.CommandLineArguments
             return noNameAttr != null ? new NoNameArgument(noNameAttr, prop) : null;
         }
 
+        // ReSharper disable once SuggestBaseTypeForParameter
         private static bool IsHelpRequest(string[] args)
         {
             return args.Length != 0 && HelpArguments.Contains(args[0], StringComparer.OrdinalIgnoreCase);

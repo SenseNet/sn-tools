@@ -10,7 +10,7 @@ namespace SenseNet.Diagnostics
     /// <summary>
     /// Abstract base class for defining general event logger behavior.
     /// </summary>
-    public abstract class SnEventloggerBase : IEventLogger //UNDONE:? BUG: typo
+    public abstract class SnEventloggerBase : IEventLogger
     {
         private readonly string _cr = Environment.NewLine;
         private const string DefaultCategories = "General";
@@ -20,6 +20,7 @@ namespace SenseNet.Diagnostics
             IDictionary<string, object> properties)
         {
             EventLogEntryType entryType;
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (severity) //UNDONE:? maybe not correct e.g. "Critical" will be "Information"
             {
                 case TraceEventType.Warning:
