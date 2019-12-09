@@ -39,9 +39,9 @@ namespace SenseNet.Tools.CommandLineArguments
         }
         private string GetArgument()
         {
-            if (this.Argument == null)
+            if (Argument == null)
                 return "??";
-            return this.Argument is NamedArgument named ? named.Name : "<noname>";
+            return Argument is NamedArgument named ? named.Name : "<noname>";
         }
 
         internal ParsingException(ResultState errorCode, Argument arg, string currentInput, ArgumentParser parser)
@@ -69,10 +69,10 @@ namespace SenseNet.Tools.CommandLineArguments
 
         private void Initialize(ResultState errorCode, Argument arg, string currentInput, ArgumentParser parser)
         {
-            this.ErrorCode = errorCode;
-            this.Argument = arg;
-            this.CurrentInput = currentInput;
-            this.Result = parser;
+            ErrorCode = errorCode;
+            Argument = arg;
+            CurrentInput = currentInput;
+            Result = parser;
         }
     }
 }

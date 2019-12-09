@@ -72,7 +72,7 @@ namespace SenseNet.Tools.CommandLineArguments
 
             if (IsHelpRequest(args))
             {
-                this.IsHelp = true;
+                IsHelp = true;
                 return;
             }
 
@@ -222,8 +222,8 @@ namespace SenseNet.Tools.CommandLineArguments
         public string GetUsage()
         {
             var usage = _target.GetType().Assembly.GetName().Name;
-            var noName = string.Join(" ", this._context.NoNameArguments.OrderBy(a => a.Order).Select(a => a.GetUsageHead()));
-            var named = string.Join(" ", this._context.NamedArguments.OrderBy(a => a.Name).Select(a => a.GetUsageHead()));
+            var noName = string.Join(" ", _context.NoNameArguments.OrderBy(a => a.Order).Select(a => a.GetUsageHead()));
+            var named = string.Join(" ", _context.NamedArguments.OrderBy(a => a.Name).Select(a => a.GetUsageHead()));
             if (!string.IsNullOrEmpty(noName))
                 usage += " " + noName;
             if (!string.IsNullOrEmpty(named))
@@ -259,14 +259,14 @@ namespace SenseNet.Tools.CommandLineArguments
             sb.AppendLine(GetUsage());
             sb.AppendLine();
 
-            foreach (var arg in this._context.NoNameArguments.OrderBy(a => a.Order))
+            foreach (var arg in _context.NoNameArguments.OrderBy(a => a.Order))
             {
                 sb.Append(arg.GetUsageHead()).AppendFormat(" ({0})", arg.Required ? "required" : "optional").AppendLine();
                 sb.Append("    ").AppendLine(arg.HelpText);
                 sb.AppendLine();
             }
 
-            foreach (var arg in this._context.NamedArguments.OrderBy(a => a.Name))
+            foreach (var arg in _context.NamedArguments.OrderBy(a => a.Name))
             {
                 sb.Append(arg.GetUsageHead()).AppendFormat(" ({0})", arg.Required ? "required" : "optional").AppendLine();
                 if(arg.Aliases.Length >0)

@@ -13,11 +13,11 @@ namespace SenseNet.Tools.CommandLineArguments
 
         protected Argument(PropertyInfo property, bool required, bool hasName, bool hasValue, string helpText)
         {
-            this.Property = property;
-            this.Required = required;
-            this.HasName = hasName;
-            this.HasValue = hasValue;
-            this.HelpText = helpText;
+            Property = property;
+            Required = required;
+            HasName = hasName;
+            HasValue = hasValue;
+            HelpText = helpText;
         }
 
         // ReSharper disable once UnusedMemberInSuper.Global
@@ -32,14 +32,14 @@ namespace SenseNet.Tools.CommandLineArguments
         public NamedArgument(CommandLineArgumentAttribute attribute, PropertyInfo property)
             : base(property, attribute.Required, true, property.PropertyType != typeof(bool), attribute.HelpText)
         {
-            this.Name = attribute.Name ?? property.Name;
-            this.Aliases = attribute.Aliases;
+            Name = attribute.Name ?? property.Name;
+            Aliases = attribute.Aliases;
         }
 
         public override string GetUsageHead()
         {
-            var type = this.Property.PropertyType.Name;
-            var name = this.Required ? "<-" + Name + ":" + type + ">" : "[-" + Name + ":" + type + "]";
+            var type = Property.PropertyType.Name;
+            var name = Required ? "<-" + Name + ":" + type + ">" : "[-" + Name + ":" + type + "]";
             return name;
         }
     }
@@ -52,15 +52,15 @@ namespace SenseNet.Tools.CommandLineArguments
         public NoNameArgument(NoNameOptionAttribute attribute, PropertyInfo property)
             : base(property, attribute.Required, false, true, attribute.HelpText)
         {
-            this.Order = attribute.Order;
-            this.NameInHelp = attribute.NameInHelp;
+            Order = attribute.Order;
+            NameInHelp = attribute.NameInHelp;
         }
 
         public override string GetUsageHead()
         {
 
             var name = NameInHelp ?? "Arg" + (Order + 1);
-            if (this.Required)
+            if (Required)
                 return "<" + name + ">";
             return "[" + name + "]";
         }
