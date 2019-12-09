@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using SenseNet.Diagnostics.Analysis;
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
 
 namespace SenseNet.Tools.Tests
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+// ReSharper disable StringLiteralTypo
 
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Tools.CommandLineArguments

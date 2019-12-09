@@ -10,7 +10,7 @@ namespace SenseNet.Diagnostics
     /// <summary>
     /// Abstract base class for defining general event logger behavior.
     /// </summary>
-    public abstract class SnEventloggerBase : IEventLogger
+    public abstract class SnEventloggerBase : IEventLogger //UNDONE:? BUG: typo
     {
         private readonly string _cr = Environment.NewLine;
         private const string DefaultCategories = "General";
@@ -81,7 +81,7 @@ namespace SenseNet.Diagnostics
             return categories == null || categories.Count == 0 ? DefaultCategories : string.Join(", ", categories);
         }
         /// <summary>
-        /// Returns a formattedd string representation of the passedd properties.
+        /// Returns a formatted string representation of the passed properties.
         /// </summary>
         protected virtual string FormatProperties(IDictionary<string, object> properties)
         {

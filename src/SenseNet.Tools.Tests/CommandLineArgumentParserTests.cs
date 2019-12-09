@@ -4,6 +4,7 @@ using SenseNet.Tools.CommandLineArguments;
 // ReSharper disable ArgumentsStyleStringLiteral
 // ReSharper disable ArgumentsStyleLiteral
 // ReSharper disable UnusedMember.Global
+// ReSharper disable StringLiteralTypo
 
 namespace SenseNet.Tools.Tests
 {

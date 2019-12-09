@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Configuration;
 // ReSharper disable UnusedMember.Global
+// ReSharper disable StringLiteralTypo
 
 namespace SenseNet.Tools.Tests
 {

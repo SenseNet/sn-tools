@@ -17,8 +17,8 @@ namespace SenseNet.Tools
     public static class TypeResolver
     {
         private static readonly object TypeCacheSync = new object();
-        private static readonly Dictionary<string, Type> TypecacheByName = new Dictionary<string, Type>();
-        private static readonly Dictionary<Type, Type[]> TypecacheByBase = new Dictionary<Type, Type[]>();
+        private static readonly Dictionary<string, Type> TypeCacheByName = new Dictionary<string, Type>();
+        private static readonly Dictionary<Type, Type[]> TypeCacheByBase = new Dictionary<Type, Type[]>();
 
         /// <summary>
         /// Creates an instance of the specified type.
@@ -93,11 +93,11 @@ namespace SenseNet.Tools
         /// <param name="throwOnError">Whether to throw an error when a type is not found.</param>
         public static Type FindTypeInAppDomain(string typeName, bool throwOnError = true)
         {
-            if (!TypecacheByName.TryGetValue(typeName, out var type))
+            if (!TypeCacheByName.TryGetValue(typeName, out var type))
             {
                 lock (TypeCacheSync)
                 {
-                    if (!TypecacheByName.TryGetValue(typeName, out type))
+                    if (!TypeCacheByName.TryGetValue(typeName, out type))
                     {
                         foreach (var assembly in GetAssemblies())
                         {
@@ -116,7 +116,7 @@ namespace SenseNet.Tools
                         if (type == null)
                         {
                             var split = typeName.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                            var tname = split[0];
+                            var tName = split[0];
                             var asmName = split.Length > 1 ? split[1].ToLower(CultureInfo.InvariantCulture).Trim() : null;
                             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                             {
@@ -124,7 +124,7 @@ namespace SenseNet.Tools
                                     continue;
                                 try
                                 {
-                                    type = assembly.GetType(tname);
+                                    type = assembly.GetType(tName);
                                     if (type != null)
                                         break;
                                 }
@@ -138,12 +138,12 @@ namespace SenseNet.Tools
 
                         //
                         //  Important: leave this comment here
-                        //  There was an error adding NULL type to _typecachaByName dictionary, after restarting the AddDomain with iisreset. 
+                        //  There was an error adding NULL type to _typeCacheByName dictionary, after restarting the AddDomain with iisReset. 
                         //  It is fixed by BuildManager.GetReferencedAssemblies() call when Application_OnStart event occurs.
                         //
 
-                        if (!TypecacheByName.ContainsKey(typeName))
-                            TypecacheByName.Add(typeName, type);
+                        if (!TypeCacheByName.ContainsKey(typeName))
+                            TypeCacheByName.Add(typeName, type);
                     }
                 }
             }
@@ -244,11 +244,11 @@ namespace SenseNet.Tools
         /// <param name="interfaceType">Interface type to look for.</param>
         public static Type[] GetTypesByInterface(Type interfaceType)
         {
-            if (!TypecacheByBase.TryGetValue(interfaceType, out var temp))
+            if (!TypeCacheByBase.TryGetValue(interfaceType, out var temp))
             {
                 lock (TypeCacheSync)
                 {
-                    if (!TypecacheByBase.TryGetValue(interfaceType, out temp))
+                    if (!TypeCacheByBase.TryGetValue(interfaceType, out temp))
                     {
                         var list = new List<Type>();
                         foreach (var asm in GetAssemblies())
@@ -261,7 +261,7 @@ namespace SenseNet.Tools
                                 // Add all types to the list that have the specified
                                 // interface type among their implemented interfaces.
                                 list.AddRange(asm.GetTypes().Where(type =>
-                                    type.GetInterfaces().Any(interf => interf == interfaceType)));
+                                    type.GetInterfaces().Any(@interface => @interface == interfaceType)));
                             }
                             catch (ReflectionTypeLoadException e)
                             {
@@ -279,8 +279,8 @@ namespace SenseNet.Tools
                         }
                         temp = list.ToArray();
 
-                        if (!TypecacheByBase.ContainsKey(interfaceType))
-                            TypecacheByBase.Add(interfaceType, temp);
+                        if (!TypeCacheByBase.ContainsKey(interfaceType))
+                            TypeCacheByBase.Add(interfaceType, temp);
                     }
                 }
             }
@@ -294,11 +294,11 @@ namespace SenseNet.Tools
         /// <param name="baseType">Base type to look for.</param>
         public static Type[] GetTypesByBaseType(Type baseType)
         {
-            if (!TypecacheByBase.TryGetValue(baseType, out var temp))
+            if (!TypeCacheByBase.TryGetValue(baseType, out var temp))
             {
                 lock (TypeCacheSync)
                 {
-                    if (!TypecacheByBase.TryGetValue(baseType, out temp))
+                    if (!TypeCacheByBase.TryGetValue(baseType, out temp))
                     {
                         var list = new List<Type>();
                         foreach (var asm in GetAssemblies())
@@ -339,8 +339,8 @@ namespace SenseNet.Tools
                         }
                         temp = list.ToArray();
 
-                        if (!TypecacheByBase.ContainsKey(baseType))
-                            TypecacheByBase.Add(baseType, temp);
+                        if (!TypeCacheByBase.ContainsKey(baseType))
+                            TypeCacheByBase.Add(baseType, temp);
                     }
                 }
             }
@@ -350,11 +350,11 @@ namespace SenseNet.Tools
             return result;
         }
 
-        private static void LogTypeLoadException(ReflectionTypeLoadException rtle, string assemblyName = null)
+        private static void LogTypeLoadException(ReflectionTypeLoadException ex, string assemblyName = null)
         {
-            SnLog.WriteError(rtle.ToString(), properties: new Dictionary<string, object> { { "Assembly", assemblyName ?? "unknown" } });
+            SnLog.WriteError(ex.ToString(), properties: new Dictionary<string, object> { { "Assembly", assemblyName ?? "unknown" } });
 
-            foreach (var exc in rtle.LoaderExceptions)
+            foreach (var exc in ex.LoaderExceptions)
             {
                 SnLog.WriteError(exc);
             }

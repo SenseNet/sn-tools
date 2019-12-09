@@ -541,7 +541,7 @@ namespace SenseNet.Tools.Tests
 
             var lastEntry = logs.First().Value.Last();
 
-            var entryData = ParseEventlogEntryData(lastEntry);
+            var entryData = ParseEventLogEntryData(lastEntry);
 
             Assert.AreEqual(testValue, entryData["Message"]);
             Assert.AreEqual("Information", entryData["Severity"]);
@@ -584,7 +584,7 @@ namespace SenseNet.Tools.Tests
 
             var allEntries = logs
                 .SelectMany(x => x.Value)
-                .Select(ParseEventlogEntryData)
+                .Select(ParseEventLogEntryData)
                 .OrderBy(e => e["EventId"])
                 .Select(e=>$"{e["Message"]}:{e["EventId"]}")
                 .ToArray();
@@ -636,7 +636,7 @@ namespace SenseNet.Tools.Tests
 
         /* ========================================================================= */
 
-        private static Dictionary<string, string> ParseEventlogEntryData(string text)
+        private static Dictionary<string, string> ParseEventLogEntryData(string text)
         {
             var result = new Dictionary<string, string>();
             var fields = text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);

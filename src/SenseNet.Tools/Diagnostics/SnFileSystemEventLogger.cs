@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+// ReSharper disable StringLiteralTypo
 
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics

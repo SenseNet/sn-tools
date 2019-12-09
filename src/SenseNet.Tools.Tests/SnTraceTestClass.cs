@@ -57,7 +57,6 @@ namespace SenseNet.Tools.Tests
 
             var fields = line.Split('\t');
 
-            // 1	2	3	4	5	6	7	8	9:asdf
             return fields.Length < 9 ? null : string.Join("\t", fields, 8, fields.Length - 8);
         }
         protected string GetColumnFromLine(string line, int col)

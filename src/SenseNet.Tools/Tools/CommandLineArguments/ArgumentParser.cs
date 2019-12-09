@@ -14,7 +14,7 @@ namespace SenseNet.Tools.CommandLineArguments
     public enum ResultState
     {
         /// <summary>Successfully parsed.</summary>
-        Succesful = 0,
+        Succesful = 0, //UNDONE:? BUG: typo
         /// <summary>Unknown error occured.</summary>
         UnknownError,
         /// <summary>Unknown argument in the argument array.</summary>
@@ -57,7 +57,7 @@ namespace SenseNet.Tools.CommandLineArguments
         private ParserContext _context;
 
         /// <summary>
-        /// Gets a value that indicates wether the argument list contains a help request.
+        /// Gets a value that indicates whether the argument list contains a help request.
         /// If that is the case, the configuration object will not be filled and the help
         /// text should be provided to the user, using the GetHelpText method of the parser.
         /// </summary>
@@ -222,10 +222,10 @@ namespace SenseNet.Tools.CommandLineArguments
         public string GetUsage()
         {
             var usage = _target.GetType().Assembly.GetName().Name;
-            var noname = string.Join(" ", this._context.NoNameArguments.OrderBy(a => a.Order).Select(a => a.GetUsageHead()));
+            var noName = string.Join(" ", this._context.NoNameArguments.OrderBy(a => a.Order).Select(a => a.GetUsageHead()));
             var named = string.Join(" ", this._context.NamedArguments.OrderBy(a => a.Name).Select(a => a.GetUsageHead()));
-            if (!string.IsNullOrEmpty(noname))
-                usage += " " + noname;
+            if (!string.IsNullOrEmpty(noName))
+                usage += " " + noName;
             if (!string.IsNullOrEmpty(named))
                 usage += " " + named;
             return usage + " [?]";

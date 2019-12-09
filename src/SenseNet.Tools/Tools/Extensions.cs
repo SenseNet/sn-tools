@@ -21,8 +21,8 @@ namespace SenseNet.Tools
         /// <param name="source">Source collection.</param>
         /// <param name="degreeOfParalellism">Number of partitions that the source collection is divided to.</param>
         /// <param name="action">An async action to call on each item.</param>
-        /// <returns> A task tham completes when the action has completed on all items.</returns>
-        public static Task ForEachAsync<T>(this IEnumerable<T> source, int degreeOfParalellism, Func<T, Task> action)
+        /// <returns> A task than completes when the action has completed on all items.</returns>
+        public static Task ForEachAsync<T>(this IEnumerable<T> source, int degreeOfParalellism, Func<T, Task> action) //UNDONE:? BUG: typo
         {
             return Task.WhenAll(Partitioner.Create(source).GetPartitions(degreeOfParalellism).Select(partition => Task.Run(async () =>
             {
