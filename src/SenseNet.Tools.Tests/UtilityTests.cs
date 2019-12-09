@@ -19,7 +19,7 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Utility_Convert_BytesToLongToBytes_NegativeOne()
         {
-            var bytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, };
+            var bytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
             var converted = Utility.Convert.BytesToLong(bytes);
             var back = Utility.Convert.LongToBytes(converted);
 

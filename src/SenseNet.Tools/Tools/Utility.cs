@@ -38,7 +38,7 @@ namespace SenseNet.Tools
                 for (var i = 0; i < bytes.Length; i++)
                 {
                     bytes[7 - i] = (byte)(@long & 0xFF);
-                    @long = @long >> 8;
+                    @long >>= 8;
                 }
                 return bytes;
             }

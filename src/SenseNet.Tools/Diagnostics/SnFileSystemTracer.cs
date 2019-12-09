@@ -18,11 +18,11 @@ namespace SenseNet.Diagnostics
             public readonly int WriteToFileDelay;
             public readonly short MaxWritesInOneFile;
 
-            private readonly string _configSection = "sensenet/detailedLogger";
+            private const string ConfigSection = "sensenet/detailedLogger";
 
             internal Config()
             {
-                var collection = ConfigurationManager.GetSection(_configSection) as NameValueCollection;
+                var collection = ConfigurationManager.GetSection(ConfigSection) as NameValueCollection;
                 BufferSize = Parse<long>(collection, "BufferSize", 10000);
                 WriteToFileDelay = Parse(collection, "WriteToFileDelay", 1000);
                 MaxWritesInOneFile = Parse<short>(collection, "MaxWritesInOneFile", 100);

@@ -12,7 +12,7 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Extensions_Parallel_ForEachAsync()
         {
-            var parallelCount = 10;
+            const int parallelCount = 10;
             var finishTimes = new DateTime[parallelCount];
             var stopWatch = new Stopwatch();
             stopWatch.Start();

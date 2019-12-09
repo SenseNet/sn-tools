@@ -132,8 +132,8 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void CmdArgs_Acceptance8()
         {
-            var defaultSource = "defaultSource";
-            var defaultInt = 444;
+            const string defaultSource = "defaultSource";
+            const int defaultInt = 444;
 
             var args = new string[0];
             var settings = new Args1 { IntParam1 = defaultInt, Source = defaultSource };
@@ -203,7 +203,8 @@ namespace SenseNet.Tools.Tests
 
             var parser = ArgumentParser.Parse(new[] { "?" }, settings);
 
-            var expected = "SenseNet.Tools.Tests [Arg1] [Arg2] [-A:Boolean] [-B:Boolean] [-C:Boolean] [-INT:Int32] [-STRING:String] [?]";
+            const string expected = "SenseNet.Tools.Tests [Arg1] [Arg2] [-A:Boolean] [-B:Boolean] " +
+                                    "[-C:Boolean] [-INT:Int32] [-STRING:String] [?]";
             var usage = parser.GetUsage();
 
             Assert.AreEqual(expected, usage);
@@ -225,7 +226,8 @@ namespace SenseNet.Tools.Tests
                 parser = e.Result;
             }
 
-            var expected = "SenseNet.Tools.Tests <source> <target> [-A:Boolean] [-B:Boolean] [-C:Boolean] [-INT:Int32] <-STRING:String> [?]";
+            const string expected = "SenseNet.Tools.Tests <source> <target> [-A:Boolean] [-B:Boolean] " +
+                                    "[-C:Boolean] [-INT:Int32] <-STRING:String> [?]";
             var usage = parser.GetUsage();
 
             Assert.AreEqual(expected, usage);

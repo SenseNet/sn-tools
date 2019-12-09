@@ -227,7 +227,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("", string.Join(", ", analysisCategoryNames.Except(names)));
             Assert.AreEqual("", string.Join(", ", names.Except(analysisCategoryNames)));
         }
-        private IEnumerable<SnTrace.SnTraceCategory> GetCategoryFields(out string[] catNames)
+        private static IEnumerable<SnTrace.SnTraceCategory> GetCategoryFields(out string[] catNames)
         {
             var type = typeof(SnTrace);
             var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
@@ -236,7 +236,7 @@ namespace SenseNet.Tools.Tests
             var cats = catFields.Select(f => (SnTrace.SnTraceCategory)f.GetValue(null)).ToArray();
             return cats;
         }
-        private string[] GetAnalysisCategoryFields(out string[] catNames)
+        private static string[] GetAnalysisCategoryFields(out string[] catNames)
         {
             var type = typeof(Category);
             var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);

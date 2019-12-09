@@ -382,18 +382,17 @@ namespace SenseNet.Diagnostics
                 for (var i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
-                    if (arg is string)
-                        continue;
-                    if (arg is IDictionary)
-                        continue;
-                    if (arg == null)
+                    switch (arg)
                     {
-                        args[i] = "[null]";
-                        continue;
+                        case string _:
+                        case IDictionary _:
+                            continue;
+                        case null:
+                            args[i] = "[null]";
+                            continue;
                     }
 
-                    var enumerable = arg as IEnumerable;
-                    if (enumerable == null)
+                    if (!(arg is IEnumerable enumerable))
                         continue;
 
                     var sb = new StringBuilder("[");
