@@ -22,6 +22,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Language>en-US</Language>
     <DebugType>Full</DebugType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
