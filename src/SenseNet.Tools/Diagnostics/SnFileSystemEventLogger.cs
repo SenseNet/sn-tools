@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+// ReSharper disable StringLiteralTypo
 
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
@@ -16,7 +17,7 @@ namespace SenseNet.Diagnostics
         public long MaxWritesPerFile { get; }
 
         private bool _directoryChecked;
-        private string _logDirectory;
+        private readonly string _logDirectory;
         private string LogDirectory
         {
             get

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools.CommandLineArguments
 {
     /// <summary>
@@ -35,11 +36,11 @@ namespace SenseNet.Tools.CommandLineArguments
         /// <param name="helpText">Text displayed in the detailed parameter information on the usage screen. Optional, default: null.</param>
         public CommandLineArgumentAttribute(string name = null, bool required = false, string aliases = null, string helpText = null)
         {
-            this.Aliases = aliases?.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray() ?? new string[0];
+            Aliases = aliases?.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray() ?? new string[0];
 
-            this.Name = name;
-            this.Required = required;
-            this.HelpText = helpText;
+            Name = name;
+            Required = required;
+            HelpText = helpText;
         }
     }
 }

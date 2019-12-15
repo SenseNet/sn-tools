@@ -210,7 +210,8 @@ namespace SenseNet.Diagnostics
             return eventProperties;
         }
 
-        private static void BindLogEntryAndTrace(string message, TraceEventType severity, IDictionary<string, object> properties, List<string> categories)
+        private static void BindLogEntryAndTrace(string message, TraceEventType severity,
+            IDictionary<string, object> properties, IReadOnlyList<string> categories)
         {
             var eventTypeName = severity.ToString().ToUpper();
             var traceId = "#" + Guid.NewGuid();
@@ -267,16 +268,16 @@ namespace SenseNet.Diagnostics
         private static IDictionary<string, object> GetPropertiesFromException(Exception e, IDictionary<string, object> props)
         {
             props.Add("Messages", Utility.CollectExceptionMessages(e));
-            var epath = string.Empty;
+            var ePath = string.Empty;
             while (e != null)
             {
-                epath += e.GetType().Name + "/";
+                ePath += e.GetType().Name + "/";
                 var data = e.Data;
                 foreach (var key in data.Keys)
-                    props.Add(epath + key, data[key]);
+                    props.Add(ePath + key, data[key]);
 
-                if (e is ReflectionTypeLoadException rtle)
-                    props.Add("Types", string.Join(", ", rtle.Types.Select(x => x.FullName)));
+                if (e is ReflectionTypeLoadException rTle)
+                    props.Add("Types", string.Join(", ", rTle.Types.Select(x => x.FullName)));
 
                 e = e.InnerException;
             }

@@ -8,13 +8,14 @@ namespace SenseNet.Diagnostics
     /// <summary>
     /// Built-in, lightweight IEventLogger implementation that writes events into the selected and existing windows event log.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class SnEventLogger : SnEventloggerBase
     {
         private readonly EventLog _eventLog;
 
         /// <summary>
         /// Initializes an instance of the SnEventLogger class by passed logName and logSourceName.
-        /// The defined log and logsource must be exist.
+        /// The defined log and logSource must be exist.
         /// </summary>
         /// <param name="logName">Name of the log. Cannot be null or empty.</param>
         /// <param name="logSourceName">Name of the log source. Cannot be null or empty.</param>

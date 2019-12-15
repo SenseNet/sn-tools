@@ -1,4 +1,5 @@
-﻿namespace SenseNet.Diagnostics
+﻿// ReSharper disable once CheckNamespace
+namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// Defines an API for verbose logging / tracing implementations.

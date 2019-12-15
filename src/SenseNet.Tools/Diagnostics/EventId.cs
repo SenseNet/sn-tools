@@ -1,4 +1,6 @@
-﻿namespace SenseNet.Diagnostics
+﻿// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// Contains well-known event ids in sensenet ECM.

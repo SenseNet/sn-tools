@@ -1,5 +1,7 @@
 ﻿using System;
+// ReSharper disable StringLiteralTypo
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools.CommandLineArguments
 {
     /// <summary>
@@ -23,6 +25,7 @@ namespace SenseNet.Tools.CommandLineArguments
         /// <summary>
         /// Error message to write to the console.
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public string FormattedMessage => GetFormattedMessage();
 
         private string GetFormattedMessage()
@@ -36,10 +39,9 @@ namespace SenseNet.Tools.CommandLineArguments
         }
         private string GetArgument()
         {
-            if (this.Argument == null)
+            if (Argument == null)
                 return "??";
-            var named = this.Argument as NamedArgument;
-            return named != null ? named.Name : "<noname>";
+            return Argument is NamedArgument named ? named.Name : "<noname>";
         }
 
         internal ParsingException(ResultState errorCode, Argument arg, string currentInput, ArgumentParser parser)
@@ -67,10 +69,10 @@ namespace SenseNet.Tools.CommandLineArguments
 
         private void Initialize(ResultState errorCode, Argument arg, string currentInput, ArgumentParser parser)
         {
-            this.ErrorCode = errorCode;
-            this.Argument = arg;
-            this.CurrentInput = currentInput;
-            this.Result = parser;
+            ErrorCode = errorCode;
+            Argument = arg;
+            CurrentInput = currentInput;
+            Result = parser;
         }
     }
 }

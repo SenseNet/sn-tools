@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>
@@ -21,7 +22,7 @@ namespace SenseNet.Diagnostics
         private long _blockSizeWarning;
 
         /// <summary>Statistical data: the longest gap between p0 and p1</summary>
-        private long _maxPdiff;
+        private long _maxPDiff;
 
         private Timer _timer;
 
@@ -74,13 +75,13 @@ namespace SenseNet.Diagnostics
                 return null;
 
             var sb = new StringBuilder(">"); // the '>' sign means: block writing start.
-            var pdiff = p1 - p0;
-            if (pdiff > _maxPdiff)
-                _maxPdiff = pdiff;
+            var pDiff = p1 - p0;
+            if (pDiff > _maxPDiff)
+                _maxPDiff = pDiff;
 
 
-            if (pdiff > _bufferSize)
-                sb.AppendFormat("BUFFER OVERRUN ERROR: Buffer size is {0}, unwritten lines : {1}", _bufferSize, pdiff).AppendLine();
+            if (pDiff > _bufferSize)
+                sb.AppendFormat("BUFFER OVERRUN ERROR: Buffer size is {0}, unwritten lines : {1}", _bufferSize, pDiff).AppendLine();
 
             while (p0 < p1)
             {
@@ -93,8 +94,8 @@ namespace SenseNet.Diagnostics
             _lastBufferPosition = p1;
 
             // If the block contains more than 20% of the buffer size, write a message
-            if (pdiff > _blockSizeWarning)
-                sb.AppendFormat("Block size reaches the risky limit: {0}. Buffer size: {1}", pdiff, _bufferSize).AppendLine();
+            if (pDiff > _blockSizeWarning)
+                sb.AppendFormat("Block size reaches the risky limit: {0}. Buffer size: {1}", pDiff, _bufferSize).AppendLine();
 
             return sb;
         }

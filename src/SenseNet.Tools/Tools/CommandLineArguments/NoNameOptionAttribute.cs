@@ -1,5 +1,6 @@
 ﻿using System;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools.CommandLineArguments
 {
     /// <summary>
@@ -34,10 +35,10 @@ namespace SenseNet.Tools.CommandLineArguments
         /// <param name="helpText">Text displayed in the detailed parameter information on the usage screen. Optional, default: null.</param>
         public NoNameOptionAttribute(int order, bool required = false, string nameInHelp = null, string helpText = null)
         {
-            this.Order = order;
-            this.Required = required;
-            this.NameInHelp = nameInHelp;
-            this.HelpText = helpText;
+            Order = order;
+            Required = required;
+            NameInHelp = nameInHelp;
+            HelpText = helpText;
         }
     }
 }

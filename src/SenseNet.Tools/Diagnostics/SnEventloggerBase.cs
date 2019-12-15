@@ -13,14 +13,15 @@ namespace SenseNet.Diagnostics
     public abstract class SnEventloggerBase : IEventLogger
     {
         private readonly string _cr = Environment.NewLine;
-        private readonly string _defaultCategories = "General";
+        private const string DefaultCategories = "General";
 
         /// <inheritdoc />
         public virtual void Write(object message, ICollection<string> categories, int priority, int eventId, TraceEventType severity, string title,
             IDictionary<string, object> properties)
         {
             EventLogEntryType entryType;
-            switch (severity)
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (severity) //UNDONE:? maybe not correct e.g. "Critical" will be "Information"
             {
                 case TraceEventType.Warning:
                     entryType = EventLogEntryType.Warning;
@@ -78,10 +79,10 @@ namespace SenseNet.Diagnostics
         /// <param name="categories">Category collection. Can be null or empty.</param>
         protected virtual string FormatCategories(ICollection<string> categories)
         {
-            return categories == null || categories.Count == 0 ? _defaultCategories : string.Join(", ", categories);
+            return categories == null || categories.Count == 0 ? DefaultCategories : string.Join(", ", categories);
         }
         /// <summary>
-        /// Returns a formattedd string representation of the passedd properties.
+        /// Returns a formatted string representation of the passed properties.
         /// </summary>
         protected virtual string FormatProperties(IDictionary<string, object> properties)
         {

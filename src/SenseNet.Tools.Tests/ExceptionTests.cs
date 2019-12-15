@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Security;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
+// ReSharper disable UnusedMember.Global
 
 namespace SenseNet.Tools.Tests
 {
@@ -84,7 +85,7 @@ namespace SenseNet.Tools.Tests
                 typeLoadEx = ex;
             }
 
-            var rtle = new ReflectionTypeLoadException(new Type[0], new Exception[]
+            var rTle = new ReflectionTypeLoadException(new Type[0], new Exception[]
             {
                 new FileLoadException("error", "FileLoadException.dll"),
                 new FileNotFoundException("error", "FileNotFoundException.dll"), 
@@ -93,7 +94,7 @@ namespace SenseNet.Tools.Tests
                 typeLoadEx
             });
 
-            var types = Utility.GetTypeLoadErrorTypes(rtle);
+            var types = Utility.GetTypeLoadErrorTypes(rTle);
 
             Assert.AreEqual(string.Join(",", 
                     "FileLoadException.dll", 

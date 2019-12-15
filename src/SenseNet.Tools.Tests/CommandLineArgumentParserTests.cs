@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Tools.CommandLineArguments;
 // ReSharper disable ArgumentsStyleStringLiteral
 // ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable UnusedMember.Global
+// ReSharper disable StringLiteralTypo
 
 namespace SenseNet.Tools.Tests
 {
@@ -131,8 +133,8 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void CmdArgs_Acceptance8()
         {
-            var defaultSource = "defaultSource";
-            var defaultInt = 444;
+            const string defaultSource = "defaultSource";
+            const int defaultInt = 444;
 
             var args = new string[0];
             var settings = new Args1 { IntParam1 = defaultInt, Source = defaultSource };
@@ -202,7 +204,8 @@ namespace SenseNet.Tools.Tests
 
             var parser = ArgumentParser.Parse(new[] { "?" }, settings);
 
-            var expected = "SenseNet.Tools.Tests [Arg1] [Arg2] [-A:Boolean] [-B:Boolean] [-C:Boolean] [-INT:Int32] [-STRING:String] [?]";
+            const string expected = "SenseNet.Tools.Tests [Arg1] [Arg2] [-A:Boolean] [-B:Boolean] " +
+                                    "[-C:Boolean] [-INT:Int32] [-STRING:String] [?]";
             var usage = parser.GetUsage();
 
             Assert.AreEqual(expected, usage);
@@ -213,7 +216,7 @@ namespace SenseNet.Tools.Tests
             var args = new string[0];
             var settings = new Args2();
 
-            ArgumentParser parser = null;
+            ArgumentParser parser;
             try
             {
                 parser = ArgumentParser.Parse(args, settings);
@@ -224,7 +227,8 @@ namespace SenseNet.Tools.Tests
                 parser = e.Result;
             }
 
-            var expected = "SenseNet.Tools.Tests <source> <target> [-A:Boolean] [-B:Boolean] [-C:Boolean] [-INT:Int32] <-STRING:String> [?]";
+            const string expected = "SenseNet.Tools.Tests <source> <target> [-A:Boolean] [-B:Boolean] " +
+                                    "[-C:Boolean] [-INT:Int32] <-STRING:String> [?]";
             var usage = parser.GetUsage();
 
             Assert.AreEqual(expected, usage);
@@ -359,11 +363,15 @@ namespace SenseNet.Tools.Tests
         [CommandLineArgument(helpText: "Description B")]
         internal bool B { get; set; }
         [CommandLineArgument(helpText: "Description C")]
+#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
         private bool C { get; set; }
+#pragma warning restore IDE0051
         [CommandLineArgument(name: "STRING", aliases: "s", helpText: "Description STRING")]
+#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
         private string StringParam1 { get; set; }
+#pragma warning restore IDE0051
         [CommandLineArgument(name: "INT", aliases: "i", helpText: "Description INT")]
         internal int IntParam1 { get; set; }
     }
@@ -378,8 +386,10 @@ namespace SenseNet.Tools.Tests
         [CommandLineArgument(helpText: "Description B")]
         internal bool B { get; set; }
         [CommandLineArgument(helpText: "Description C")]
+#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
         private bool C { get; set; }
+#pragma warning restore IDE0051
         [CommandLineArgument(name: "STRING", aliases: "s", required: true, helpText: "Description STRING")]
         public string StringParam1 { get; set; }
         [CommandLineArgument(name: "INT", aliases: "i", helpText: "Description INT")]

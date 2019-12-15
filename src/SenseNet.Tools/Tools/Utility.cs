@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools
 {
     /// <summary>
@@ -37,7 +38,7 @@ namespace SenseNet.Tools
                 for (var i = 0; i < bytes.Length; i++)
                 {
                     bytes[7 - i] = (byte)(@long & 0xFF);
-                    @long = @long >> 8;
+                    @long >>= 8;
                 }
                 return bytes;
             }
@@ -81,8 +82,7 @@ namespace SenseNet.Tools
                 sb.Append(": ");
                 sb.AppendLine(e.Message);
 
-                var fileNotFoundException = e as System.IO.FileNotFoundException;
-                if (fileNotFoundException != null)
+                if (e is FileNotFoundException fileNotFoundException)
                 {
                     sb.AppendLine("FUSION LOG:");
                     sb.AppendLine(fileNotFoundException.FusionLog);

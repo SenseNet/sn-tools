@@ -5,6 +5,7 @@ using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Configuration
 {
     /// <summary>
@@ -84,7 +85,7 @@ namespace SenseNet.Configuration
 
                 var configValue = _configValues?[key];
 
-                // backward compatibility: fallback to the appsettings section
+                // backward compatibility: fallback to the appSettings section
                 return configValue ?? ConfigurationManager.AppSettings[key];
             }
             set => throw new SnNotSupportedException("Setting a section value is not supported.");

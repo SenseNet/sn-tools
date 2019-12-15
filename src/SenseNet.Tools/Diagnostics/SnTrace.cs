@@ -7,7 +7,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 // ReSharper disable UseStringInterpolation
+// ReSharper disable StringLiteralTypo
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>
@@ -18,7 +20,7 @@ namespace SenseNet.Diagnostics
     /// </summary>
     public static class SnTrace
     {
-        //====================================================================== Nested classess
+        //====================================================================== Nested classes
 
         /// <summary>
         /// Represents an execution block that needs a start and finish log message
@@ -26,7 +28,7 @@ namespace SenseNet.Diagnostics
         /// messages can be associated by their common operation id. 
         /// Setting the Successful property to true is mandatory when the execution
         /// was successful - otherwise the logger would assume that the operation failed.
-        /// Tipical usage:
+        /// Typical usage:
         /// using (var op = SnTrace.StartOperation("message")) { ...; op.Successful = true; }
         /// </summary>
         public class Operation : IDisposable
@@ -109,7 +111,7 @@ namespace SenseNet.Diagnostics
 
             /// <summary>
             /// Gets or sets whether the category is enabled or not. Messages sent to 
-            /// a disabled category will not be writted to the trace log.
+            /// a disabled category will not be written to the trace log.
             /// </summary>
             public bool Enabled { get; set; }
 
@@ -381,18 +383,17 @@ namespace SenseNet.Diagnostics
                 for (var i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
-                    if (arg is string)
-                        continue;
-                    if (arg is IDictionary)
-                        continue;
-                    if (arg == null)
+                    switch (arg)
                     {
-                        args[i] = "[null]";
-                        continue;
+                        case string _:
+                        case IDictionary _:
+                            continue;
+                        case null:
+                            args[i] = "[null]";
+                            continue;
                     }
 
-                    var enumerable = arg as IEnumerable;
-                    if (enumerable == null)
+                    if (!(arg is IEnumerable enumerable))
                         continue;
 
                     var sb = new StringBuilder("[");

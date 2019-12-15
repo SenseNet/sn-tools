@@ -14,6 +14,7 @@ using SenseNet.Tools.Diagnostics;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
+// ReSharper disable UnusedMember.Global
 
 namespace SenseNet.Tools.Tests
 {
@@ -177,6 +178,7 @@ namespace SenseNet.Tools.Tests
         #endregion
 
         [TestMethod]
+        [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
         public void SnLog_WriteException()
         {
             var loggerBackup = SnLog.Instance;
@@ -224,7 +226,7 @@ namespace SenseNet.Tools.Tests
                 var exceptions = new[]
                 {
                     new Exception("Exception1"),
-                    new Exception("Exception2"),
+                    new Exception("Exception2")
                 };
 
                 throw new ReflectionTypeLoadException(types, exceptions);
@@ -294,7 +296,7 @@ namespace SenseNet.Tools.Tests
                 SnLog.WriteInformation("Informative message.", properties: new Dictionary<string, object>
                 {
                     {"name1", "value1"},
-                    {"name42", 42},
+                    {"name42", 42}
                 });
             }
             finally
@@ -321,7 +323,7 @@ namespace SenseNet.Tools.Tests
                 SnLog.WriteInformation("Informative message.", properties: new Dictionary<string, object>
                 {
                     {"name1", "value1"},
-                    {"name42", 42},
+                    {"name42", 42}
                 });
             }
             finally
@@ -342,7 +344,7 @@ namespace SenseNet.Tools.Tests
             SnLog.Instance = logger;
 
             var propertyCollectorBackup = SnLog.PropertyCollector;
-            var errorMessage = "After all, the bug is just an animal.";
+            const string errorMessage = "After all, the bug is just an animal.";
             SnLog.PropertyCollector = new BuggyEventPropertyCollector(errorMessage);
 
             try
@@ -374,8 +376,8 @@ namespace SenseNet.Tools.Tests
             SnLog.Instance = logger;
 
             var propertyCollectorBackup = SnLog.PropertyCollector;
-            var errorMessage1 = "After all, the bug is just an animal.";
-            var errorMessage2 = "We can handle all the problems.";
+            const string errorMessage1 = "After all, the bug is just an animal.";
+            const string errorMessage2 = "We can handle all the problems.";
 
             try
             {
@@ -424,7 +426,7 @@ namespace SenseNet.Tools.Tests
             {
                 SnLog.WriteInformation("Msg1", properties: commonProperties);
                 SnLog.WriteWarning("Msg2", properties: commonProperties);
-                SnLog.WriteAudit(new TestAuditEvent("Msg3"), properties: commonProperties);
+                SnLog.WriteAudit(new TestAuditEvent("Msg3"), commonProperties);
                 SnLog.WriteError("Msg4", properties: commonProperties);
                 SnLog.WriteException(new Exception("Msg5"), properties: commonProperties);
             }
@@ -468,7 +470,7 @@ namespace SenseNet.Tools.Tests
             {
                 SnLog.WriteInformation("Msg1", properties: commonProperties());
                 SnLog.WriteWarning("Msg2", properties: commonProperties());
-                SnLog.WriteAudit(new TestAuditEvent("Msg3"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg3"), commonProperties());
                 SnLog.WriteError("Msg4", properties: commonProperties());
                 SnLog.WriteException(new Exception("Msg5"), properties: commonProperties());
             }
@@ -489,18 +491,18 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(5, entries.Count);
             Assert.AreEqual(5, traceLines.Count);
 
-            for (int i = 0; i < entries.Count; i++)
+            for (var i = 0; i < entries.Count; i++)
                 CheckBinding(entries[i], traceLines[i], i);
             // Information: Msg1 (a:b, x:y, SnTrace:#b18b0463-45c1-4e72-8882-8837df131556)
             // 1	2018-08-01 00:15:33.85820	Event	A:UnitTestAdapter: Running test	T:9				INFORMATION #b18b0463-45c1-4e72-8882-8837df131556: Msg1
         }
-        private void CheckBinding(TestEventEntry logEntry, string traceLine, int testCase)
+        private static void CheckBinding(TestEventEntry logEntry, string traceLine, int testCase)
         {
             var log = GetGuidAndMessageFromLog(logEntry, testCase);
             var trace = GetGuidAndMessageFromTrace(traceLine);
             Assert.AreEqual(log, trace);
         }
-        private string GetGuidAndMessageFromLog(TestEventEntry logEntry, int testCase)
+        private static string GetGuidAndMessageFromLog(TestEventEntry logEntry, int testCase)
         {
             // a:b, x:y, SnTrace:#b18b0463-45c1-4e72-8882-8837df131556
             var bindingInfo = logEntry.Properties.Split(',')
@@ -509,11 +511,11 @@ namespace SenseNet.Tools.Tests
             Assert.IsNotNull(bindingInfo, "Binding info not found in test case " + testCase);
 
             var guid = bindingInfo.Substring("SnTrace:#".Length);
-            if(logEntry.EventType == TraceEventType.Verbose)
-                return $"{guid}|{logEntry.Message}";
-            return $"{logEntry.EventType.ToString().ToUpperInvariant()}|{guid}|{logEntry.Message}";
+            return logEntry.EventType == TraceEventType.Verbose 
+                ? $"{guid}|{logEntry.Message}" 
+                : $"{logEntry.EventType.ToString().ToUpperInvariant()}|{guid}|{logEntry.Message}";
         }
-        private string GetGuidAndMessageFromTrace(string line)
+        private static string GetGuidAndMessageFromTrace(string line)
         {
             // 1	2018-08-01 00:15:33.85820	Event	A:UnitTestAdapter: Running test	T:9				INFORMATION #b18b0463-45c1-4e72-8882-8837df131556: Msg1
             var bindingInfo = line.Split('\t').Last();
@@ -539,7 +541,7 @@ namespace SenseNet.Tools.Tests
 
             var lastEntry = logs.First().Value.Last();
 
-            var entryData = ParseEventlogEntryData(lastEntry);
+            var entryData = ParseEventLogEntryData(lastEntry);
 
             Assert.AreEqual(testValue, entryData["Message"]);
             Assert.AreEqual("Information", entryData["Severity"]);
@@ -570,7 +572,7 @@ namespace SenseNet.Tools.Tests
             var logger = new TestSnFileSystemEventLogger(@"X:\MyLog", 2);
 
             // action
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 Thread.Sleep(600);
                 logger.Write("Msg" + i, null, 0, i, TraceEventType.Information, null, null);
@@ -582,7 +584,7 @@ namespace SenseNet.Tools.Tests
 
             var allEntries = logs
                 .SelectMany(x => x.Value)
-                .Select(ParseEventlogEntryData)
+                .Select(ParseEventLogEntryData)
                 .OrderBy(e => e["EventId"])
                 .Select(e=>$"{e["Message"]}:{e["EventId"]}")
                 .ToArray();
@@ -610,14 +612,14 @@ namespace SenseNet.Tools.Tests
             try
             {
                 SnLog.AuditEventWriter = null;
-                SnLog.WriteAudit(new TestAuditEvent("Msg1"), properties: commonProperties());
-                SnLog.WriteAudit(new TestAuditEvent("Msg2"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg1"), commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg2"), commonProperties());
                 SnLog.AuditEventWriter = auditEventWriter;
-                SnLog.WriteAudit(new TestAuditEvent("Msg3"), properties: commonProperties());
-                SnLog.WriteAudit(new TestAuditEvent("Msg4"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg3"), commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg4"), commonProperties());
                 SnLog.AuditEventWriter = null;
-                SnLog.WriteAudit(new TestAuditEvent("Msg5"), properties: commonProperties());
-                SnLog.WriteAudit(new TestAuditEvent("Msg6"), properties: commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg5"), commonProperties());
+                SnLog.WriteAudit(new TestAuditEvent("Msg6"), commonProperties());
             }
             finally
             {
@@ -634,7 +636,7 @@ namespace SenseNet.Tools.Tests
 
         /* ========================================================================= */
 
-        private Dictionary<string, string> ParseEventlogEntryData(string text)
+        private static Dictionary<string, string> ParseEventLogEntryData(string text)
         {
             var result = new Dictionary<string, string>();
             var fields = text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
@@ -651,7 +653,7 @@ namespace SenseNet.Tools.Tests
                     continue;
                 }
                 var extendedValue = new StringBuilder(value);
-                for (int i = index; i < fields.Length; i++)
+                for (var i = index; i < fields.Length; i++)
                     extendedValue.Append(", ").Append(fields[i]);
                 result.Add(name, extendedValue.ToString());
                 break;

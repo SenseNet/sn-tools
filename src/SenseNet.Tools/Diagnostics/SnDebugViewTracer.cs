@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// An ISnTracer implementation that enables monitoring the SnTrace output
-    /// (sensenet's verbose log) using a debug viewer of your choice - for example 
-    /// DebugView in the Sysinternals package.
+    /// (verbose log of sensenet) using a debug viewer of your choice - for example 
+    /// DebugView in the SysInternals package.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class SnDebugViewTracer : ISnTracer
     {
         /// <summary>

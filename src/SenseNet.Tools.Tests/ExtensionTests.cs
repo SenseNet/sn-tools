@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -15,7 +12,7 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Extensions_Parallel_ForEachAsync()
         {
-            var parallelCount = 10;
+            const int parallelCount = 10;
             var finishTimes = new DateTime[parallelCount];
             var stopWatch = new Stopwatch();
             stopWatch.Start();

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+// ReSharper disable UnusedMember.Global
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools.CommandLineArguments
 {
     /// <summary>
@@ -55,7 +57,7 @@ namespace SenseNet.Tools.CommandLineArguments
         private ParserContext _context;
 
         /// <summary>
-        /// Gets a value that indicates wether the argument list contains a help request.
+        /// Gets a value that indicates whether the argument list contains a help request.
         /// If that is the case, the configuration object will not be filled and the help
         /// text should be provided to the user, using the GetHelpText method of the parser.
         /// </summary>
@@ -70,7 +72,7 @@ namespace SenseNet.Tools.CommandLineArguments
 
             if (IsHelpRequest(args))
             {
-                this.IsHelp = true;
+                IsHelp = true;
                 return;
             }
 
@@ -124,8 +126,7 @@ namespace SenseNet.Tools.CommandLineArguments
                 }
                 else
                 {
-                    var namedArg = argument as NamedArgument;
-                    if (namedArg != null)
+                    if (argument is NamedArgument namedArg)
                         existingArguments.Add(namedArg.Name);
                     SetProperty(target, argument, value);
                 }
@@ -209,6 +210,7 @@ namespace SenseNet.Tools.CommandLineArguments
             return noNameAttr != null ? new NoNameArgument(noNameAttr, prop) : null;
         }
 
+        // ReSharper disable once SuggestBaseTypeForParameter
         private static bool IsHelpRequest(string[] args)
         {
             return args.Length != 0 && HelpArguments.Contains(args[0], StringComparer.OrdinalIgnoreCase);
@@ -221,10 +223,10 @@ namespace SenseNet.Tools.CommandLineArguments
         public string GetUsage()
         {
             var usage = _target.GetType().Assembly.GetName().Name;
-            var noname = string.Join(" ", this._context.NoNameArguments.OrderBy(a => a.Order).Select(a => a.GetUsageHead()));
-            var named = string.Join(" ", this._context.NamedArguments.OrderBy(a => a.Name).Select(a => a.GetUsageHead()));
-            if (!string.IsNullOrEmpty(noname))
-                usage += " " + noname;
+            var noName = string.Join(" ", _context.NoNameArguments.OrderBy(a => a.Order).Select(a => a.GetUsageHead()));
+            var named = string.Join(" ", _context.NamedArguments.OrderBy(a => a.Name).Select(a => a.GetUsageHead()));
+            if (!string.IsNullOrEmpty(noName))
+                usage += " " + noName;
             if (!string.IsNullOrEmpty(named))
                 usage += " " + named;
             return usage + " [?]";
@@ -241,7 +243,7 @@ namespace SenseNet.Tools.CommandLineArguments
             var asmName = assembly.GetName();
             var name = asmName.Name;
             var version = asmName.Version;
-            return string.Format("{0} {1}", name, version);
+            return $"{name} {version}";
         }
         /// <summary>
         /// Returns detailed information about how to use the tool.
@@ -258,14 +260,14 @@ namespace SenseNet.Tools.CommandLineArguments
             sb.AppendLine(GetUsage());
             sb.AppendLine();
 
-            foreach (var arg in this._context.NoNameArguments.OrderBy(a => a.Order))
+            foreach (var arg in _context.NoNameArguments.OrderBy(a => a.Order))
             {
                 sb.Append(arg.GetUsageHead()).AppendFormat(" ({0})", arg.Required ? "required" : "optional").AppendLine();
                 sb.Append("    ").AppendLine(arg.HelpText);
                 sb.AppendLine();
             }
 
-            foreach (var arg in this._context.NamedArguments.OrderBy(a => a.Name))
+            foreach (var arg in _context.NamedArguments.OrderBy(a => a.Name))
             {
                 sb.Append(arg.GetUsageHead()).AppendFormat(" ({0})", arg.Required ? "required" : "optional").AppendLine();
                 if(arg.Aliases.Length >0)

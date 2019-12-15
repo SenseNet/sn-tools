@@ -1,18 +1,18 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using SenseNet.Diagnostics.Analysis;
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
 
 namespace SenseNet.Tools.Tests
 {
     [TestClass]
     public class SnTraceTests : SnTraceTestClass
     {
-        private void AssertOneErrorLine(List<string> log, string expectedSubstring)
+        private void AssertOneErrorLine(IReadOnlyList<string> log, string expectedSubstring)
         {
             var msg = GetMessageFromLine(log[0]);
 
@@ -104,6 +104,7 @@ namespace SenseNet.Tools.Tests
 
             using (var op1 = SnTrace.StartOperation("Op1"))
             {
+                // ReSharper disable once UnusedVariable
                 using (var op2 = SnTrace.StartOperation("Op2"))
                 {
                     SnTrace.Write("asdf");
@@ -215,21 +216,20 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void SnTrace_CategoriesContainsAll()
         {
-            string[] names;
-            var categoryFields = GetCategoryFields(out names);
+            var categoryFields = GetCategoryFields(out var names).ToArray();
             Assert.AreEqual("", string.Join(", ", SnTrace.Categories.Except(categoryFields).Select(x => x.Name)));
             Assert.AreEqual("", string.Join(", ", categoryFields.Except(SnTrace.Categories).Select(x => x.Name)));
             Assert.AreEqual("", string.Join(", ", names.Except(SnTrace.Categories.Select(x => x.Name))));
             Assert.AreEqual("", string.Join(", ", SnTrace.Categories.Select(x => x.Name).Except(names)));
 
-            var categoryNames = SnTrace.Categories.Select(c=>c.Name);
+            var categoryNames = SnTrace.Categories.Select(c=>c.Name).ToArray();
             var analysisCategoryNames = GetAnalysisCategoryFields(out names);
             Assert.AreEqual("", string.Join(", ", categoryNames.Except(analysisCategoryNames)));
             Assert.AreEqual("", string.Join(", ", analysisCategoryNames.Except(categoryNames)));
             Assert.AreEqual("", string.Join(", ", analysisCategoryNames.Except(names)));
             Assert.AreEqual("", string.Join(", ", names.Except(analysisCategoryNames)));
         }
-        private IEnumerable<SnTrace.SnTraceCategory> GetCategoryFields(out string[] catNames)
+        private static IEnumerable<SnTrace.SnTraceCategory> GetCategoryFields(out string[] catNames)
         {
             var type = typeof(SnTrace);
             var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
@@ -238,7 +238,7 @@ namespace SenseNet.Tools.Tests
             var cats = catFields.Select(f => (SnTrace.SnTraceCategory)f.GetValue(null)).ToArray();
             return cats;
         }
-        private string[] GetAnalysisCategoryFields(out string[] catNames)
+        private static string[] GetAnalysisCategoryFields(out string[] catNames)
         {
             var type = typeof(Category);
             var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
@@ -274,6 +274,7 @@ namespace SenseNet.Tools.Tests
 
             using (var op1 = SnTrace.StartOperation("Op1"))
             {
+                // ReSharper disable once UnusedVariable
                 using (var op2 = SnTrace.StartOperation("Op2"))
                 {
                     SnTrace.Write("asdf");

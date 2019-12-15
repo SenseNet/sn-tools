@@ -1,6 +1,7 @@
 ﻿using System;
 using SenseNet.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet
 {
     /// <summary>
@@ -17,6 +18,7 @@ namespace SenseNet
         /// <summary>
         /// Gets a unique error identifier containing the type name and the error number.
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public string ErrorToken => string.Concat(GetType().FullName, ".", ErrorNumber);
 
         /// <summary>

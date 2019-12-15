@@ -3,17 +3,12 @@ using SenseNet.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SenseNet.Tools.Tests
 {
     public abstract class SnTraceTestClass
     {
-        public TestContext TestContext { get; set; }
-
-
+        // ReSharper disable once InconsistentNaming
         private string __detailedLogDirectory;
         protected string DetailedLogDirectory => __detailedLogDirectory ??
                                                  (__detailedLogDirectory = SnFileSystemTracer.GetRelativeLogDirectory(AppDomain.CurrentDomain.BaseDirectory));
@@ -62,7 +57,6 @@ namespace SenseNet.Tools.Tests
 
             var fields = line.Split('\t');
 
-            // 1	2	3	4	5	6	7	8	9:asdf
             return fields.Length < 9 ? null : string.Join("\t", fields, 8, fields.Length - 8);
         }
         protected string GetColumnFromLine(string line, int col)

@@ -1,4 +1,6 @@
-﻿namespace SenseNet.Diagnostics.Analysis
+﻿// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+namespace SenseNet.Diagnostics.Analysis
 {
     /// <summary>
     /// Contains available values of the Category column.

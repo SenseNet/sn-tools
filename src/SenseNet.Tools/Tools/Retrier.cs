@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+// ReSharper disable IdentifierTypo
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Tools
 {
     /// <summary>
@@ -19,6 +22,7 @@ namespace SenseNet.Tools
         /// <param name="waitMilliseconds">Milliseconds to wait between two attempts.</param>
         /// <param name="caughtExceptionType">Type of exception that is suppressed and triggers the next attempt.</param>
         /// <param name="callback">Void, parameterless method that the retrier executes.</param>
+        [SuppressMessage("ReSharper", "CommentTypo")]
         public static void Retry(int count, int waitMilliseconds, Type caughtExceptionType, Action callback)
         {
             var retryCount = count;
@@ -58,6 +62,7 @@ namespace SenseNet.Tools
         /// <param name="caughtExceptionType">Type of exception that is suppressed and triggers the next attempt.</param>
         /// <param name="callback">Parameterless method with T return type.</param>
         /// <returns>Result of the callback method.</returns>
+        // ReSharper disable once UnusedMember.Global
         public static T Retry<T>(int count, int waitMilliseconds, Type caughtExceptionType, Func<T> callback)
         {
             var retryCount = count;
@@ -85,13 +90,13 @@ namespace SenseNet.Tools
                 throw lastException;
 
             // unreachable code: the last exception above is never null
-            return default(T);
+            return default;
         }
 
         /// <summary>
         /// Performs an operation, and based on a condition it retries it a given number of times. 
         /// The checkCondition method is always called, even if there was no exception during 
-        /// the operation. If it returns true, there will be no retries and the metod will exit.
+        /// the operation. If it returns true, there will be no retries and the method will exit.
         /// </summary>
         /// <param name="count">Maximum number of attempts before throwing the caught exception.</param>
         /// <param name="waitMilliseconds">Milliseconds to wait between two attempts.</param>
@@ -132,7 +137,7 @@ namespace SenseNet.Tools
         /// <summary>
         /// Performs an operation, and based on a condition it retries it a given number of times. 
         /// The checkCondition method is always called, even if there was no exception during 
-        /// the operation. If it returns true, there will be no retries and the metod will exit.
+        /// the operation. If it returns true, there will be no retries and the method will exit.
         /// </summary>
         /// <typeparam name="T">The type of the returned object.</typeparam>
         /// <param name="count">Maximum number of attempts before throwing the caught exception.</param>
@@ -179,7 +184,7 @@ namespace SenseNet.Tools
         /// <summary>
         /// Performs an async operation, and based on a condition it retries it a given number of times. 
         /// The checkCondition method is always called, even if there was no exception during the operation. 
-        /// If it returns true, there will be no retries and the metod will exit.
+        /// If it returns true, there will be no retries and the method will exit.
         /// </summary>
         /// <typeparam name="T">The type of the returned object.</typeparam>
         /// <param name="count">Maximum number of attempts before throwing the caught exception.</param>
@@ -193,6 +198,7 @@ namespace SenseNet.Tools
         /// Otherwise the next attempt will be performed.
         /// </param>
         /// <returns>Result of the callback method.</returns>
+        // ReSharper disable once UnusedMember.Global
         public static async Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> callback, Func<T, int, Exception, bool> checkCondition)
         {
             var retryCount = count;
@@ -226,7 +232,7 @@ namespace SenseNet.Tools
         /// <summary>
         /// Performs an operation asynchronously, and based on a condition it retries it a given number of times. 
         /// The checkCondition method is always called, even if there was no exception during the operation. 
-        /// If it returns true, there will be no retries and the metod will exit.
+        /// If it returns true, there will be no retries and the method will exit.
         /// </summary>
         /// <param name="count">Maximum number of attempts before throwing the caught exception.</param>
         /// <param name="waitMilliseconds">Milliseconds to wait between two attempts.</param>
