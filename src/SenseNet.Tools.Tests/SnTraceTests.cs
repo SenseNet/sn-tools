@@ -21,6 +21,38 @@ namespace SenseNet.Tools.Tests
             Assert.IsTrue(msg.Contains(expectedSubstring));
         }
 
+        //[TestMethod]
+        //public void SnTrace_InfiniteWriting()
+        //{
+        //    // WARNING
+        //    // This method causes an infinite loop. Designed for a manual test.
+        //    // Before the fix this test threw an IOException with a similar message:
+        //    // "The process cannot access the file '...' because it is being used by another process."
+        //    //
+        //    // The manual test steps:
+        //    //   1 - PREPARATION
+        //    //     - Uncomment the whole test method.
+        //    //     - Start only this test.
+        //    //     - Search the log file in the bin\Debug\App_Data\DetailedLog directory
+        //    //       (example name: detailedlog_20200116-052425-7334Z.log)
+        //    //   2 - TEST ACTION
+        //    //     - Open this file a file-blocker application (e.g. Microsoft Word)
+        //    //   3 - ASSERT
+        //    //     - The test runs continuously and a new log file created.
+        //    //   4 - COMPLETION
+        //    //     - Stop the running test.
+        //    //     - Comment out the whole test method.
+
+        //    CleanupAndEnableAll();
+
+        //    while (true)
+        //    {
+        //        SnTrace.Write("test-line");
+        //        SnTrace.Flush();
+        //        System.Threading.Thread.Sleep(1000);
+        //    }
+        //}
+
         [TestMethod]
         public void SnTrace_Write2lines()
         {
