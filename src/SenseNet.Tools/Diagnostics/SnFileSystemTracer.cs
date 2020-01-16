@@ -63,8 +63,35 @@ namespace SenseNet.Diagnostics
         /// <param name="text"></param>
         protected override void WriteBatch(string text)
         {
-            using (var writer = new StreamWriter(LogFilePath, true))
-                writer.Write(text);
+            IOException lastError = null;
+
+            // Max 3 attempt.
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    // Write the text.
+                    using (var writer = new StreamWriter(LogFilePath, true))
+                        writer.Write(text);
+                    // Return if everything is OK.
+                    return;
+                }
+                catch (IOException e)
+                {
+                    // Memorize the exception.
+                    lastError = e;
+                    // Open a new file immediately and try again.
+                    _logFilePath = null;
+                }
+            }
+
+            // Throw the last error.
+            if (lastError != null)
+                throw lastError;
+
+            // General error message.
+            throw new ApplicationException("Something went wrong" +
+                " when we tried to write a file in the following directory: " + LogDirectory);
         }
 
         /* ===================================================================== */
@@ -82,7 +109,7 @@ namespace SenseNet.Diagnostics
                     {
                         if (_logFilePath == null || _lineCount >= _config.MaxWritesInOneFile)
                         {
-                            var logFilePath = Path.Combine(LogDirectory, "detailedlog_" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "Z.log");
+                            var logFilePath = Path.Combine(LogDirectory, "detailedlog_" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-ffff") + "Z.log");
                             if (!File.Exists(logFilePath))
                                 using (var fs = new FileStream(logFilePath, FileMode.Create))
                                 using (var wr = new StreamWriter(fs))
