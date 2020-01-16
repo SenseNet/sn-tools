@@ -315,14 +315,14 @@ namespace SenseNet.Diagnostics
 
         // ReSharper disable once InconsistentNaming
         private static string __appDomainName;
-        private static string AppDomainName => __appDomainName ?? (__appDomainName = AppDomain.CurrentDomain.FriendlyName);
+        private static string AppDomainName => __appDomainName ??= AppDomain.CurrentDomain.FriendlyName;
 
         /*================================================================== Logger */
 
         /// <summary>
         /// Gets or sets the trace provider implementation instances.
         /// </summary>
-        public static List<ISnTracer> SnTracers { get; } = new List<ISnTracer>(new[] { new SnFileSystemTracer() });
+        public static List<ISnTracer> SnTracers { get; } = new List<ISnTracer>(new[] { new SnDebugViewTracer() });
         private static void WriteToProviders(string line)
         {
             foreach (var provider in SnTracers)

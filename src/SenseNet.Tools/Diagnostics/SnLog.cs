@@ -277,7 +277,7 @@ namespace SenseNet.Diagnostics
                     props.Add(ePath + key, data[key]);
 
                 if (e is ReflectionTypeLoadException rTle)
-                    props.Add("Types", string.Join(", ", rTle.Types.Select(x => x.FullName)));
+                    props.Add("Types", string.Join(", ", rTle.Types?.Select(x => x?.FullName) ?? new[] { "unknown" }));
 
                 e = e.InnerException;
             }

@@ -12,6 +12,15 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class SnTraceTests : SnTraceTestClass
     {
+        [ClassInitialize]
+        public static void InitializeTracers(TestContext context)
+        {
+            // We have to replace the default tracer with a file system
+            // implementation because the tests check the log file.
+            SnTrace.SnTracers.Clear();
+            SnTrace.SnTracers.Add(new SnFileSystemTracer());
+        }
+
         private void AssertOneErrorLine(IReadOnlyList<string> log, string expectedSubstring)
         {
             var msg = GetMessageFromLine(log[0]);
