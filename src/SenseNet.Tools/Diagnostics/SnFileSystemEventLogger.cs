@@ -43,7 +43,7 @@ namespace SenseNet.Diagnostics
         /// <param name="maxWritesPerFile">Number of entries that can be written into a log file.</param>
         public SnFileSystemEventLogger(string logDirectory = null, int maxWritesPerFile = 100)
         {
-            _logDirectory = logDirectory ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data\\EventLog");
+            _logDirectory = logDirectory ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "EventLog");
             MaxWritesPerFile = maxWritesPerFile < 1 ? 10 : maxWritesPerFile;
         }
 
