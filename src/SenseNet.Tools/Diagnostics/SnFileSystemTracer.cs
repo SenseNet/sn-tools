@@ -131,7 +131,7 @@ namespace SenseNet.Diagnostics
         /// <param name="baseDirectoryPath">Directory that will contain the log directory</param>
         public static string GetRelativeLogDirectory(string baseDirectoryPath)
         {
-            return Path.Combine(baseDirectoryPath, "App_Data\\DetailedLog");
+            return Path.Combine(baseDirectoryPath, "App_Data", "DetailedLog");
         }
 
         // ReSharper disable once InconsistentNaming
@@ -143,7 +143,7 @@ namespace SenseNet.Diagnostics
                 if (__logDirectory != null)
                     return __logDirectory;
 
-                var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data\\DetailedLog");
+                var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DetailedLog");
                 if (!Directory.Exists(logDirectory))
                     Directory.CreateDirectory(logDirectory);
                 __logDirectory = logDirectory;

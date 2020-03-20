@@ -563,7 +563,7 @@ namespace SenseNet.Tools.Tests
 
             var fileName = logs.First().Key;
             var dirName = (Path.GetDirectoryName(fileName) ?? string.Empty).ToLowerInvariant();
-            var expected = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data\\EventLog").ToLowerInvariant();
+            var expected = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "EventLog").ToLowerInvariant();
             Assert.AreEqual(expected, dirName);
         }
         [TestMethod]
