@@ -123,6 +123,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AccessorTests.cs" />
     <Compile Include="ExceptionTests.cs" />
     <Compile Include="ExtensionTests.cs" />
     <Compile Include="CommandLineArgumentParserTests.cs" />

@@ -97,9 +97,13 @@ namespace SenseNet.Testing
         }
         private ConstructorInfo GetConstructorByTypes(Type type, Type[] argTypes)
         {
-            var ctor = type.GetConstructor(argTypes);
+            var ctor = type.GetConstructor(_privateFlags, null, argTypes, null);
             if (ctor == null)
-                throw new ApplicationException("Constructor not found.");
+            {
+                ctor = type.GetConstructor(_publicFlags, null, argTypes, null);
+                if (ctor == null)
+                    throw new ApplicationException("Constructor not found.");
+            }
             return ctor;
         }
 
