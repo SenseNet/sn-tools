@@ -1,4 +1,5 @@
-﻿using System.Xml.Schema;
+﻿using System;
+using System.Xml.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Testing;
 
@@ -274,5 +275,24 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("InstancePublicMethod***", actualValue);
         }
 
+        /* =============================================== Swindler tests */
+
+        [TestMethod]
+        public void Swindler()
+        {
+            AccessorTestObject.StaticPublicProperty = 42;
+            try
+            {
+                using (new Swindler<int>(142,
+                    () => AccessorTestObject.StaticPublicProperty,
+                    v => AccessorTestObject.StaticPublicProperty = v))
+                {
+                    Assert.AreEqual(142, AccessorTestObject.StaticPublicProperty);
+                    throw new Exception("An exception for fault-tolerance test.");
+                }
+            }
+            catch { /* ignored */ }
+            Assert.AreEqual(42, AccessorTestObject.StaticPublicProperty);
+        }
     }
 }
