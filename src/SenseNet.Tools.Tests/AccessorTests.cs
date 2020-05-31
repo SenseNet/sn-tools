@@ -7,6 +7,7 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class AccessorTests
     {
+        #region private class AccessorTestObject
         private class AccessorTestObject
         {
             private static int _staticPrivateField;
@@ -58,6 +59,9 @@ namespace SenseNet.Tools.Tests
                 return "InstancePublicMethod" + new string(c, count);
             }
         }
+        #endregion
+
+        /* =============================================== Access to private members */
 
         [TestMethod]
         public void Accessor_Private_Type_Field()
@@ -163,10 +167,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("InstancePrivateMethod***", actualValue);
         }
 
-
-
-
-
+        /* =============================================== Access to public members */
 
         [TestMethod]
         public void Accessor_Public_Type_Field()
