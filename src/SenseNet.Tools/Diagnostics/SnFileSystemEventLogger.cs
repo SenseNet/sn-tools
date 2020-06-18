@@ -108,7 +108,10 @@ namespace SenseNet.Diagnostics
         protected virtual void WriteToFile(string entry, string fileName)
         {
             using (var writer = new StreamWriter(fileName, true))
-                writer.Write(entry);
+            {
+                writer.WriteLine(entry);
+                writer.WriteLine();
+            }
         }
     }
 }
