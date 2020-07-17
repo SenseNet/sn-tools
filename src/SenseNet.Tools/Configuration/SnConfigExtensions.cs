@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SenseNet.Configuration;
 using SenseNet.Tools;
 
 // ReSharper disable once CheckNamespace
-namespace SenseNet.Configuration
+namespace SenseNet.Extensions.DependencyInjection
 {
     /// <summary>
     /// SnConfig extension methods.
