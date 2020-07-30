@@ -137,7 +137,8 @@ namespace SenseNet.Testing
         }
         private FieldInfo GetFieldInfo(string name, bool throwOnError = true)
         {
-            var field = _targetType.GetField(name, BindingFlags.GetField | BindingFlags.FlattenHierarchy | _publicFlags) ?? _targetType.GetField(name,BindingFlags.GetField | BindingFlags.FlattenHierarchy |  _privateFlags);
+            var field = _targetType.GetField(name, BindingFlags.GetField | _publicFlags) ??
+                        _targetType.GetField(name, BindingFlags.GetField | _privateFlags);
             if (field == null && throwOnError)
                 throw new ApplicationException("Field not found: " + name);
             return field;
