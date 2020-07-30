@@ -8,8 +8,26 @@ namespace SenseNet.Tools.Tests
     [TestClass]
     public class AccessorTests
     {
-        #region private class AccessorTestObject
-        private class AccessorTestObject
+        #region private class AccessorTestObjects
+
+        private abstract class AbstractionForAccessorTest
+        {
+            protected static int ProtectedStaticProperty { get; set; } = 42;
+
+            protected static string ProtectedStaticMethod1(char c, int count)
+            {
+                return "ProtectedStaticMethod1" + new string(c, count);
+            }
+            protected static string ProtectedStaticMethod2(char c, int count)
+            {
+                return "ProtectedStaticMethod2" + new string(c, count);
+            }
+            protected abstract int ProtectedInheritedProperty { get; set; }
+            protected abstract string ProtectedInheritedAbstractMethod(char c, int count);
+            protected virtual string ProtectedInheritedVirtualMethod(char c, int count) { return "abstract value"; }
+        }
+
+        private class AccessorTestObject : AbstractionForAccessorTest
         {
             private static int _staticPrivateField;
             private static int StaticPrivateProperty { get; set; }
@@ -58,6 +76,21 @@ namespace SenseNet.Tools.Tests
             public string InstancePublicMethod(char c, int count)
             {
                 return "InstancePublicMethod" + new string(c, count);
+            }
+
+            protected new static string ProtectedStaticMethod2(char c, int count)
+            {
+                return "ProtectedOverriddenStaticMethod2" + new string(c, count);
+            }
+            protected override int ProtectedInheritedProperty { get; set; }
+            protected override string ProtectedInheritedAbstractMethod(char c, int count)
+            {
+                return "ProtectedInheritedAbstractMethod" + new string(c, count);
+            }
+            protected override string ProtectedInheritedVirtualMethod(char c, int count)
+            {
+                return $"ProtectedInheritedVirtualMethod{new string(c, count)} " +
+                       $"{base.ProtectedInheritedVirtualMethod(c, count)}";
             }
         }
         #endregion
@@ -273,6 +306,172 @@ namespace SenseNet.Tools.Tests
                 new object[] { '*', 3 });
 
             Assert.AreEqual("InstancePublicMethod***", actualValue);
+        }
+
+        /* ----------------------------------------------- Inheritance tests */
+
+        [TestMethod]
+        public void Accessor_Protected_Type_Property_OnAbstract()
+        {
+            var typeAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
+
+            var origValue = (int)typeAcc.GetStaticProperty("ProtectedStaticProperty");
+            typeAcc.SetStaticProperty("ProtectedStaticProperty", origValue + 1);
+            var actualValue = (int)typeAcc.GetStaticProperty("ProtectedStaticProperty");
+            Assert.AreEqual(origValue + 1, actualValue);
+
+            typeAcc.SetStaticFieldOrProperty("ProtectedStaticProperty", origValue - 1);
+            actualValue = (int)typeAcc.GetStaticFieldOrProperty("ProtectedStaticProperty");
+            Assert.AreEqual(origValue - 1, actualValue);
+        }
+        [TestMethod]
+        public void Accessor_Protected_Type_Property_OnImplementation()
+        {
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
+
+            var origValue = (int)typeAcc.GetStaticProperty("ProtectedStaticProperty");
+            typeAcc.SetStaticProperty("ProtectedStaticProperty", origValue + 1);
+            var actualValue = (int)typeAcc.GetStaticProperty("ProtectedStaticProperty");
+            Assert.AreEqual(origValue + 1, actualValue);
+
+            typeAcc.SetStaticFieldOrProperty("ProtectedStaticProperty", origValue - 1);
+            actualValue = (int)typeAcc.GetStaticFieldOrProperty("ProtectedStaticProperty");
+            Assert.AreEqual(origValue - 1, actualValue);
+
+        }
+
+        [TestMethod]
+        public void Accessor_Protected_Type_Method1_OnAbstract()
+        {
+            var objAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
+
+            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1", '@', 7);
+            Assert.AreEqual("ProtectedStaticMethod1@@@@@@@", actualValue);
+
+            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedStaticMethod1***", actualValue);
+        }
+        [TestMethod]
+        public void Accessor_Protected_Type_Method1_OnImplementation()
+        {
+            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+
+            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1", '@', 7);
+            Assert.AreEqual("ProtectedStaticMethod1@@@@@@@", actualValue);
+
+            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedStaticMethod1***", actualValue);
+        }
+        [TestMethod]
+        public void Accessor_Protected_Type_Method2_OnAbstract()
+        {
+            var objAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
+
+            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2", '@', 7);
+            Assert.AreEqual("ProtectedStaticMethod2@@@@@@@", actualValue);
+
+            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedStaticMethod2***", actualValue);
+        }
+        [TestMethod]
+        public void Accessor_Protected_Type_Method2_OnImplementation()
+        {
+            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+
+            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2", '@', 7);
+            Assert.AreEqual("ProtectedOverriddenStaticMethod2@@@@@@@", actualValue);
+
+            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedOverriddenStaticMethod2***", actualValue);
+        }
+
+        [TestMethod]
+        public void Accessor_Protected_Object_InheritedProperty_OnAbstract()
+        {
+            AbstractionForAccessorTest instance = new AccessorTestObject();
+            var typeAcc = new ObjectAccessor(instance);
+
+            var origValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
+            typeAcc.SetProperty("ProtectedInheritedProperty", origValue + 1);
+            var actualValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
+            Assert.AreEqual(origValue + 1, actualValue);
+
+            typeAcc.SetFieldOrProperty("ProtectedInheritedProperty", origValue - 1);
+            actualValue = (int)typeAcc.GetFieldOrProperty("ProtectedInheritedProperty");
+            Assert.AreEqual(origValue - 1, actualValue);
+        }
+        [TestMethod]
+        public void Accessor_Protected_Object_InheritedProperty_OnImplementation()
+        {
+            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+
+            var origValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
+            typeAcc.SetProperty("ProtectedInheritedProperty", origValue + 1);
+            var actualValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
+            Assert.AreEqual(origValue + 1, actualValue);
+
+            typeAcc.SetFieldOrProperty("ProtectedInheritedProperty", origValue - 1);
+            actualValue = (int)typeAcc.GetFieldOrProperty("ProtectedInheritedProperty");
+            Assert.AreEqual(origValue - 1, actualValue);
+        }
+
+        [TestMethod]
+        public void Accessor_Protected_Object_InheritedAbstractMethod()
+        {
+            AbstractionForAccessorTest instance = new AccessorTestObject();
+            var typeAcc = new ObjectAccessor(instance);
+
+            var actualValue = (string)typeAcc.Invoke("ProtectedInheritedAbstractMethod", '*', 5);
+            Assert.AreEqual("ProtectedInheritedAbstractMethod*****", actualValue);
+
+            actualValue = (string)typeAcc.Invoke("ProtectedInheritedAbstractMethod",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedInheritedAbstractMethod***", actualValue);
+        }
+
+        [TestMethod]
+        public void Accessor_Protected_Object_InheritedVirtualMethod_OnAbstract()
+        {
+            AbstractionForAccessorTest instance = new AccessorTestObject();
+            var typeAcc = new ObjectAccessor(instance);
+
+            var actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod", '*', 5);
+            Assert.AreEqual("ProtectedInheritedVirtualMethod***** abstract value", actualValue);
+
+            actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedInheritedVirtualMethod*** abstract value", actualValue);
+        }
+
+        [TestMethod]
+        public void Accessor_Protected_Object_InheritedVirtualMethod_OnImplementation()
+        {
+            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+
+            var actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod", '*', 5);
+            Assert.AreEqual("ProtectedInheritedVirtualMethod***** abstract value", actualValue);
+
+            actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod",
+                new[] { typeof(char), typeof(int) },
+                new object[] { '*', 3 });
+
+            Assert.AreEqual("ProtectedInheritedVirtualMethod*** abstract value", actualValue);
         }
 
         /* =============================================== Swindler tests */

@@ -10,8 +10,8 @@ namespace SenseNet.Testing
     /// </summary>
     public class TypeAccessor
     {
-        private BindingFlags _publicFlags = BindingFlags.Static | BindingFlags.Public;
-        private BindingFlags _privateFlags = BindingFlags.Static | BindingFlags.NonPublic;
+        private BindingFlags _publicFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+        private BindingFlags _privateFlags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 
         /// <summary>
         /// Gets the target type.
