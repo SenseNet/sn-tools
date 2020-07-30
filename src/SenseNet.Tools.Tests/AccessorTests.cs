@@ -5,14 +5,13 @@ using SenseNet.Testing;
 
 namespace SenseNet.Tools.Tests
 {
-    [TestClass]
-    public class AccessorTests
-    {
-        #region private class AccessorTestObjects
+    #region private class AccessorTestObjects
 
-        private abstract class AbstractionForAccessorTest
+        internal abstract class AbstractionForAccessorTest
         {
-            protected static int ProtectedStaticProperty { get; set; } = 42;
+            private int _privateFieldOnAbstract;
+
+            protected static int ProtectedStaticProperty { get; set; }
 
             protected static string ProtectedStaticMethod1(char c, int count)
             {
@@ -27,7 +26,7 @@ namespace SenseNet.Tools.Tests
             protected virtual string ProtectedInheritedVirtualMethod(char c, int count) { return "abstract value"; }
         }
 
-        private class AccessorTestObject : AbstractionForAccessorTest
+        internal class AccessorTestObject : AbstractionForAccessorTest
         {
             private static int _staticPrivateField;
             private static int StaticPrivateProperty { get; set; }
@@ -44,16 +43,19 @@ namespace SenseNet.Tools.Tests
             public AccessorTestObject()
             {
             }
+
             private AccessorTestObject(int field)
             {
                 _instancePrivateField = field;
                 _instancePublicField = field;
             }
-            private AccessorTestObject(int field, int property):this(field)
+
+            private AccessorTestObject(int field, int property) : this(field)
             {
                 InstancePrivateProperty = property;
                 InstancePublicProperty = property;
             }
+
             public AccessorTestObject(int field, int property, bool isPublic) : this(field, property)
             {
                 InstancePrivateProperty = property;
@@ -64,6 +66,7 @@ namespace SenseNet.Tools.Tests
             {
                 return "StaticPrivateMethod" + new string(c, count);
             }
+
             private string InstancePrivateMethod(char c, int count)
             {
                 return "InstancePrivateMethod" + new string(c, count);
@@ -73,6 +76,7 @@ namespace SenseNet.Tools.Tests
             {
                 return "StaticPublicMethod" + new string(c, count);
             }
+
             public string InstancePublicMethod(char c, int count)
             {
                 return "InstancePublicMethod" + new string(c, count);
@@ -82,18 +86,26 @@ namespace SenseNet.Tools.Tests
             {
                 return "ProtectedOverriddenStaticMethod2" + new string(c, count);
             }
+
             protected override int ProtectedInheritedProperty { get; set; }
+
             protected override string ProtectedInheritedAbstractMethod(char c, int count)
             {
                 return "ProtectedInheritedAbstractMethod" + new string(c, count);
             }
+
             protected override string ProtectedInheritedVirtualMethod(char c, int count)
             {
                 return $"ProtectedInheritedVirtualMethod{new string(c, count)} " +
                        $"{base.ProtectedInheritedVirtualMethod(c, count)}";
             }
         }
+
         #endregion
+
+    [TestClass]
+    public class AccessorTests
+    {
 
         /* =============================================== Access to private members */
 
@@ -311,6 +323,21 @@ namespace SenseNet.Tools.Tests
         /* ----------------------------------------------- Inheritance tests */
 
         [TestMethod]
+        public void Accessor_Private_Object_Field_OnImplementation()
+        {
+            var objAcc = new ObjectAccessor(new AccessorTestObject(), typeof(AbstractionForAccessorTest));
+
+            var origValue = (int)objAcc.GetField("_privateFieldOnAbstract");
+            objAcc.SetField("_privateFieldOnAbstract", origValue + 1);
+            var actualValue = (int)objAcc.GetField("_privateFieldOnAbstract");
+            Assert.AreEqual(origValue + 1, actualValue);
+
+            objAcc.SetFieldOrProperty("_privateFieldOnAbstract", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("_privateFieldOnAbstract");
+            Assert.AreEqual(origValue - 1, actualValue);
+        }
+
+        [TestMethod]
         public void Accessor_Protected_Type_Property_OnAbstract()
         {
             var typeAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
@@ -458,7 +485,6 @@ namespace SenseNet.Tools.Tests
 
             Assert.AreEqual("ProtectedInheritedVirtualMethod*** abstract value", actualValue);
         }
-
         [TestMethod]
         public void Accessor_Protected_Object_InheritedVirtualMethod_OnImplementation()
         {
