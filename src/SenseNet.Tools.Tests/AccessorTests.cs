@@ -100,40 +100,40 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Private_Type_Field()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var origValue = (int)objAcc.GetStaticField("_staticPrivateField");
-            objAcc.SetStaticField("_staticPrivateField", origValue + 1);
-            var actualValue = (int)objAcc.GetStaticField("_staticPrivateField");
+            var origValue = (int)typeAcc.GetStaticField("_staticPrivateField");
+            typeAcc.SetStaticField("_staticPrivateField", origValue + 1);
+            var actualValue = (int)typeAcc.GetStaticField("_staticPrivateField");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            objAcc.SetStaticFieldOrProperty("_staticPrivateField", origValue - 1);
-            actualValue = (int)objAcc.GetStaticFieldOrProperty("_staticPrivateField");
+            typeAcc.SetStaticFieldOrProperty("_staticPrivateField", origValue - 1);
+            actualValue = (int)typeAcc.GetStaticFieldOrProperty("_staticPrivateField");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Private_Type_Property()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var origValue = (int)objAcc.GetStaticProperty("StaticPrivateProperty");
-            objAcc.SetStaticProperty("StaticPrivateProperty", origValue + 1);
-            var actualValue = (int)objAcc.GetStaticProperty("StaticPrivateProperty");
+            var origValue = (int)typeAcc.GetStaticProperty("StaticPrivateProperty");
+            typeAcc.SetStaticProperty("StaticPrivateProperty", origValue + 1);
+            var actualValue = (int)typeAcc.GetStaticProperty("StaticPrivateProperty");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            objAcc.SetStaticFieldOrProperty("StaticPrivateProperty", origValue - 1);
-            actualValue = (int)objAcc.GetStaticFieldOrProperty("StaticPrivateProperty");
+            typeAcc.SetStaticFieldOrProperty("StaticPrivateProperty", origValue - 1);
+            actualValue = (int)typeAcc.GetStaticFieldOrProperty("StaticPrivateProperty");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Private_Type_Method()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var actualValue = (string)objAcc.InvokeStatic("StaticPrivateMethod", '*', 5);
+            var actualValue = (string)typeAcc.InvokeStatic("StaticPrivateMethod", '*', 5);
             Assert.AreEqual("StaticPrivateMethod*****", actualValue);
 
-            actualValue = (string)objAcc.InvokeStatic("StaticPrivateMethod", 
+            actualValue = (string)typeAcc.InvokeStatic("StaticPrivateMethod", 
                 new[] {typeof(char), typeof(int)}, 
                 new object[]{'*', 3});
 
@@ -161,40 +161,40 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Private_Object_Field()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var origValue = (int)typeAcc.GetField("_instancePrivateField");
-            typeAcc.SetField("_instancePrivateField", origValue + 1);
-            var actualValue = (int)typeAcc.GetField("_instancePrivateField");
+            var origValue = (int)objAcc.GetField("_instancePrivateField");
+            objAcc.SetField("_instancePrivateField", origValue + 1);
+            var actualValue = (int)objAcc.GetField("_instancePrivateField");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            typeAcc.SetFieldOrProperty("_instancePrivateField", origValue - 1);
-            actualValue = (int)typeAcc.GetFieldOrProperty("_instancePrivateField");
+            objAcc.SetFieldOrProperty("_instancePrivateField", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("_instancePrivateField");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Private_Object_Property()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var origValue = (int)typeAcc.GetProperty("InstancePrivateProperty");
-            typeAcc.SetProperty("InstancePrivateProperty", origValue + 1);
-            var actualValue = (int)typeAcc.GetProperty("InstancePrivateProperty");
+            var origValue = (int)objAcc.GetProperty("InstancePrivateProperty");
+            objAcc.SetProperty("InstancePrivateProperty", origValue + 1);
+            var actualValue = (int)objAcc.GetProperty("InstancePrivateProperty");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            typeAcc.SetFieldOrProperty("InstancePrivateProperty", origValue - 1);
-            actualValue = (int)typeAcc.GetFieldOrProperty("InstancePrivateProperty");
+            objAcc.SetFieldOrProperty("InstancePrivateProperty", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("InstancePrivateProperty");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Private_Object_Method()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var actualValue = (string)typeAcc.Invoke("InstancePrivateMethod", '*', 5);
+            var actualValue = (string)objAcc.Invoke("InstancePrivateMethod", '*', 5);
             Assert.AreEqual("InstancePrivateMethod*****", actualValue);
 
-            actualValue = (string)typeAcc.Invoke("InstancePrivateMethod",
+            actualValue = (string)objAcc.Invoke("InstancePrivateMethod",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -206,40 +206,40 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Public_Type_Field()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var origValue = (int)objAcc.GetStaticField("_staticPublicField");
-            objAcc.SetStaticField("_staticPublicField", origValue + 1);
-            var actualValue = (int)objAcc.GetStaticField("_staticPublicField");
+            var origValue = (int)typeAcc.GetStaticField("_staticPublicField");
+            typeAcc.SetStaticField("_staticPublicField", origValue + 1);
+            var actualValue = (int)typeAcc.GetStaticField("_staticPublicField");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            objAcc.SetStaticFieldOrProperty("_staticPublicField", origValue - 1);
-            actualValue = (int)objAcc.GetStaticFieldOrProperty("_staticPublicField");
+            typeAcc.SetStaticFieldOrProperty("_staticPublicField", origValue - 1);
+            actualValue = (int)typeAcc.GetStaticFieldOrProperty("_staticPublicField");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Public_Type_Property()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var origValue = (int)objAcc.GetStaticProperty("StaticPublicProperty");
-            objAcc.SetStaticProperty("StaticPublicProperty", origValue + 1);
-            var actualValue = (int)objAcc.GetStaticProperty("StaticPublicProperty");
+            var origValue = (int)typeAcc.GetStaticProperty("StaticPublicProperty");
+            typeAcc.SetStaticProperty("StaticPublicProperty", origValue + 1);
+            var actualValue = (int)typeAcc.GetStaticProperty("StaticPublicProperty");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            objAcc.SetStaticFieldOrProperty("StaticPublicProperty", origValue - 1);
-            actualValue = (int)objAcc.GetStaticFieldOrProperty("StaticPublicProperty");
+            typeAcc.SetStaticFieldOrProperty("StaticPublicProperty", origValue - 1);
+            actualValue = (int)typeAcc.GetStaticFieldOrProperty("StaticPublicProperty");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Public_Type_Method()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var actualValue = (string)objAcc.InvokeStatic("StaticPublicMethod", '*', 5);
+            var actualValue = (string)typeAcc.InvokeStatic("StaticPublicMethod", '*', 5);
             Assert.AreEqual("StaticPublicMethod*****", actualValue);
 
-            actualValue = (string)objAcc.InvokeStatic("StaticPublicMethod",
+            actualValue = (string)typeAcc.InvokeStatic("StaticPublicMethod",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -268,40 +268,40 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Public_Object_Field()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var origValue = (int)typeAcc.GetField("_instancePublicField");
-            typeAcc.SetField("_instancePublicField", origValue + 1);
-            var actualValue = (int)typeAcc.GetField("_instancePublicField");
+            var origValue = (int)objAcc.GetField("_instancePublicField");
+            objAcc.SetField("_instancePublicField", origValue + 1);
+            var actualValue = (int)objAcc.GetField("_instancePublicField");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            typeAcc.SetFieldOrProperty("_instancePublicField", origValue - 1);
-            actualValue = (int)typeAcc.GetFieldOrProperty("_instancePublicField");
+            objAcc.SetFieldOrProperty("_instancePublicField", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("_instancePublicField");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Public_Object_Property()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var origValue = (int)typeAcc.GetProperty("InstancePublicProperty");
-            typeAcc.SetProperty("InstancePublicProperty", origValue + 1);
-            var actualValue = (int)typeAcc.GetProperty("InstancePublicProperty");
+            var origValue = (int)objAcc.GetProperty("InstancePublicProperty");
+            objAcc.SetProperty("InstancePublicProperty", origValue + 1);
+            var actualValue = (int)objAcc.GetProperty("InstancePublicProperty");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            typeAcc.SetFieldOrProperty("InstancePublicProperty", origValue - 1);
-            actualValue = (int)typeAcc.GetFieldOrProperty("InstancePublicProperty");
+            objAcc.SetFieldOrProperty("InstancePublicProperty", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("InstancePublicProperty");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Public_Object_Method()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var actualValue = (string)typeAcc.Invoke("InstancePublicMethod", '*', 5);
+            var actualValue = (string)objAcc.Invoke("InstancePublicMethod", '*', 5);
             Assert.AreEqual("InstancePublicMethod*****", actualValue);
 
-            actualValue = (string)typeAcc.Invoke("InstancePublicMethod",
+            actualValue = (string)objAcc.Invoke("InstancePublicMethod",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -343,12 +343,12 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Protected_Type_Method1_OnAbstract()
         {
-            var objAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
+            var typeAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
 
-            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1", '@', 7);
+            var actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod1", '@', 7);
             Assert.AreEqual("ProtectedStaticMethod1@@@@@@@", actualValue);
 
-            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1",
+            actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod1",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -357,12 +357,12 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Protected_Type_Method1_OnImplementation()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1", '@', 7);
+            var actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod1", '@', 7);
             Assert.AreEqual("ProtectedStaticMethod1@@@@@@@", actualValue);
 
-            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod1",
+            actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod1",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -371,12 +371,12 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Protected_Type_Method2_OnAbstract()
         {
-            var objAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
+            var typeAcc = new TypeAccessor(typeof(AbstractionForAccessorTest));
 
-            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2", '@', 7);
+            var actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod2", '@', 7);
             Assert.AreEqual("ProtectedStaticMethod2@@@@@@@", actualValue);
 
-            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2",
+            actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod2",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -385,12 +385,12 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Protected_Type_Method2_OnImplementation()
         {
-            var objAcc = new TypeAccessor(typeof(AccessorTestObject));
+            var typeAcc = new TypeAccessor(typeof(AccessorTestObject));
 
-            var actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2", '@', 7);
+            var actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod2", '@', 7);
             Assert.AreEqual("ProtectedOverriddenStaticMethod2@@@@@@@", actualValue);
 
-            actualValue = (string)objAcc.InvokeStatic("ProtectedStaticMethod2",
+            actualValue = (string)typeAcc.InvokeStatic("ProtectedStaticMethod2",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -401,29 +401,29 @@ namespace SenseNet.Tools.Tests
         public void Accessor_Protected_Object_InheritedProperty_OnAbstract()
         {
             AbstractionForAccessorTest instance = new AccessorTestObject();
-            var typeAcc = new ObjectAccessor(instance);
+            var objAcc = new ObjectAccessor(instance);
 
-            var origValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
-            typeAcc.SetProperty("ProtectedInheritedProperty", origValue + 1);
-            var actualValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
+            var origValue = (int)objAcc.GetProperty("ProtectedInheritedProperty");
+            objAcc.SetProperty("ProtectedInheritedProperty", origValue + 1);
+            var actualValue = (int)objAcc.GetProperty("ProtectedInheritedProperty");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            typeAcc.SetFieldOrProperty("ProtectedInheritedProperty", origValue - 1);
-            actualValue = (int)typeAcc.GetFieldOrProperty("ProtectedInheritedProperty");
+            objAcc.SetFieldOrProperty("ProtectedInheritedProperty", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("ProtectedInheritedProperty");
             Assert.AreEqual(origValue - 1, actualValue);
         }
         [TestMethod]
         public void Accessor_Protected_Object_InheritedProperty_OnImplementation()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var origValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
-            typeAcc.SetProperty("ProtectedInheritedProperty", origValue + 1);
-            var actualValue = (int)typeAcc.GetProperty("ProtectedInheritedProperty");
+            var origValue = (int)objAcc.GetProperty("ProtectedInheritedProperty");
+            objAcc.SetProperty("ProtectedInheritedProperty", origValue + 1);
+            var actualValue = (int)objAcc.GetProperty("ProtectedInheritedProperty");
             Assert.AreEqual(origValue + 1, actualValue);
 
-            typeAcc.SetFieldOrProperty("ProtectedInheritedProperty", origValue - 1);
-            actualValue = (int)typeAcc.GetFieldOrProperty("ProtectedInheritedProperty");
+            objAcc.SetFieldOrProperty("ProtectedInheritedProperty", origValue - 1);
+            actualValue = (int)objAcc.GetFieldOrProperty("ProtectedInheritedProperty");
             Assert.AreEqual(origValue - 1, actualValue);
         }
 
@@ -431,12 +431,12 @@ namespace SenseNet.Tools.Tests
         public void Accessor_Protected_Object_InheritedAbstractMethod()
         {
             AbstractionForAccessorTest instance = new AccessorTestObject();
-            var typeAcc = new ObjectAccessor(instance);
+            var objAcc = new ObjectAccessor(instance);
 
-            var actualValue = (string)typeAcc.Invoke("ProtectedInheritedAbstractMethod", '*', 5);
+            var actualValue = (string)objAcc.Invoke("ProtectedInheritedAbstractMethod", '*', 5);
             Assert.AreEqual("ProtectedInheritedAbstractMethod*****", actualValue);
 
-            actualValue = (string)typeAcc.Invoke("ProtectedInheritedAbstractMethod",
+            actualValue = (string)objAcc.Invoke("ProtectedInheritedAbstractMethod",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -447,12 +447,12 @@ namespace SenseNet.Tools.Tests
         public void Accessor_Protected_Object_InheritedVirtualMethod_OnAbstract()
         {
             AbstractionForAccessorTest instance = new AccessorTestObject();
-            var typeAcc = new ObjectAccessor(instance);
+            var objAcc = new ObjectAccessor(instance);
 
-            var actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod", '*', 5);
+            var actualValue = (string)objAcc.Invoke("ProtectedInheritedVirtualMethod", '*', 5);
             Assert.AreEqual("ProtectedInheritedVirtualMethod***** abstract value", actualValue);
 
-            actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod",
+            actualValue = (string)objAcc.Invoke("ProtectedInheritedVirtualMethod",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
@@ -462,12 +462,12 @@ namespace SenseNet.Tools.Tests
         [TestMethod]
         public void Accessor_Protected_Object_InheritedVirtualMethod_OnImplementation()
         {
-            var typeAcc = new ObjectAccessor(new AccessorTestObject());
+            var objAcc = new ObjectAccessor(new AccessorTestObject());
 
-            var actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod", '*', 5);
+            var actualValue = (string)objAcc.Invoke("ProtectedInheritedVirtualMethod", '*', 5);
             Assert.AreEqual("ProtectedInheritedVirtualMethod***** abstract value", actualValue);
 
-            actualValue = (string)typeAcc.Invoke("ProtectedInheritedVirtualMethod",
+            actualValue = (string)objAcc.Invoke("ProtectedInheritedVirtualMethod",
                 new[] { typeof(char), typeof(int) },
                 new object[] { '*', 3 });
 
