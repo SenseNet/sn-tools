@@ -27,6 +27,18 @@ namespace SenseNet.Testing
             _targetType = Target.GetType();
         }
         /// <summary>
+        /// Initializes a <see cref="ObjectAccessor"/> instance that wraps the given target object.
+        /// Target object can be accessed by the given <paramref name="baseType"/> type.
+        /// Typical usage: access a field that defined on the abstract ancestor.
+        /// </summary>
+        /// <param name="target">Object to wrap.</param>
+        /// <param name="baseType">Accessor abstraction.</param>
+        public ObjectAccessor(object target, Type baseType)
+        {
+            Target = target;
+            _targetType = baseType;
+        }
+        /// <summary>
         /// Initializes a new instance of the <see cref="ObjectAccessor" /> class that wraps the
         /// newly created instance of the specified type.
         /// </summary>
@@ -125,7 +137,8 @@ namespace SenseNet.Testing
         }
         private FieldInfo GetFieldInfo(string name, bool throwOnError = true)
         {
-            var field = _targetType.GetField(name, _publicFlags) ?? _targetType.GetField(name, _privateFlags);
+            var field = _targetType.GetField(name, BindingFlags.GetField | _publicFlags) ??
+                        _targetType.GetField(name, BindingFlags.GetField | _privateFlags);
             if (field == null && throwOnError)
                 throw new ApplicationException("Field not found: " + name);
             return field;
