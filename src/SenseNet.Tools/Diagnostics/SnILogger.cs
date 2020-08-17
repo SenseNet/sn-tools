@@ -2,12 +2,13 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
+// ReSharper disable once CheckNamespace
 namespace SenseNet.Diagnostics
 {
     /// <summary>
     /// Routes all log messages to the official .Net log interface.
     /// </summary>
-    public class SnILogger : SnEventloggerBase
+    internal class SnILogger : SnEventloggerBase
     {
         private readonly ILogger<SnILogger> _logger;
         public SnILogger(ILogger<SnILogger> logger)
