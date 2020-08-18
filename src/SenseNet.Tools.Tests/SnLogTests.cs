@@ -10,7 +10,9 @@ using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
+using SenseNet.Testing;
 using SenseNet.Tools.Diagnostics;
+using MEL= Microsoft.Extensions.Logging;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
@@ -343,6 +345,9 @@ namespace SenseNet.Tools.Tests
             var logger = new TestEventEntryLogger();
             SnLog.Instance = logger;
 
+            // switch this off to make assertion simpler
+            SnTrace.Event.Enabled = false;
+
             var propertyCollectorBackup = SnLog.PropertyCollector;
             const string errorMessage = "After all, the bug is just an animal.";
             SnLog.PropertyCollector = new BuggyEventPropertyCollector(errorMessage);
@@ -374,6 +379,9 @@ namespace SenseNet.Tools.Tests
             var loggerBackup = SnLog.Instance;
             var logger = new TestEventEntryLogger();
             SnLog.Instance = logger;
+
+            // switch this off to make assertion simpler
+            SnTrace.Event.Enabled = false;
 
             var propertyCollectorBackup = SnLog.PropertyCollector;
             const string errorMessage1 = "After all, the bug is just an animal.";
@@ -418,6 +426,9 @@ namespace SenseNet.Tools.Tests
             var loggerBackup = SnLog.Instance;
             var logger = new TestEventEntryLogger();
             SnLog.Instance = logger;
+
+            // switch this off to make assertion simpler
+            SnTrace.Event.Enabled = false;
 
             var propertyCollectorBackup = SnLog.PropertyCollector;
             SnLog.PropertyCollector = new TestEventPropertyCollector(new Dictionary<string, object> { { "x", "y" } });
@@ -632,6 +643,73 @@ namespace SenseNet.Tools.Tests
             var writerEntries = string.Join(", ", auditEventWriter.Entries.Select(e => e.Message).ToArray());
             Assert.AreEqual("Msg1, Msg2, Msg5, Msg6", logEntries);
             Assert.AreEqual("Msg3, Msg4", writerEntries);
+        }
+
+        /* ========================================================================= ILogger */
+
+        [TestMethod]
+        public void SnLog_ILogger_LogInfo()
+        {
+            static void AssertEntry(LogEntry entry, MEL.LogLevel expectedLevel, string message)
+            {
+                Assert.AreEqual(expectedLevel, entry.LogLevel);
+                Assert.IsTrue(entry.Message.Contains("Message: " + message));
+            }
+
+            var testILogger = new TestILogger<SnILogger>();
+            var logger = new SnILogger(testILogger);
+
+            using (new Swindler<IEventLogger>(logger, 
+                () => SnLog.Instance, 
+                original => SnLog.Instance = original))
+            {
+                SnLog.WriteInformation("test123");
+                SnLog.WriteError("testError123");
+                SnLog.WriteException(new InvalidOperationException("IOEx123"));
+                SnLog.WriteWarning("warning123");
+            }
+            
+            Assert.AreEqual(4, testILogger.Entries.Count);
+            AssertEntry(testILogger.Entries[0], MEL.LogLevel.Information, "test123");
+            AssertEntry(testILogger.Entries[1], MEL.LogLevel.Error, "testError123");
+            AssertEntry(testILogger.Entries[2], MEL.LogLevel.Error, "IOEx123");
+            AssertEntry(testILogger.Entries[3], MEL.LogLevel.Warning, "warning123");
+        }
+
+        [TestMethod]
+        public void SnLog_ILogger_Trace()
+        {
+            static void AssertEntry(LogEntry entry, string message)
+            {
+                Assert.AreEqual(MEL.LogLevel.Trace, entry.LogLevel);
+                Assert.IsTrue(entry.Message.Contains(message));
+            }
+
+            var testILogger = new TestILogger<SnILoggerTracer>();
+            var tracer = new SnILoggerTracer(testILogger);
+            
+            // let all messages pass through
+            SnTrace.EnableAll();
+
+            using (new Swindler<List<ISnTracer>>(new List<ISnTracer> { tracer },
+                () => SnTrace.SnTracers,
+                original =>
+                {
+                    SnTrace.SnTracers.Clear();
+                    SnTrace.SnTracers.AddRange(original);
+                }))
+            {
+                SnTrace.Repository.Write("RepoInfo123");
+                SnTrace.Repository.WriteError("RepoError123");
+                SnTrace.Custom.Write("CustomInfo123");
+                SnTrace.Custom.WriteError("CustomError123");
+            }
+
+            Assert.AreEqual(4, testILogger.Entries.Count);
+            AssertEntry(testILogger.Entries[0], "RepoInfo123");
+            AssertEntry(testILogger.Entries[1], "RepoError123");
+            AssertEntry(testILogger.Entries[2], "CustomInfo123");
+            AssertEntry(testILogger.Entries[3], "CustomError123");
         }
 
         /* ========================================================================= */
