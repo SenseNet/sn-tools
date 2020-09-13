@@ -8,7 +8,7 @@ namespace SenseNet.Diagnostics
     /// <summary>
     /// Routes all log messages to the official .Net log interface.
     /// </summary>
-    internal class SnILogger : SnEventloggerBase
+    public class SnILogger : SnEventloggerBase
     {
         private readonly ILogger<SnILogger> _logger;
         public SnILogger(ILogger<SnILogger> logger)

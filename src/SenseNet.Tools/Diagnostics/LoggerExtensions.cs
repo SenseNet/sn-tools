@@ -23,5 +23,16 @@ namespace SenseNet.Extensions.DependencyInjection
 
             return provider;
         }
+
+        /// <summary>
+        /// Register the logger and tracer wrapper classes for the ILogger interface.
+        /// </summary>
+        public static IServiceCollection AddSenseNetILogger(this IServiceCollection services)
+        {
+            services.AddSingleton<IEventLogger, SnILogger>();
+            services.AddSingleton<ISnTracer, SnILoggerTracer>();
+
+            return services;
+        }
     }
 }
