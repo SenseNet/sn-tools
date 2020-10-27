@@ -1,6 +1,5 @@
 # sensenet Tools
 
-[![Join the chat at https://gitter.im/SenseNet/sn-tools](https://badges.gitter.im/SenseNet/sn-tools.svg)](https://gitter.im/SenseNet/sn-tools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NuGet](https://img.shields.io/nuget/v/SenseNet.Tools.svg)](https://www.nuget.org/packages/SenseNet.Tools)
 [![Build Status](https://dev.azure.com/sensenetplatform/sensenet/_apis/build/status/SenseNet.sn-tools)](https://dev.azure.com/sensenetplatform/sensenet/_build/latest?definitionId=4)
 
@@ -69,3 +68,9 @@ var dbProvider = TypeResolver.CreateInstance<DbProvider>("MyNamespace.MyDbProvid
 This is a simple base API for loading **strongly typed values** from .Net configuration files. It lets you define your custom config classes and publish config properties with only a few lines of code.
 
 See details [here](src/SenseNet.Tools/Configuration/Readme.md).
+
+# sensenet as a service (SNaaS) - use sensenet from the cloud
+
+For a monthly subscription fee, we store all your content and data, relieving you of all maintenance-related tasks and installation, ensuring easy onboarding, easy updates, and patches.
+
+https://www.sensenet.com/pricing
