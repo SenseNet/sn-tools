@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SenseNet.Configuration;
 using SenseNet.Tools;
 
@@ -21,6 +22,18 @@ namespace SenseNet.Extensions.DependencyInjection
             SnConfig.Instance = configuration;
 
             return repositoryBuilder;
+        }
+
+        /// <summary>
+        /// Sets the provided configuration as the current configuration instance
+        /// used by the SnConfig infrastructure.
+        /// </summary>
+        // ReSharper disable once UnusedMember.Global
+        public static IServiceCollection SetSenseNetConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            SnConfig.Instance = configuration;
+
+            return services;
         }
     }
 }
