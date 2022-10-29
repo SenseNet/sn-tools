@@ -317,6 +317,18 @@ namespace SenseNet.Diagnostics
         private static string __appDomainName;
         private static string AppDomainName => __appDomainName ??= AppDomain.CurrentDomain.FriendlyName;
 
+        /*================================================================== ProgramFlow */
+
+        private static long _nextProgramFlowId = 1L;
+        private static readonly AsyncLocal<long> ProgramFlow = new AsyncLocal<long>();
+
+        private static long GetProgramFlowId()
+        {
+            if (ProgramFlow.Value == 0)
+                ProgramFlow.Value = Interlocked.Increment(ref _nextProgramFlowId) - 1;
+            return ProgramFlow.Value;
+        }
+
         /*================================================================== Logger */
 
         /// <summary>
@@ -344,12 +356,14 @@ namespace SenseNet.Diagnostics
         private static string FinishOperation(Operation op)
         {
             var lineCounter = Interlocked.Increment(ref _lineCounter);
+            var programFlow = GetProgramFlowId();
 
-            var line = string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tOp:{5}\t{6}\t{7:hh\':\'mm\':\'ss\'.\'ffffff}\t{8}"
+            var line = string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tPf:{5}\tOp:{6}\t{7}\t{8:hh\':\'mm\':\'ss\'.\'ffffff}\t{9}"
                 , lineCounter
                 , DateTime.UtcNow, op.Category
                 , AppDomainName
                 , Thread.CurrentThread.ManagedThreadId
+                , programFlow
                 , op.Id
                 , op.Successful ? "End" : "UNTERMINATED"
                 , DateTime.UtcNow - op.StartedAt
@@ -361,20 +375,23 @@ namespace SenseNet.Diagnostics
         private static string SafeFormatString(string category, bool isError, Operation op, string message, params object[] args)
         {
             var lineCounter = Interlocked.Increment(ref _lineCounter);
+            var programFlow = GetProgramFlowId();
             var line = op != null
-                ? string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tOp:{5}\tStart\t\t"
+                ? string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tPf:{5}\tOp:{6}\tStart\t\t"
                     , lineCounter
                     , DateTime.UtcNow
                     , category
                     , AppDomainName
                     , Thread.CurrentThread.ManagedThreadId
+                    , programFlow
                     , op.Id)
-                : string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\t\t{5}\t\t"
+                : string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tPf:{5}\t\t{6}\t\t"
                     , lineCounter
                     , DateTime.UtcNow
                     , category
                     , AppDomainName
                     , Thread.CurrentThread.ManagedThreadId
+                    , programFlow
                     , isError ? "ERROR" : "");
 
             // smart formatting

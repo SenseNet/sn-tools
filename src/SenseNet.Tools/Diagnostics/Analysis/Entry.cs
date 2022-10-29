@@ -32,12 +32,14 @@ namespace SenseNet.Diagnostics.Analysis
             /// <summary>Value = 4</summary>
             ThreadId,
             /// <summary>Value = 5</summary>
-            OpId,
+            ProgramFlowId,
             /// <summary>Value = 6</summary>
-            Status,
+            OpId,
             /// <summary>Value = 7</summary>
-            Duration,
+            Status,
             /// <summary>Value = 8</summary>
+            Duration,
+            /// <summary>Value = 9</summary>
             Message
         }
 
@@ -65,6 +67,10 @@ namespace SenseNet.Diagnostics.Analysis
         /// Current thread id.
         /// </summary>
         public int ThreadId;
+        /// <summary>
+        /// Current program thread id.
+        /// </summary>
+        public long ProgramFlowId;
         /// <summary>
         /// Id of the operation
         /// </summary>
@@ -120,6 +126,7 @@ namespace SenseNet.Diagnostics.Analysis
                 Category = data[(int)Field.Category],
                 AppDomain = ParseAppDomain(data[(int)Field.AppDomain]),
                 ThreadId = ParseThread(data[(int)Field.ThreadId]),
+                ProgramFlowId = ParseProgramFlow(data[(int)Field.ProgramFlowId]),
                 OpId = ParseOperationId(data[(int)Field.OpId]),
                 Status = data[(int)Field.Status],
                 Duration = ParseDuration(data[(int)Field.Duration]),
@@ -154,6 +161,12 @@ namespace SenseNet.Diagnostics.Analysis
             if (src.StartsWith("T:"))
                 src = src.Substring(2);
             return src.Length == 0 ? default : int.Parse(src);
+        }
+        private static long ParseProgramFlow(string src)
+        {
+            if (src.StartsWith("Pf:"))
+                src = src.Substring(3);
+            return src.Length == 0 ? default : long.Parse(src);
         }
         private static int ParseOperationId(string src)
         {

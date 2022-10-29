@@ -3,6 +3,7 @@ using SenseNet.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SenseNet.Diagnostics.Analysis;
 
 namespace SenseNet.Tools.Tests
 {
@@ -57,12 +58,12 @@ namespace SenseNet.Tools.Tests
 
             var fields = line.Split('\t');
 
-            return fields.Length < 9 ? null : string.Join("\t", fields, 8, fields.Length - 8);
+            return fields.Length < 10 ? null : string.Join("\t", fields, 9, fields.Length - 9);
         }
-        protected string GetColumnFromLine(string line, int col)
+        protected string GetColumnFromLine(string line, Entry.Field col)
         {
             var fields = line?.Split('\t');
-            return fields?[col];
+            return fields?[(int)col];
         }
 
     }
