@@ -315,7 +315,7 @@ namespace SenseNet.Diagnostics
 
         // ReSharper disable once InconsistentNaming
         private static string __appDomainName;
-        private static string AppDomainName => __appDomainName ??= AppDomain.CurrentDomain.FriendlyName;
+        private static string AppDomainName => __appDomainName ??= Guid.NewGuid().ToString();
 
         /*================================================================== ProgramFlow */
 
