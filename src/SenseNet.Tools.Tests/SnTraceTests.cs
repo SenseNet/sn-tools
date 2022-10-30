@@ -87,7 +87,7 @@ namespace SenseNet.Tools.Tests
             var log = DisableAllAndGetLog();
 
             Assert.AreEqual(1, log.Count);
-            Assert.AreEqual("ERROR", GetColumnFromLine(log[0], 6));
+            Assert.AreEqual("ERROR", GetColumnFromLine(log[0], Entry.Field.Status));
             Assert.IsTrue(log[0].EndsWith("asdf"));
         }
 
@@ -170,7 +170,7 @@ namespace SenseNet.Tools.Tests
             var messages = string.Join(", ", log.Select(GetMessageFromLine));
             Assert.AreEqual("Op1, Op2, asdf, Op2, Op3, qwer, Op3, Op4, yxcv, Op4, Op1", messages);
 
-            var operationData = string.Join(", ", log.Select(x => GetColumnFromLine(x, 5) + " " + GetColumnFromLine(x, 6)));
+            var operationData = string.Join(", ", log.Select(x => GetColumnFromLine(x, Entry.Field.OpId) + " " + GetColumnFromLine(x, Entry.Field.Status)));
             Assert.AreEqual("Op:1 Start, Op:2 Start,  , Op:2 UNTERMINATED, Op:3 Start,  , Op:3 UNTERMINATED, Op:4 Start,  , Op:4 End, Op:1 End", operationData);
         }
 
