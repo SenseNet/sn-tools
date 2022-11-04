@@ -16,16 +16,15 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "/a", "/string:asdf", "/int:42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
             Assert.AreEqual(true, settings.A);
             Assert.AreEqual(false, settings.B);
-            Assert.AreEqual(false, (bool)settingsAcc.GetProperty("C"));
+            Assert.AreEqual(false, settings.C);
             Assert.AreEqual(null, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -33,7 +32,6 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "--string=asdf", "-int:42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -42,7 +40,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual(null, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -50,7 +48,6 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "/STRING:asdf", "-INT=42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -59,7 +56,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual(null, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -67,7 +64,6 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "-s=asdf", "-i:42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -76,7 +72,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual(null, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -84,7 +80,6 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "-STRING", "asdf", "-INT", "42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -93,7 +88,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual(null, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -101,7 +96,6 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "/STRING", "asdf", "/INT", "42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -110,7 +104,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual(null, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -118,7 +112,6 @@ namespace SenseNet.Tools.Tests
         {
             var args = new[] { "source", "/STRING", "asdf", "target", "-i:42" };
             var settings = new Args1();
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -127,7 +120,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual("source", settings.Source);
             Assert.AreEqual("target", settings.Target);
-            Assert.AreEqual("asdf", (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual("asdf", settings.StringParam1);
             Assert.AreEqual(42, settings.IntParam1);
         }
         [TestMethod]
@@ -138,7 +131,6 @@ namespace SenseNet.Tools.Tests
 
             var args = new string[0];
             var settings = new Args1 { IntParam1 = defaultInt, Source = defaultSource };
-            var settingsAcc = new PrivateObject(settings);
 
             ArgumentParser.Parse(args, settings);
 
@@ -147,7 +139,7 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(false, settings.A);
             Assert.AreEqual(defaultSource, settings.Source);
             Assert.AreEqual(null, settings.Target);
-            Assert.AreEqual(null, (string)settingsAcc.GetFieldOrProperty("StringParam1"));
+            Assert.AreEqual(null, settings.StringParam1);
             Assert.AreEqual(defaultInt, settings.IntParam1);
         }
 
@@ -363,15 +355,11 @@ namespace SenseNet.Tools.Tests
         [CommandLineArgument(helpText: "Description B")]
         internal bool B { get; set; }
         [CommandLineArgument(helpText: "Description C")]
-#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
-        private bool C { get; set; }
-#pragma warning restore IDE0051
+        internal bool C { get; set; }
         [CommandLineArgument(name: "STRING", aliases: "s", helpText: "Description STRING")]
-#pragma warning disable IDE0051
         // ReSharper disable once UnusedMember.Local
-        private string StringParam1 { get; set; }
-#pragma warning restore IDE0051
+        internal string StringParam1 { get; set; }
         [CommandLineArgument(name: "INT", aliases: "i", helpText: "Description INT")]
         internal int IntParam1 { get; set; }
     }

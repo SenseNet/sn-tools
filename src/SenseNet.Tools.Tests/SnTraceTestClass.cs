@@ -16,8 +16,7 @@ namespace SenseNet.Tools.Tests
 
         protected void ResetOperationId()
         {
-            var acc = new PrivateType(typeof(SnTrace.Operation));
-            acc.SetStaticField("_nextId", 1L);
+            SnTrace.Operation.ResetOperationId();
         }
 
         private void CleanupLog()
