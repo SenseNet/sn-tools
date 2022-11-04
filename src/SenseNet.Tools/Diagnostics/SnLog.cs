@@ -230,7 +230,7 @@ namespace SenseNet.Diagnostics
             }
         }
 
-        private static TraceEventType GetEventType(Exception e)
+        internal static TraceEventType GetEventType(Exception e)
         {
             var ee = e;
             while (ee != null)
