@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Configuration;
+
 // ReSharper disable UnusedMember.Global
 // ReSharper disable StringLiteralTypo
 
@@ -37,6 +40,16 @@ namespace SenseNet.Tools.Tests
             {"sensenet:subsection:key1", "subvalue1"}
         };
         #endregion
+
+        [AssemblyInitialize]
+        public static void InitializeAssembly(TestContext context)
+        {
+#if NETCOREAPP
+            // workaround for .net 6+: renaming the legacy configuration from App.config to the runtime assembly name
+            var outputConfigFile = System.Configuration.ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath;
+            File.Copy("App.config", outputConfigFile, true);
+#endif
+        }
 
         [TestMethod]
         public void SnConfig_SectionName_ExistingValue()

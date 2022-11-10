@@ -37,6 +37,11 @@ namespace SenseNet.Diagnostics
 
             internal static readonly Operation Null = new Operation(0L);
 
+            internal static void ResetOperationId(long operationId = 1)
+            {
+                _nextId = operationId;
+            }
+
             /// <summary>
             /// Gets the operation identifier that is unique in the current AppDomain.
             /// </summary>

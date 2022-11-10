@@ -262,9 +262,7 @@ namespace SenseNet.Tools.Tests
             e = new TestException_Information("E3", e);
             e = new Exception("E4", e);
 
-            //"GetEventType", e
-            var snLogAcc = new PrivateType(typeof(SnLog));
-            var actual = (TraceEventType)snLogAcc.InvokeStatic("GetEventType", e);
+            var actual = SnLog.GetEventType(e);
 
             Assert.AreEqual(TraceEventType.Information, actual);
         }
@@ -278,9 +276,7 @@ namespace SenseNet.Tools.Tests
             e = new TestException_Warning("E3", e);
             e = new Exception("E4", e);
 
-            //"GetEventType", e
-            var snLogAcc = new PrivateType(typeof(SnLog));
-            var actual = (TraceEventType)snLogAcc.InvokeStatic("GetEventType", e);
+            var actual = SnLog.GetEventType(e);
 
             Assert.AreEqual(TraceEventType.Warning, actual);
         }
