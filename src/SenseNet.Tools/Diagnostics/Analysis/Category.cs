@@ -24,6 +24,8 @@ namespace SenseNet.Diagnostics.Analysis
         public static readonly string Messaging = "Messaging";
         /// <summary>Security category</summary>
         public static readonly string Security = "Security";
+        /// <summary>SecurityDatabase category</summary>
+        public static readonly string SecurityDatabase = "SecurityDatabase";
         /// <summary>SecurityQueue category</summary>
         public static readonly string SecurityQueue = "SecurityQueue";
         /// <summary>System category</summary>

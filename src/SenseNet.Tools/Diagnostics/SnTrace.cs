@@ -182,6 +182,8 @@ namespace SenseNet.Diagnostics
         public static readonly SnTraceCategory Messaging = new SnTraceCategory("Messaging");
         /// <summary>Security category</summary>
         public static readonly SnTraceCategory Security = new SnTraceCategory("Security");
+        /// <summary>SecurityDatabase category</summary>
+        public static readonly SnTraceCategory SecurityDatabase = new SnTraceCategory("SecurityDatabase");
         /// <summary>SecurityQueue category</summary>
         public static readonly SnTraceCategory SecurityQueue = new SnTraceCategory("SecurityQueue");
         /// <summary>System category</summary>
@@ -202,7 +204,7 @@ namespace SenseNet.Diagnostics
         /// <summary>
         /// Contains all SnTrace categories to help enumerate them.
         /// </summary>
-        public static readonly SnTraceCategory[] Categories = { ContentOperation, Database, Index, IndexQueue, Query, Repository, Messaging, Security, SecurityQueue, System, Web, Workflow, TaskManagement, Test, Event, Custom };
+        public static readonly SnTraceCategory[] Categories = { ContentOperation, Database, Index, IndexQueue, Query, Repository, Messaging, Security, SecurityDatabase, SecurityQueue, System, Web, Workflow, TaskManagement, Test, Event, Custom };
 
         //====================================================================== Static API
 
