@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SenseNet.Extensions.DependencyInjection;
+
 // ReSharper disable IdentifierTypo
 
 namespace SenseNet.Tools.Tests
@@ -215,6 +218,90 @@ namespace SenseNet.Tools.Tests
 
             Assert.AreEqual(1, RetryTestValue, $"#1 RetryTestValue contains a wrong value: {RetryTestValue}.");
             Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
+        }
+
+        [TestMethod]
+        public async Task RetrierService_Simple()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+
+            // success immediately
+            await retrier.RetryAsync(() =>
+            {
+                testCounter++;
+                return Task.CompletedTask;
+            }, ex => false);
+
+            Assert.AreEqual(1, testCounter);
+
+            // success after a few tries
+            await retrier.RetryAsync(() =>
+            {
+                testCounter++;
+                
+                // do NOT throw on the last attempt
+                if (testCounter < 3)
+                    throw new InvalidOperationException("Retry123");
+
+                return Task.CompletedTask;
+            }, ex => ex.Message.Contains("Retry123"));
+
+            Assert.AreEqual(3, testCounter);
+
+            try
+            {
+                // always fail
+                await retrier.RetryAsync(() =>
+                    {
+                        testCounter++;
+
+                        throw new InvalidOperationException("Retry123");
+                    }, ex => ex.Message.Contains("Retry123"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual("Retry timeout occurred after 3 iterations.", ex.Message);
+            }
+
+            Assert.AreEqual(6, testCounter);
+        }
+
+        [TestMethod]
+        public async Task RetrierService_Full()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+
+            // expecting 1 retry
+            var result1 = await retrier.RetryAsync(() =>
+                {
+                    testCounter++;
+                    return Task.FromResult(testCounter);
+                },
+                result => result == 2,
+                ex => true,
+                null);
+
+            Assert.AreEqual(2, result1);
+
+            //UNDONE: add more Retry tests
+        }
+
+        private static IRetrier GetRetrier(Action<RetrierOptions> configure = null)
+        {
+            var services = new ServiceCollection()
+                .AddLogging()
+                .AddSenseNetRetrier(options =>
+                {
+                    options.Count = 3;
+                    options.WaitMilliseconds = 20;
+
+                    configure?.Invoke(options);
+                })
+                .BuildServiceProvider();
+
+            return services.GetRequiredService<IRetrier>();
         }
     }
 }
