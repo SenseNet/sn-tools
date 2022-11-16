@@ -220,8 +220,10 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
         }
 
+        //====================================================================================== Retrier service
+
         [TestMethod]
-        public async Task RetrierService_Simple()
+        public async Task RetrierService_Void_DefaultConfig_Success()
         {
             var retrier = GetRetrier();
             var testCounter = 0;
@@ -231,24 +233,32 @@ namespace SenseNet.Tools.Tests
             {
                 testCounter++;
                 return Task.CompletedTask;
-            }, ex => false);
+            }, (ex, _) => false);
 
             Assert.AreEqual(1, testCounter);
+            testCounter = 0;
 
             // success after a few tries
             await retrier.RetryAsync(() =>
             {
                 testCounter++;
-                
+
                 // do NOT throw on the last attempt
                 if (testCounter < 3)
                     throw new InvalidOperationException("Retry123");
 
                 return Task.CompletedTask;
-            }, ex => ex.Message.Contains("Retry123"));
+            }, (ex, _) => ex.Message.Contains("Retry123"));
 
             Assert.AreEqual(3, testCounter);
-
+        }
+        [TestMethod]
+        public async Task RetrierService_Void_DefaultConfig_Error()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+            
             try
             {
                 // always fail
@@ -257,35 +267,438 @@ namespace SenseNet.Tools.Tests
                         testCounter++;
 
                         throw new InvalidOperationException("Retry123");
-                    }, ex => ex.Message.Contains("Retry123"));
+                    }, (ex, _) => ex.Message.Contains("Retry123"));
             }
             catch (InvalidOperationException ex)
             {
+                thrown = true;
                 Assert.AreEqual("Retry timeout occurred after 3 iterations.", ex.Message);
             }
 
-            Assert.AreEqual(6, testCounter);
+            Assert.IsTrue(thrown);
+            Assert.AreEqual(3, testCounter);
+
+            var handled = false;
+            testCounter = 0;
+
+            // always fail but suppress it
+            await retrier.RetryAsync(() =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                },
+                (ex, _) => ex.Message.Contains("Retry123"),
+                (ex, i) => { handled = true; });
+
+            Assert.IsTrue(handled);
+            Assert.AreEqual(3, testCounter);
         }
 
         [TestMethod]
-        public async Task RetrierService_Full()
+        public async Task RetrierService_Generic_DefaultConfig_Success()
         {
             var retrier = GetRetrier();
             var testCounter = 0;
 
-            // expecting 1 retry
-            var result1 = await retrier.RetryAsync(() =>
+            // success immediately
+            var result = await retrier.RetryAsync(async () =>
                 {
                     testCounter++;
+
+                    // test async/await mode
+                    await Task.Delay(20);
+
+                    return testCounter;
+                },
+                (ex, _) => false);
+
+            Assert.AreEqual(1, result);
+            testCounter = 0;
+
+            // success after a few tries
+            result = await retrier.RetryAsync(() =>
+                {
+                    testCounter++;
+
+                    // do NOT throw on the last attempt
+                    if (testCounter < 3)
+                        throw new InvalidOperationException("Retry123");
+
                     return Task.FromResult(testCounter);
                 },
-                result => result == 2,
-                ex => true,
-                null);
+                (ex, _) => ex.Message.Contains("Retry123"));
 
-            Assert.AreEqual(2, result1);
+            Assert.AreEqual(3, result);
+        }
 
-            //UNDONE: add more Retry tests
+        [TestMethod]
+        public async Task RetrierService_Generic_DefaultConfig_Error()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+
+            try
+            {
+                // always fail
+                await retrier.RetryAsync<int>(() =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                }, (ex, _) => ex.Message.Contains("Retry123"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                thrown = true;
+                Assert.AreEqual("Retry timeout occurred after 3 iterations.", ex.Message);
+            }
+
+            Assert.IsTrue(thrown);
+            Assert.AreEqual(3, testCounter);
+
+            var handled = false;
+            testCounter = 0;
+
+            // always fail but suppress it
+            var result = await retrier.RetryAsync<object>(() =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                },
+                (ex, _) => ex.Message.Contains("Retry123"),
+                (_, _, _) => { handled = true; });
+
+            Assert.IsTrue(handled);
+            Assert.AreEqual(3, testCounter);
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task RetrierService_Generic_DefaultConfig_Full_Success()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+
+            // success immediately
+            var result = await retrier.RetryAsync(() =>
+                {
+                    testCounter++;
+
+                    return Task.FromResult(testCounter);
+                },
+                (value, _) => value == 0,
+                (_, _) => true,
+                (_, _, _) => throw new InvalidOperationException("not thrown"));
+
+            Assert.AreEqual(1, result);
+            testCounter = 0;
+
+            // success after a few tries
+            result = await retrier.RetryAsync(() =>
+                {
+                    testCounter++;
+
+                    // do NOT throw on the last attempt
+                    if (testCounter < 3)
+                        throw new InvalidOperationException("Retry123");
+
+                    return Task.FromResult(testCounter);
+                },
+                (value, _) => value < 3,
+                (_, _) => true,
+                (_, _, _) => throw new InvalidOperationException("not thrown"));
+
+            Assert.AreEqual(3, result);
+        }
+        [TestMethod]
+        public async Task RetrierService_Generic_DefaultConfig_Full_Error()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+
+            try
+            {
+                // always fail
+                await retrier.RetryAsync<int>(() =>
+                    {
+                        testCounter++;
+
+                        throw new InvalidOperationException("Retry123");
+                    },
+                    (_, _) => true,
+                    (ex, _) => ex.Message.Contains("Retry123"),
+                    (_, ex, _) => throw new InvalidOperationException("thrown"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                if (ex.Message == "thrown")
+                    thrown = true;
+            }
+
+            Assert.IsTrue(thrown);
+            Assert.AreEqual(3, testCounter);
+
+            var handled = false;
+            testCounter = 0;
+
+            // always fail but suppress it
+            var result = await retrier.RetryAsync<object>(() =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                },
+                (_, _) => true,
+                (ex, _) => ex.Message.Contains("Retry123"),
+                (_, _, _) => { handled = true; });
+
+            Assert.IsTrue(handled);
+            Assert.AreEqual(3, testCounter);
+            Assert.IsNull(result);
+        }
+
+
+        [TestMethod]
+        public async Task RetrierService_Void_CustomConfig_Success()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+
+            // success immediately
+            await retrier.RetryAsync(5, 10, () =>
+            {
+                testCounter++;
+                return Task.CompletedTask;
+            }, (ex, _) => false);
+
+            Assert.AreEqual(1, testCounter);
+            testCounter = 0;
+
+            // success after a few tries
+            await retrier.RetryAsync(5, 10, () =>
+            {
+                testCounter++;
+
+                // do NOT throw on the last attempt
+                if (testCounter < 5)
+                    throw new InvalidOperationException("Retry123");
+
+                return Task.CompletedTask;
+            }, (ex, _) => ex.Message.Contains("Retry123"));
+
+            Assert.AreEqual(5, testCounter);
+        }
+        [TestMethod]
+        public async Task RetrierService_Void_CustomConfig_Error()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+
+            try
+            {
+                // always fail
+                await retrier.RetryAsync(5, 10, () =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                }, (ex, _) => ex.Message.Contains("Retry123"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                thrown = true;
+                Assert.AreEqual("Retry timeout occurred after 5 iterations.", ex.Message);
+            }
+
+            Assert.IsTrue(thrown);
+            Assert.AreEqual(5, testCounter);
+
+            var handled = false;
+            testCounter = 0;
+
+            // always fail but suppress it
+            await retrier.RetryAsync(5, 10, () =>
+            {
+                testCounter++;
+
+                throw new InvalidOperationException("Retry123");
+            },
+                (ex, _) => ex.Message.Contains("Retry123"),
+                (ex, i) => { handled = true; });
+
+            Assert.IsTrue(handled);
+            Assert.AreEqual(5, testCounter);
+        }
+
+        [TestMethod]
+        public async Task RetrierService_Generic_CustomConfig_Success()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+
+            // success immediately
+            var result = await retrier.RetryAsync(5, 10, async () =>
+            {
+                testCounter++;
+
+                // test async/await mode
+                await Task.Delay(20);
+
+                return testCounter;
+            },
+                (ex, _) => false);
+
+            Assert.AreEqual(1, result);
+            testCounter = 0;
+
+            // success after a few tries
+            result = await retrier.RetryAsync(5, 10, () =>
+            {
+                testCounter++;
+
+                // do NOT throw on the last attempt
+                if (testCounter < 5)
+                    throw new InvalidOperationException("Retry123");
+
+                return Task.FromResult(testCounter);
+            },
+                (ex, _) => ex.Message.Contains("Retry123"));
+
+            Assert.AreEqual(5, result);
+        }
+
+        [TestMethod]
+        public async Task RetrierService_Generic_CustomConfig_Error()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+
+            try
+            {
+                // always fail
+                await retrier.RetryAsync<int>(5, 10, () =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                }, (ex, _) => ex.Message.Contains("Retry123"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                thrown = true;
+                Assert.AreEqual("Retry timeout occurred after 5 iterations.", ex.Message);
+            }
+
+            Assert.IsTrue(thrown);
+            Assert.AreEqual(5, testCounter);
+
+            var handled = false;
+            testCounter = 0;
+
+            // always fail but suppress it
+            var result = await retrier.RetryAsync<object>(5, 10, () =>
+            {
+                testCounter++;
+
+                throw new InvalidOperationException("Retry123");
+            },
+                (ex, _) => ex.Message.Contains("Retry123"),
+                (_, _, _) => { handled = true; });
+
+            Assert.IsTrue(handled);
+            Assert.AreEqual(5, testCounter);
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public async Task RetrierService_Generic_CustomConfig_Full_Success()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+
+            // success immediately
+            var result = await retrier.RetryAsync(5, 10, () =>
+                {
+                    testCounter++;
+
+                    return Task.FromResult(testCounter);
+                },
+                (value, _) => value == 0,
+                (_, _) => true,
+                (_, _, _) => throw new InvalidOperationException("not thrown"));
+
+            Assert.AreEqual(1, result);
+            testCounter = 0;
+
+            // success after a few tries
+            result = await retrier.RetryAsync(5, 10, () =>
+                {
+                    testCounter++;
+
+                    // do NOT throw on the last attempt
+                    if (testCounter < 5)
+                        throw new InvalidOperationException("Retry123");
+
+                    return Task.FromResult(testCounter);
+                },
+                (value, _) => value < 5,
+                (_, _) => true,
+                (_, _, _) => throw new InvalidOperationException("not thrown"));
+
+            Assert.AreEqual(5, result);
+        }
+        [TestMethod]
+        public async Task RetrierService_Generic_CustomConfig_Full_Error()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+
+            try
+            {
+                // always fail
+                await retrier.RetryAsync<int>(5, 10, () =>
+                    {
+                        testCounter++;
+
+                        throw new InvalidOperationException("Retry123");
+                    },
+                    (_, _) => true,
+                    (ex, _) => ex.Message.Contains("Retry123"),
+                    (_, ex, _) => throw new InvalidOperationException("thrown"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                if (ex.Message == "thrown")
+                    thrown = true;
+            }
+
+            Assert.IsTrue(thrown);
+            Assert.AreEqual(5, testCounter);
+
+            var handled = false;
+            testCounter = 0;
+
+            // always fail but suppress it
+            var result = await retrier.RetryAsync<object>(5, 10, () =>
+                {
+                    testCounter++;
+
+                    throw new InvalidOperationException("Retry123");
+                },
+                (_, _) => true,
+                (ex, _) => ex.Message.Contains("Retry123"),
+                (_, _, _) => { handled = true; });
+
+            Assert.IsTrue(handled);
+            Assert.AreEqual(5, testCounter);
+            Assert.IsNull(result);
         }
 
         private static IRetrier GetRetrier(Action<RetrierOptions> configure = null)

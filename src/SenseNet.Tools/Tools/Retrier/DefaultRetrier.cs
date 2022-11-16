@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Tools
 {
+    /// <inheritdoc cref="IRetrier"/>
     internal class DefaultRetrier : IRetrier
     {
         private readonly ILogger<DefaultRetrier> _logger;
@@ -16,58 +17,90 @@ namespace SenseNet.Tools
             _logger = logger;
             _options = options.Value;
         }
-
-        public Task RetryAsync(Func<Task> action, Func<Exception, bool> shouldRetry)
+        
+        public Task RetryAsync(Func<Task> action, Func<Exception, int, bool> shouldRetryOnError)
         {
-            return RetryAsync(action, shouldRetry, (ex) =>
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetryOnError);
+        }
+
+        public Task RetryAsync(Func<Task> action, Func<Exception, int, bool> shouldRetryOnError,
+            Action<Exception, int> handleLast)
+        {
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetryOnError, handleLast);
+        }
+
+        public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<Exception, int, bool> shouldRetryOnError)
+        {
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetryOnError);
+        }
+
+        public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<Exception, int, bool> shouldRetryOnError,
+            Action<T, Exception, int> handleLast)
+        {
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetryOnError, handleLast);
+        }
+
+        public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<T, int, bool> shouldRetry,
+            Func<Exception, int, bool> shouldRetryOnError,
+            Action<T, Exception, int> handleLast)
+        {
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetry, shouldRetryOnError,
+                handleLast);
+        }
+
+        public Task RetryAsync(int count, int waitMilliseconds, Func<Task> action, Func<Exception, int, bool> shouldRetryOnError)
+        {
+            return RetryAsync(count, waitMilliseconds, action, shouldRetryOnError, (ex, iteration) =>
             {
-                _logger.LogTrace($"Retry error after {_options.Count} iterations: {ex.Message}.");
-                throw new InvalidOperationException($"Retry timeout occurred after {_options.Count} iterations.", ex);
+                _logger.LogTrace($"Retry timeout occurred after {iteration} iterations. {ex?.Message}.");
+                throw new InvalidOperationException($"Retry timeout occurred after {iteration} iterations.", ex);
             });
         }
-        public Task RetryAsync(Func<Task> action, Func<Exception, bool> shouldRetry, Action<Exception> handleLast)
+        public Task RetryAsync(int count, int waitMilliseconds, Func<Task> action, Func<Exception, int, bool> shouldRetryOnError, Action<Exception, int> handleLast)
         {
-            return RetryAsync(async () =>
-            {
-                await action.Invoke().ConfigureAwait(false);
+            return RetryAsync(count, waitMilliseconds, async () =>
+                {
+                    await action.Invoke().ConfigureAwait(false);
 
-                // return a dummy result
-                return true;
-            },
-                shouldRetry,
-                (_, ex) => { handleLast.Invoke(ex); });
+                    // return a dummy result
+                    return true;
+                },
+                shouldRetryOnError,
+                (_, ex, iteration) => { handleLast.Invoke(ex, iteration); });
         }
 
-        public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<Exception, bool> shouldRetry)
+        public Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> action, Func<Exception, int, bool> shouldRetryOnError)
         {
-            return RetryAsync(action, shouldRetry, (_, ex) =>
+            return RetryAsync(count, waitMilliseconds, action, shouldRetryOnError, (_, ex, iteration) =>
             {
-                _logger.LogTrace($"Retry error after {_options.Count} iterations: {ex.Message}.");
-                throw new InvalidOperationException($"Retry timeout occurred after {_options.Count} iterations.", ex);
+                _logger.LogTrace($"Retry timeout occurred after {iteration} iterations. {ex?.Message}.");
+                throw new InvalidOperationException($"Retry timeout occurred after {iteration} iterations.", ex);
             });
         }
-        public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<Exception, bool> shouldRetry, Action<T, Exception> handleLast)
+
+        public Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> action, Func<Exception, int, bool> shouldRetryOnError,
+            Action<T, Exception, int> handleLast)
         {
-            // we accept all kinds of results by default, even null
-            return RetryAsync(action, _ => true, shouldRetry, handleLast);
+            // if no error occurred, we accept all kinds of results by default, so no retry is necessary
+            return RetryAsync(count, waitMilliseconds, action, (_, _) => false, shouldRetryOnError, handleLast);
         }
 
-        public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<T, bool> acceptResult, Func<Exception, bool> shouldRetry,
-            Action<T, Exception> handleLast)
+        public Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> action, Func<T, int, bool> shouldRetry, Func<Exception, int, bool> shouldRetryOnError,
+            Action<T, Exception, int> handleLast)
         {
-            return Retrier.RetryAsync(_options.Count, _options.WaitMilliseconds, action,
+            return Retrier.RetryAsync(count, waitMilliseconds, action,
                 (result, i, ex) =>
                 {
                     if (ex == null)
                     {
                         // no exception, check if the result is acceptable (for example a null check)
-                        if (acceptResult(result))
+                        if (!shouldRetry(result, count - i + 1))
                             return true;
                     }
                     else
                     {
                         // if we do not recognize the error, throw it immediately
-                        if (!shouldRetry(ex))
+                        if (!shouldRetryOnError(ex, count - i + 1))
                             throw ex;
                     }
 
@@ -76,7 +109,7 @@ namespace SenseNet.Tools
                         return false;
 
                     // last iteration (caller may throw their own exception)
-                    handleLast?.Invoke(result, ex);
+                    handleLast?.Invoke(result, ex, count - i + 1);
                     return true;
                 });
         }
