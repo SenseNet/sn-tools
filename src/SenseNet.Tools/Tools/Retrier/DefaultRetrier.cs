@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 // ReSharper disable once CheckNamespace
@@ -20,20 +21,25 @@ namespace SenseNet.Tools
 
         public Task RetryAsync(Func<Task> action, Func<int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null, 
-            Action<Exception, int> onAfterLastIteration = null)
+            Action<Exception, int> onAfterLastIteration = null, 
+            CancellationToken cancel = default)
         {
-            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetry, shouldRetryOnError, onAfterLastIteration);
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetry, shouldRetryOnError,
+                onAfterLastIteration, cancel);
         }
 
         public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<T, int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null,
-            Action<T, Exception, int> onAfterLastIteration = null)
+            Action<T, Exception, int> onAfterLastIteration = null, 
+            CancellationToken cancel = default)
         {
-            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetry, shouldRetryOnError, onAfterLastIteration);
+            return RetryAsync(_options.Count, _options.WaitMilliseconds, action, shouldRetry, shouldRetryOnError,
+                onAfterLastIteration, cancel);
         }
 
         public Task RetryAsync(int count, int waitMilliseconds, Func<Task> action, Func<int, bool> shouldRetry = null,
-            Func<Exception, int, bool> shouldRetryOnError = null, Action<Exception, int> onAfterLastIteration = null)
+            Func<Exception, int, bool> shouldRetryOnError = null, Action<Exception, int> onAfterLastIteration = null,
+            CancellationToken cancel = default)
         {
             return RetryAsync<object>(count, waitMilliseconds, async () =>
                 {
@@ -50,16 +56,21 @@ namespace SenseNet.Tools
                 shouldRetryOnError,
                 onAfterLastIteration: onAfterLastIteration != null
                     ? (_, ex, iteration) => onAfterLastIteration.Invoke(ex, iteration)
-                    : null);
+                    : null, 
+                cancel: cancel);
         }
 
         public Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> action, Func<T, int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null,
-            Action<T, Exception, int> onAfterLastIteration = null)
+            Action<T, Exception, int> onAfterLastIteration = null, 
+            CancellationToken cancel = default)
         {
             return Retrier.RetryAsync(count, waitMilliseconds, action,
                 (result, i, ex) =>
                 {
+                    // check if the operation was cancelled before going any further
+                    cancel.ThrowIfCancellationRequested();
+
                     var iteration = count - i + 1;
 
                     if (ex == null)

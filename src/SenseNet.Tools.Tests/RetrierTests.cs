@@ -710,6 +710,38 @@ namespace SenseNet.Tools.Tests
             Assert.IsNull(result);
         }
 
+        [TestMethod]
+        public async Task RetrierService_Void_DefaultConfig_Cancellation()
+        {
+            var retrier = GetRetrier();
+            var testCounter = 0;
+            var thrown = false;
+            var cts = new CancellationTokenSource(300);
+
+            try
+            {
+                // execute a couple of times then get cancelled after the timeout above
+                await retrier.RetryAsync(50, 80,
+                    () =>
+                    {
+                        testCounter++;
+                        return Task.CompletedTask;
+                    },
+                    // always retry to test cancellation
+                    shouldRetry: _ => true,
+                    cancel: cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                thrown = true;
+            }
+
+            Assert.IsTrue(thrown);
+
+            // check if the code executed at least a couple of times
+            Assert.IsTrue(testCounter is > 3 and < 6, $"Invalid counter value: {testCounter}"); 
+        }
+
         private static IRetrier GetRetrier(Action<RetrierOptions> configure = null)
         {
             var services = new ServiceCollection()
