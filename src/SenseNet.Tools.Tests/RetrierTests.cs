@@ -113,7 +113,7 @@ namespace SenseNet.Tools.Tests
                 Interlocked.Increment(ref RetryCallCounter);
                 return 123;
             }, 
-            (r, i, e) => e == null);
+            (_, _, e) => e == null);
 
             Assert.AreEqual(123, result, "Wrong result: " + result);
             Assert.AreEqual(1, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
@@ -134,7 +134,7 @@ namespace SenseNet.Tools.Tests
 
                 return 123;
             }, 
-            (r, i, e) => e == null && r == 123);
+            (r, _, e) => e == null && r == 123);
 
             Assert.AreEqual(123, result, "Wrong result: " + result);
             Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
@@ -151,7 +151,7 @@ namespace SenseNet.Tools.Tests
 
                 return 123;
             },
-            (r, i, e) => e == null && r == 456);
+            (r, _, e) => e == null && r == 456);
 
             Assert.AreEqual(123, result, "Wrong result: " + result);
             Assert.AreEqual(3, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
@@ -167,7 +167,7 @@ namespace SenseNet.Tools.Tests
                 Interlocked.Increment(ref RetryCallCounter);
                 throw new InvalidOperationException();
             },
-            (r, i, e) => e == null);
+            (_, _, e) => e == null);
 
             Assert.AreEqual(default, result, "Wrong result: " + result);
             Assert.AreEqual(3, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
@@ -189,7 +189,7 @@ namespace SenseNet.Tools.Tests
 
                 RetryTestValue++;
             },
-            (i, e) => e == null);
+            (_, e) => e == null);
 
             Assert.AreEqual(1, RetryTestValue, $"#1 RetryTestValue contains a wrong value: {RetryTestValue}.");
             Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
@@ -214,7 +214,7 @@ namespace SenseNet.Tools.Tests
                 // simulate an async method call
                 await Task.Delay(10);
             },
-            (i, e) => e == null);
+            (_, e) => e == null);
 
             Assert.AreEqual(1, RetryTestValue, $"#1 RetryTestValue contains a wrong value: {RetryTestValue}.");
             Assert.AreEqual(2, RetryCallCounter, $"#1 Callback called {RetryCallCounter} times.");
@@ -291,7 +291,7 @@ namespace SenseNet.Tools.Tests
                     throw new InvalidOperationException("Retry123");
                 },
                 shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"),
-                onAfterLastIteration: (ex, i) => { handled = true; });
+                onAfterLastIteration: (_, _) => { handled = true; });
 
             Assert.IsTrue(handled);
             Assert.AreEqual(3, testCounter);
@@ -313,7 +313,7 @@ namespace SenseNet.Tools.Tests
 
                     return testCounter;
                 },
-                shouldRetryOnError:(ex, _) => false);
+                shouldRetryOnError:(_, _) => false);
 
             Assert.AreEqual(1, result);
             testCounter = 0;
@@ -434,7 +434,7 @@ namespace SenseNet.Tools.Tests
                     },
                     (_, _) => true,
                     (ex, _) => ex.Message.Contains("Retry123"),
-                    (_, ex, _) => throw new InvalidOperationException("thrown"));
+                    (_, ex, _) => throw new InvalidOperationException("thrown", ex));
             }
             catch (InvalidOperationException ex)
             {
