@@ -233,22 +233,23 @@ namespace SenseNet.Tools.Tests
             {
                 testCounter++;
                 return Task.CompletedTask;
-            }, (ex, _) => false);
+            });
 
             Assert.AreEqual(1, testCounter);
             testCounter = 0;
 
             // success after a few tries
             await retrier.RetryAsync(() =>
-            {
-                testCounter++;
+                {
+                    testCounter++;
 
-                // do NOT throw on the last attempt
-                if (testCounter < 3)
-                    throw new InvalidOperationException("Retry123");
+                    // do NOT throw on the last attempt
+                    if (testCounter < 3)
+                        throw new InvalidOperationException("Retry123");
 
-                return Task.CompletedTask;
-            }, (ex, _) => ex.Message.Contains("Retry123"));
+                    return Task.CompletedTask;
+                },
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
 
             Assert.AreEqual(3, testCounter);
         }
@@ -267,7 +268,8 @@ namespace SenseNet.Tools.Tests
                         testCounter++;
 
                         throw new InvalidOperationException("Retry123");
-                    }, (ex, _) => ex.Message.Contains("Retry123"));
+                    },
+                    shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
             }
             catch (InvalidOperationException ex)
             {
@@ -288,8 +290,8 @@ namespace SenseNet.Tools.Tests
 
                     throw new InvalidOperationException("Retry123");
                 },
-                (ex, _) => ex.Message.Contains("Retry123"),
-                (ex, i) => { handled = true; });
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"),
+                onAfterLastIteration: (ex, i) => { handled = true; });
 
             Assert.IsTrue(handled);
             Assert.AreEqual(3, testCounter);
@@ -311,7 +313,7 @@ namespace SenseNet.Tools.Tests
 
                     return testCounter;
                 },
-                (ex, _) => false);
+                shouldRetryOnError:(ex, _) => false);
 
             Assert.AreEqual(1, result);
             testCounter = 0;
@@ -327,7 +329,7 @@ namespace SenseNet.Tools.Tests
 
                     return Task.FromResult(testCounter);
                 },
-                (ex, _) => ex.Message.Contains("Retry123"));
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
 
             Assert.AreEqual(3, result);
         }
@@ -343,11 +345,12 @@ namespace SenseNet.Tools.Tests
             {
                 // always fail
                 await retrier.RetryAsync<int>(() =>
-                {
-                    testCounter++;
+                    {
+                        testCounter++;
 
-                    throw new InvalidOperationException("Retry123");
-                }, (ex, _) => ex.Message.Contains("Retry123"));
+                        throw new InvalidOperationException("Retry123");
+                    },
+                    shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
             }
             catch (InvalidOperationException ex)
             {
@@ -368,8 +371,8 @@ namespace SenseNet.Tools.Tests
 
                     throw new InvalidOperationException("Retry123");
                 },
-                (ex, _) => ex.Message.Contains("Retry123"),
-                (_, _, _) => { handled = true; });
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"),
+                onAfterLastIteration: (_, _, _) => { handled = true; });
 
             Assert.IsTrue(handled);
             Assert.AreEqual(3, testCounter);
@@ -470,25 +473,28 @@ namespace SenseNet.Tools.Tests
 
             // success immediately
             await retrier.RetryAsync(5, 10, () =>
-            {
-                testCounter++;
-                return Task.CompletedTask;
-            }, (ex, _) => false);
+                {
+                    testCounter++;
+                    return Task.CompletedTask;
+                },
+                shouldRetryOnError: (_, _) => false);
 
             Assert.AreEqual(1, testCounter);
             testCounter = 0;
 
             // success after a few tries
             await retrier.RetryAsync(5, 10, () =>
-            {
-                testCounter++;
+                {
+                    testCounter++;
 
-                // do NOT throw on the last attempt
-                if (testCounter < 5)
-                    throw new InvalidOperationException("Retry123");
+                    // do NOT throw on the last attempt
+                    if (testCounter < 5)
+                        throw new InvalidOperationException("Retry123");
 
-                return Task.CompletedTask;
-            }, (ex, _) => ex.Message.Contains("Retry123"));
+                    return Task.CompletedTask;
+                },
+                shouldRetry: result => result == 0,
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
 
             Assert.AreEqual(5, testCounter);
         }
@@ -503,11 +509,13 @@ namespace SenseNet.Tools.Tests
             {
                 // always fail
                 await retrier.RetryAsync(5, 10, () =>
-                {
-                    testCounter++;
+                    {
+                        testCounter++;
 
-                    throw new InvalidOperationException("Retry123");
-                }, (ex, _) => ex.Message.Contains("Retry123"));
+                        throw new InvalidOperationException("Retry123");
+                    },
+                    shouldRetry: _ => true,
+                    shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
             }
             catch (InvalidOperationException ex)
             {
@@ -523,13 +531,13 @@ namespace SenseNet.Tools.Tests
 
             // always fail but suppress it
             await retrier.RetryAsync(5, 10, () =>
-            {
-                testCounter++;
+                {
+                    testCounter++;
 
-                throw new InvalidOperationException("Retry123");
-            },
-                (ex, _) => ex.Message.Contains("Retry123"),
-                (ex, i) => { handled = true; });
+                    throw new InvalidOperationException("Retry123");
+                },
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"),
+                onAfterLastIteration: (_, _) => { handled = true; });
 
             Assert.IsTrue(handled);
             Assert.AreEqual(5, testCounter);
@@ -551,23 +559,23 @@ namespace SenseNet.Tools.Tests
 
                 return testCounter;
             },
-                (ex, _) => false);
+                (_, _) => false);
 
             Assert.AreEqual(1, result);
             testCounter = 0;
 
             // success after a few tries
             result = await retrier.RetryAsync(5, 10, () =>
-            {
-                testCounter++;
+                {
+                    testCounter++;
 
-                // do NOT throw on the last attempt
-                if (testCounter < 5)
-                    throw new InvalidOperationException("Retry123");
+                    // do NOT throw on the last attempt
+                    if (testCounter < 5)
+                        throw new InvalidOperationException("Retry123");
 
-                return Task.FromResult(testCounter);
-            },
-                (ex, _) => ex.Message.Contains("Retry123"));
+                    return Task.FromResult(testCounter);
+                },
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
 
             Assert.AreEqual(5, result);
         }
@@ -583,11 +591,12 @@ namespace SenseNet.Tools.Tests
             {
                 // always fail
                 await retrier.RetryAsync<int>(5, 10, () =>
-                {
-                    testCounter++;
+                    {
+                        testCounter++;
 
-                    throw new InvalidOperationException("Retry123");
-                }, (ex, _) => ex.Message.Contains("Retry123"));
+                        throw new InvalidOperationException("Retry123");
+                    },
+                    shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"));
             }
             catch (InvalidOperationException ex)
             {
@@ -603,13 +612,13 @@ namespace SenseNet.Tools.Tests
 
             // always fail but suppress it
             var result = await retrier.RetryAsync<object>(5, 10, () =>
-            {
-                testCounter++;
+                {
+                    testCounter++;
 
-                throw new InvalidOperationException("Retry123");
-            },
-                (ex, _) => ex.Message.Contains("Retry123"),
-                (_, _, _) => { handled = true; });
+                    throw new InvalidOperationException("Retry123");
+                },
+                shouldRetryOnError: (ex, _) => ex.Message.Contains("Retry123"),
+                onAfterLastIteration: (_, _, _) => { handled = true; });
 
             Assert.IsTrue(handled);
             Assert.AreEqual(5, testCounter);
@@ -671,7 +680,7 @@ namespace SenseNet.Tools.Tests
                     },
                     (_, _) => true,
                     (ex, _) => ex.Message.Contains("Retry123"),
-                    (_, ex, _) => throw new InvalidOperationException("thrown"));
+                    (_, _, _) => throw new InvalidOperationException("thrown"));
             }
             catch (InvalidOperationException ex)
             {
