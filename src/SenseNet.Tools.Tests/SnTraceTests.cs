@@ -68,7 +68,7 @@ namespace SenseNet.Tools.Tests
             CleanupAndEnableAll();
 
             SnTrace.Write("asdf");
-            SnTrace.Write("qwer");
+            SnTrace.Write(() => "qwer");
 
             var log = DisableAllAndGetLog();
 
@@ -83,12 +83,15 @@ namespace SenseNet.Tools.Tests
             CleanupAndEnableAll();
 
             SnTrace.WriteError("asdf");
+            SnTrace.WriteError(() => "qwer");
 
             var log = DisableAllAndGetLog();
 
-            Assert.AreEqual(1, log.Count);
+            Assert.AreEqual(2, log.Count);
             Assert.AreEqual("ERROR", GetColumnFromLine(log[0], Entry.Field.Status));
+            Assert.AreEqual("ERROR", GetColumnFromLine(log[1], Entry.Field.Status));
             Assert.IsTrue(log[0].EndsWith("asdf"));
+            Assert.IsTrue(log[1].EndsWith("qwer"));
         }
 
 
@@ -97,7 +100,7 @@ namespace SenseNet.Tools.Tests
         {
             CleanupAndEnableAll();
 
-            SnTrace.Write(null);
+            SnTrace.Write((string)null);
 
             var log = DisableAllAndGetLog();
             AssertOneErrorLine(log, "Value cannot be null");
@@ -155,7 +158,7 @@ namespace SenseNet.Tools.Tests
                     SnTrace.Write("qwer");
                     op3.Successful = false;
                 }
-                using (var op4 = SnTrace.StartOperation("Op4"))
+                using (var op4 = SnTrace.StartOperation(() => "Op4"))
                 {
                     SnTrace.Write("yxcv");
                     op4.Successful = true;
