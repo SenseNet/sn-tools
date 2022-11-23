@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using SenseNet.Diagnostics;
+
 // ReSharper disable IdentifierTypo
 
 // ReSharper disable once CheckNamespace
@@ -41,6 +43,7 @@ namespace SenseNet.Tools
                     if (!caughtExceptionType.IsInstanceOfType(e))
                         throw;
 
+                    SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     lastException = e;
                     retryCount--;
                     System.Threading.Thread.Sleep(waitMilliseconds);
@@ -80,6 +83,7 @@ namespace SenseNet.Tools
                     if (!caughtExceptionType.IsInstanceOfType(e))
                         throw;
 
+                    SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     lastException = e;
                     retryCount--;
                     System.Threading.Thread.Sleep(waitMilliseconds);
@@ -121,6 +125,7 @@ namespace SenseNet.Tools
                 }
                 catch (Exception e)
                 {
+                    SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     error = e;
                 }
 
@@ -166,6 +171,7 @@ namespace SenseNet.Tools
                 }
                 catch (Exception e)
                 {
+                    SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     error = e;
                 }
 
@@ -214,6 +220,7 @@ namespace SenseNet.Tools
                 }
                 catch (Exception e)
                 {
+                    SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     error = e;
                 }
 
@@ -257,6 +264,7 @@ namespace SenseNet.Tools
                 }
                 catch (Exception e)
                 {
+                    SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     error = e;
                 }
 

@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+
 // ReSharper disable UseStringInterpolation
 // ReSharper disable StringLiteralTypo
 
@@ -139,6 +140,18 @@ namespace SenseNet.Diagnostics
             {
                 return Enabled ? StartOp(Name, message, args) : Operation.Null;
             }
+
+            /// <summary>
+            /// Starts a traced operation in the current category. The message will be written to the trace.
+            /// </summary>
+            /// <param name="getMessage">A function that returns the message to log. It will be executed
+            /// only if the category is enabled.</param>
+            /// <returns>A disposable operation object usually encapsulated in a using block.</returns>
+            public Operation StartOperation(Func<string> getMessage)
+            {
+                return StartOperation(Enabled ? getMessage() : string.Empty);
+            }
+
             /// <summary>
             /// Writes a line to the trace with the current category. The message will be written with smart formatting.
             /// </summary>
@@ -154,6 +167,17 @@ namespace SenseNet.Diagnostics
                 Log(Name, false, message, args);
             }
             /// <summary>
+            /// Writes a line to the trace with the current category.
+            /// </summary>
+            /// <param name="getMessage">A function that returns the message to log. It will be executed
+            /// only if the category is enabled.</param>
+            public void Write(Func<string> getMessage)
+            {
+                if (!Enabled || getMessage == null)
+                    return;
+                Write(getMessage());
+            }
+            /// <summary>
             /// Writes an error line to the trace with the current category. The message will be written with smart formatting.
             /// </summary>
             /// <param name="message">Message template that works as a composite format string (see string.Format method).</param>
@@ -166,6 +190,17 @@ namespace SenseNet.Diagnostics
                 if (!Enabled)
                     return;
                 Log(Name, true, message, args);
+            }
+            /// <summary>
+            /// Writes an error line to the trace with the current category.
+            /// </summary>
+            /// <param name="getMessage">A function that returns the message to log. It will be executed
+            /// only if the category is enabled.</param>
+            public void WriteError(Func<string> getMessage)
+            {
+                if (!Enabled || getMessage == null)
+                    return;
+                WriteError(getMessage());
             }
         }
 
@@ -187,6 +222,8 @@ namespace SenseNet.Diagnostics
         public static readonly SnTraceCategory Messaging = new SnTraceCategory("Messaging");
         /// <summary>Security category</summary>
         public static readonly SnTraceCategory Security = new SnTraceCategory("Security");
+        /// <summary>SecurityDatabase category</summary>
+        public static readonly SnTraceCategory SecurityDatabase = new SnTraceCategory("SecurityDatabase");
         /// <summary>SecurityQueue category</summary>
         public static readonly SnTraceCategory SecurityQueue = new SnTraceCategory("SecurityQueue");
         /// <summary>System category</summary>
@@ -207,7 +244,7 @@ namespace SenseNet.Diagnostics
         /// <summary>
         /// Contains all SnTrace categories to help enumerate them.
         /// </summary>
-        public static readonly SnTraceCategory[] Categories = { ContentOperation, Database, Index, IndexQueue, Query, Repository, Messaging, Security, SecurityQueue, System, Web, Workflow, TaskManagement, Test, Event, Custom };
+        public static readonly SnTraceCategory[] Categories = { ContentOperation, Database, Index, IndexQueue, Query, Repository, Messaging, Security, SecurityDatabase, SecurityQueue, System, Web, Workflow, TaskManagement, Test, Event, Custom };
 
         //====================================================================== Static API
 
@@ -229,10 +266,20 @@ namespace SenseNet.Diagnostics
         /// Null values will be written as "null". IEnumerable values will be written as comma separated lists.
         /// All control characters (including tabs, return and line feed) are changed to '.'
         /// </param>
-        /// <returns></returns>
+        /// <returns>A disposable operation object usually encapsulated in a using block.</returns>
         public static Operation StartOperation(string message, params object[] args)
         {
             return Custom.StartOperation(message, args);
+        }
+        /// <summary>
+        ///  Starts a traced operation in the "Custom" category.
+        /// </summary>
+        /// <param name="getMessage">A function that returns the message to log. It will be executed
+        /// only if the category is enabled.</param>
+        /// <returns>A disposable operation object usually encapsulated in a using block.</returns>
+        public static Operation StartOperation(Func<string> getMessage)
+        {
+            return Custom.StartOperation(getMessage);
         }
         /// <summary>
         /// Writes a line to the trace in the "Custom" category. The message will be written with smart formatting.
@@ -247,6 +294,15 @@ namespace SenseNet.Diagnostics
             Custom.Write(message, args);
         }
         /// <summary>
+        /// Writes a line to the trace in the "Custom" category.
+        /// </summary>
+        /// <param name="getMessage">A function that returns the message to log. It will be executed
+        /// only if the category is enabled.</param>
+        public static void Write(Func<string> getMessage)
+        {
+            Custom.Write(getMessage);
+        }
+        /// <summary>
         /// Writes an error line to the trace in the "Custom" category. The message will be written with smart formatting.
         /// </summary>
         /// <param name="message">Message template that works as a composite format string (see string.Format method).</param>
@@ -257,6 +313,15 @@ namespace SenseNet.Diagnostics
         public static void WriteError(string message, params object[] args)
         {
             Custom.WriteError(message, args);
+        }
+        /// <summary>
+        /// Writes an error line to the trace in the "Custom" category.
+        /// </summary>
+        /// <param name="getMessage">A function that returns the message to log. It will be executed
+        /// only if the category is enabled.</param>
+        public static void WriteError(Func<string> getMessage)
+        {
+            Custom.WriteError(getMessage);
         }
 
         /// <summary>
