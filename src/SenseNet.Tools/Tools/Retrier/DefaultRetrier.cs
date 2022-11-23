@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SenseNet.Tools
 {
     /// <inheritdoc cref="IRetrier"/>
-    internal class DefaultRetrier : IRetrier
+    public class DefaultRetrier : IRetrier
     {
         private readonly ILogger<DefaultRetrier> _logger;
         private readonly RetrierOptions _options;
