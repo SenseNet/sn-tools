@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -438,5 +439,58 @@ namespace SenseNet.Tools.Tests
             Assert.AreEqual("0124579BCDE", actual);
         }
 
+        [TestMethod]
+        public void SnTrace_ToTrace_String()
+        {
+            string s1 = null;
+            var s2 = string.Empty;
+            var s3 = "short";
+            var s4 = "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong";
+
+            Assert.AreEqual(string.Empty, s1.ToTrace());
+            Assert.AreEqual(string.Empty, s2.ToTrace());
+            Assert.AreEqual("short", s3.ToTrace());
+            Assert.AreEqual("looooooooooooooooooo", s4.ToTrace(20));
+        }
+
+        [TestMethod]
+        public void SnTrace_ToTrace_Array_Int()
+        {
+            int[] a1 = null;
+            var a2 = Array.Empty<int>();
+            var a3 = new[] { 1, 2 };
+
+            Assert.AreEqual(string.Empty, a1.ToTrace());
+            Assert.AreEqual("[]", a2.ToTrace());
+            Assert.AreEqual("[1, 2]", a3.ToTrace());
+            Assert.AreEqual("[1, ...]", a3.ToTrace(1));
+        }
+        [TestMethod]
+        public void SnTrace_ToTrace_Array_String()
+        {
+            string[] a1 = null;
+            var a2 = Array.Empty<string>();
+            var a3 = new[] { "s1", "s2", null };
+
+            Assert.AreEqual(string.Empty, a1.ToTrace());
+            Assert.AreEqual("[]", a2.ToTrace());
+            Assert.AreEqual("[s1, s2, ]", a3.ToTrace());
+            Assert.AreEqual("[s1, ...]", a3.ToTrace(1));
+        }
+
+        [TestMethod]
+        public void SnTrace_ToTrace_Dictionary_StringString()
+        {
+            Dictionary<string, string> d1 = null;
+            var d2 = new Dictionary<string, string>()
+            {
+                { "key1", null },
+                { "key2", "value2" },
+                { "key3", "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong" },
+            };
+
+            Assert.AreEqual(string.Empty, d1.ToTrace());
+            Assert.AreEqual("key1: {null}, key2: value2 (6), key3: looooooooooooooooooo... (77)", d2.ToTrace());
+        }
     }
 }
