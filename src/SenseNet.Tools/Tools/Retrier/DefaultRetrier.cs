@@ -106,7 +106,7 @@ namespace SenseNet.Tools
                     }
 
                     return true;
-                });
+                }, cancel);
         }
     }
 }
