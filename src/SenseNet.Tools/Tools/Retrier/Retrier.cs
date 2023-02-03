@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using SenseNet.Diagnostics;
 
@@ -25,6 +26,7 @@ namespace SenseNet.Tools
         /// <param name="caughtExceptionType">Type of exception that is suppressed and triggers the next attempt.</param>
         /// <param name="callback">Void, parameterless method that the retrier executes.</param>
         [SuppressMessage("ReSharper", "CommentTypo")]
+        [Obsolete("Use the async methods in the IRetrier service instead.")]
         public static void Retry(int count, int waitMilliseconds, Type caughtExceptionType, Action callback)
         {
             var retryCount = count;
@@ -46,7 +48,7 @@ namespace SenseNet.Tools
                     SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     lastException = e;
                     retryCount--;
-                    System.Threading.Thread.Sleep(waitMilliseconds);
+                    Thread.Sleep(waitMilliseconds);
                 }
             }
 
@@ -66,6 +68,7 @@ namespace SenseNet.Tools
         /// <param name="callback">Parameterless method with T return type.</param>
         /// <returns>Result of the callback method.</returns>
         // ReSharper disable once UnusedMember.Global
+        [Obsolete("Use the async methods in the IRetrier service instead.")]
         public static T Retry<T>(int count, int waitMilliseconds, Type caughtExceptionType, Func<T> callback)
         {
             var retryCount = count;
@@ -86,7 +89,7 @@ namespace SenseNet.Tools
                     SnTrace.System.Write($"Retrier caught an exception (countdown: {retryCount}): {e.GetType().Name}: {e.Message}");
                     lastException = e;
                     retryCount--;
-                    System.Threading.Thread.Sleep(waitMilliseconds);
+                    Thread.Sleep(waitMilliseconds);
                 }
             }
 
@@ -111,6 +114,7 @@ namespace SenseNet.Tools
         /// If the decider method returns with true, the main method returns immediately. Otherwise the next 
         /// attempt will be performed.
         /// </param>
+        [Obsolete("Use the async methods in the IRetrier service instead.")]
         public static void Retry(int count, int waitMilliseconds, Action callback, Func<int, Exception, bool> checkCondition)
         {
             var retryCount = count;
@@ -135,7 +139,7 @@ namespace SenseNet.Tools
                     break;
 
                 retryCount--;
-                System.Threading.Thread.Sleep(waitMilliseconds);
+                Thread.Sleep(waitMilliseconds);
             }
         }
 
@@ -156,6 +160,7 @@ namespace SenseNet.Tools
         /// Otherwise the next attempt will be performed.
         /// </param>
         /// <returns>Result of the callback method.</returns>
+        [Obsolete("Use the async methods in the IRetrier service instead.")]
         public static T Retry<T>(int count, int waitMilliseconds, Func<T> callback, Func<T, int, Exception, bool> checkCondition)
         {
             var retryCount = count;
@@ -181,7 +186,7 @@ namespace SenseNet.Tools
                     break;
 
                 retryCount--;
-                System.Threading.Thread.Sleep(waitMilliseconds);
+                Thread.Sleep(waitMilliseconds);
             }
 
             return result;
@@ -203,9 +208,11 @@ namespace SenseNet.Tools
         /// returns with true, the main method returns with the callback's result immediately. 
         /// Otherwise the next attempt will be performed.
         /// </param>
+        /// <param name="cancel">The token to monitor for cancellation requests.</param>
         /// <returns>Result of the callback method.</returns>
         // ReSharper disable once UnusedMember.Global
-        public static async Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> callback, Func<T, int, Exception, bool> checkCondition)
+        public static async Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> callback, 
+            Func<T, int, Exception, bool> checkCondition, CancellationToken cancel = default)
         {
             var retryCount = count;
             var result = default(T);
@@ -213,6 +220,9 @@ namespace SenseNet.Tools
             while (retryCount > 0)
             {
                 Exception error = null;
+
+                // check if the operation was cancelled before going any further
+                cancel.ThrowIfCancellationRequested();
 
                 try
                 {
@@ -230,7 +240,8 @@ namespace SenseNet.Tools
                     break;
 
                 retryCount--;
-                System.Threading.Thread.Sleep(waitMilliseconds);
+
+                await Task.Delay(waitMilliseconds, cancel).ConfigureAwait(false);
             }
 
             return result;
@@ -250,13 +261,18 @@ namespace SenseNet.Tools
         /// If this checker method returns with true, the main method returns immediately. 
         /// Otherwise the next attempt will be performed.
         /// </param>
-        public static async Task RetryAsync(int count, int waitMilliseconds, Func<Task> callback, Func<int, Exception, bool> checkCondition)
+        /// <param name="cancel">The token to monitor for cancellation requests.</param>
+        public static async Task RetryAsync(int count, int waitMilliseconds, Func<Task> callback, 
+            Func<int, Exception, bool> checkCondition, CancellationToken cancel = default)
         {
             var retryCount = count;
 
             while (retryCount > 0)
             {
                 Exception error = null;
+
+                // check if the operation was cancelled before going any further
+                cancel.ThrowIfCancellationRequested();
 
                 try
                 {
@@ -274,7 +290,8 @@ namespace SenseNet.Tools
                     break;
 
                 retryCount--;
-                System.Threading.Thread.Sleep(waitMilliseconds);
+                
+                await Task.Delay(waitMilliseconds, cancel).ConfigureAwait(false);
             }
         }
     }
