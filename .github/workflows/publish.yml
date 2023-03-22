@@ -2,7 +2,7 @@ name: Publish to NuGet
 on:
   push:
     branches:
-      - feature/github-release-flow
+      - master
 
 jobs:
 
@@ -35,8 +35,8 @@ jobs:
       run: dotnet build $SOLUTION --configuration Release --no-restore
     - name: Pack nugets
       run: dotnet pack $SOLUTION -c Release --no-build --output .
-    #- name: Push to NuGet
-    #  run: dotnet nuget push "*.*nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
+    - name: Push to NuGet
+      run: dotnet nuget push "*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json
 
 
 
