@@ -1,4 +1,6 @@
-﻿namespace SenseNet.Tools.Mail
+﻿using System.Net.Security;
+
+namespace SenseNet.Tools.Mail
 {
     /// <summary>
     /// Email options for sending emails.
@@ -29,5 +31,12 @@
         /// Password for authentication if required.
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Optional SSL certificate validation callback. Developers may
+        /// use this to accept all certificates (by always returning true)
+        /// in a development environment.
+        /// </summary>
+        public RemoteCertificateValidationCallback ServerCertificateValidationCallback { get; set; }
     }
 }

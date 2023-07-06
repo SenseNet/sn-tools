@@ -63,6 +63,7 @@ namespace SenseNet.Tools.Tests
                 .AddSenseNetEmailSender(options =>
                 {
                     config.GetSection("sensenet:Email").Bind(options);
+                    options.ServerCertificateValidationCallback = (_, _, _, _) => true;
                 })
                 .BuildServiceProvider();
 

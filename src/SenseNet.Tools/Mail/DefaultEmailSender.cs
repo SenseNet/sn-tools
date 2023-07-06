@@ -56,7 +56,7 @@ namespace SenseNet.Tools.Mail
                     ? _options.FromAddress
                     : emailData.FromAddress;
 
-                var mimeMessage = new MimeMessage();
+                using var mimeMessage = new MimeMessage();
                 mimeMessage.From.Add(new MailboxAddress(senderName, fromAddress));
                 mimeMessage.To.AddRange(emailData.ToAddresses?.Select(ea => new MailboxAddress(ea.Name, ea.Address)));
                 mimeMessage.Subject = emailData.Subject;
@@ -65,11 +65,12 @@ namespace SenseNet.Tools.Mail
                     Text = emailData.Body
                 };
 
-                using var client = new SmtpClient
-                {
-                    // accept all SSL certificates (in case the server supports STARTTLS)
-                    ServerCertificateValidationCallback = (_, _, _, _) => true
-                };
+                using var client = new SmtpClient();
+
+                // The caller application may customize certificate handling
+                // (for example switch off certificate validation in a development environment).
+                if (_options.ServerCertificateValidationCallback != null)
+                    client.ServerCertificateValidationCallback = _options.ServerCertificateValidationCallback;
                 
                 await client.ConnectAsync(_options.Server, _options.Port, cancellationToken: cancel).ConfigureAwait(false);
 
