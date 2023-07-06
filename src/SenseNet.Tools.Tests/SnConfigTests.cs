@@ -48,6 +48,9 @@ namespace SenseNet.Tools.Tests
             // workaround for .net 6+: renaming the legacy configuration from App.config to the runtime assembly name
             var outputConfigFile = System.Configuration.ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath;
             File.Copy("App.config", outputConfigFile, true);
+
+            // workaround for .net 6+: register the code page encoding provider
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 #endif
         }
 
