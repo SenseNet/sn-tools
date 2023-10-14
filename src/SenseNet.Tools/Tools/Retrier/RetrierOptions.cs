@@ -1,8 +1,11 @@
-﻿namespace SenseNet.Tools
+﻿using SenseNet.Tools.Configuration;
+
+// ReSharper disable once CheckNamespace
+namespace SenseNet.Tools;
+
+[OptionsClass(sectionName: "sensenet:Retrier")]
+public class RetrierOptions
 {
-    public class RetrierOptions
-    {
-        public int Count { get; set; } = 10;
-        public int WaitMilliseconds { get; set; } = 1000;
-    }
+    public int Count { get; set; } = 10;
+    public int WaitMilliseconds { get; set; } = 1000;
 }
