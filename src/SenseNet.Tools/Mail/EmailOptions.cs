@@ -6,7 +6,7 @@ namespace SenseNet.Tools.Mail
     /// <summary>
     /// Email options for sending emails.
     /// </summary>
-    [OptionsClass(sectionName: "Email")]
+    [OptionsClass(sectionName: "sensenet:Email")]
     public class EmailOptions
     {
         /// <summary>

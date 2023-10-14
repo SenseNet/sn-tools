@@ -3,7 +3,7 @@
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Tools;
 
-[OptionsClass(sectionName: "Retrier")]
+[OptionsClass(sectionName: "sensenet:Retrier")]
 public class RetrierOptions
 {
     public int Count { get; set; } = 10;
