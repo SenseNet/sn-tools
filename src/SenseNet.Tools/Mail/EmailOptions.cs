@@ -1,10 +1,12 @@
 ﻿using System.Net.Security;
+using SenseNet.Tools.Configuration;
 
 namespace SenseNet.Tools.Mail
 {
     /// <summary>
     /// Email options for sending emails.
     /// </summary>
+    [OptionsClass(sectionName: "Email")]
     public class EmailOptions
     {
         /// <summary>
