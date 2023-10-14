@@ -2,7 +2,7 @@
 
 namespace SenseNet.Tools.Configuration;
 
-[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class OptionsClassAttribute : Attribute
 {
     public string SectionName { get; }
