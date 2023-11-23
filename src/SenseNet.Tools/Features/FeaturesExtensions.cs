@@ -9,7 +9,7 @@ public static class FeaturesExtensions
     /// <summary>
     /// Adds a feature to the service collection.
     /// </summary>
-    public static IServiceCollection AddFeature<TFeature>(this IServiceCollection services)
+    public static IServiceCollection AddSenseNetFeature<TFeature>(this IServiceCollection services)
         where TFeature : class, ISnFeature
     {
         services.AddSingleton<ISnFeature, TFeature>();

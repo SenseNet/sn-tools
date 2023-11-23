@@ -10,11 +10,11 @@ public interface ISnFeature
     /// <summary>
     /// Gets the name of the feature.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; }
     /// <summary>
     /// Gets the display name of the feature.
     /// </summary>
-    public string DisplayName { get; set; }
+    public string DisplayName { get; }
 
     /// <summary>
     /// Gets the current state of the feature.
