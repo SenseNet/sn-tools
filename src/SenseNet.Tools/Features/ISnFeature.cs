@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace SenseNet.Tools.Features;
 
@@ -20,5 +21,5 @@ public interface ISnFeature
     /// Gets the current state of the feature.
     /// </summary>
     /// <returns>A state object that provides information about the current availability of the feature.</returns>
-    public Task<FeatureAvailability> GetStateAsync();
+    public Task<FeatureAvailability> GetStateAsync(CancellationToken cancel);
 }
