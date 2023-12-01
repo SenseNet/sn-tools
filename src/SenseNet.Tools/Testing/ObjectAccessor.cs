@@ -15,6 +15,9 @@ namespace SenseNet.Testing
         private BindingFlags _publicFlags = BindingFlags.Instance | BindingFlags.Public;
         private BindingFlags _privateFlags = BindingFlags.Instance | BindingFlags.NonPublic;
 
+        /// <summary>
+        /// Gets the wrapped object.
+        /// </summary>
         public object Target { get; }
 
         /// <summary>

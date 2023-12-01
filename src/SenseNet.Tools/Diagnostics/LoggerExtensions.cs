@@ -6,7 +6,9 @@ using SenseNet.Diagnostics;
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Extensions.DependencyInjection
 {
+#pragma warning disable CS1591
     public static class LoggerExtensions
+#pragma warning restore CS1591
     {
         /// <summary>
         /// Routes all log and trace messages to the official .Net ILogger interface.

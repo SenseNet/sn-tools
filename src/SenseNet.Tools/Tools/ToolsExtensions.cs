@@ -5,7 +5,9 @@ using SenseNet.Tools;
 // ReSharper disable once CheckNamespace
 namespace SenseNet.Extensions.DependencyInjection
 {
+#pragma warning disable CS1591
     public static class ToolsExtensions
+#pragma warning restore CS1591
     {
         /// <summary>
         /// Adds the default retrier to the service collection.

@@ -12,7 +12,7 @@ namespace SenseNet.Tools.Tests
 {
     [TestClass]
     public class SnTraceTests : SnTraceTestClass
-    {
+    { 
         [ClassInitialize]
         public static void InitializeTracers(TestContext context)
         {
@@ -482,15 +482,20 @@ namespace SenseNet.Tools.Tests
         public void SnTrace_ToTrace_Dictionary_StringString()
         {
             Dictionary<string, string> d1 = null;
-            var d2 = new Dictionary<string, string>()
+            var d2 = new Dictionary<string, string>
             {
                 { "key1", null },
                 { "key2", "value2" },
                 { "key3", "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong" },
+                { "key4", "value4" },
+                { "key5", "value5" },
+                { "key6", "value6" },
             };
 
             Assert.AreEqual(string.Empty, d1.ToTrace());
-            Assert.AreEqual("key1: {null}, key2: value2 (6), key3: looooooooooooooooooo... (77)", d2.ToTrace());
+            Assert.AreEqual(
+                "key1:{null}, key2:value2, key3:looooooooooooooooooo...(77), key4:value4, ... (total count: 6)",
+                d2.ToTrace(4));
         }
     }
 }
