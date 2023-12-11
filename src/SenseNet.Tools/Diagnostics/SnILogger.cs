@@ -11,11 +11,17 @@ namespace SenseNet.Diagnostics
     public class SnILogger : SnEventloggerBase
     {
         private readonly ILogger<SnILogger> _logger;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SnILogger"/> class.
+        /// </summary>
+        /// <param name="logger">Target logger service</param>
         public SnILogger(ILogger<SnILogger> logger)
         {
             _logger = logger;
         }
 
+        /// <inheritdoc />
         protected override void WriteEntry(string entry, EventLogEntryType entryType, int eventId)
         {
             switch (entryType)

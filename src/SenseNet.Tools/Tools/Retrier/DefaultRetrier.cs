@@ -13,12 +13,18 @@ namespace SenseNet.Tools
         private readonly ILogger<DefaultRetrier> _logger;
         private readonly RetrierOptions _options;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultRetrier"/> class.
+        /// </summary>
+        /// <param name="options">Configuration object.</param>
+        /// <param name="logger">Logger service.</param>
         public DefaultRetrier(IOptions<RetrierOptions> options, ILogger<DefaultRetrier> logger)
         {
             _logger = logger;
             _options = options.Value;
         }
 
+        /// <inheritdoc />
         public Task RetryAsync(Func<Task> action, Func<int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null, 
             Action<Exception, int> onAfterLastIteration = null, 
@@ -28,6 +34,7 @@ namespace SenseNet.Tools
                 onAfterLastIteration, cancel);
         }
 
+        /// <inheritdoc />
         public Task<T> RetryAsync<T>(Func<Task<T>> action, Func<T, int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null,
             Action<T, Exception, int> onAfterLastIteration = null, 
@@ -37,6 +44,7 @@ namespace SenseNet.Tools
                 onAfterLastIteration, cancel);
         }
 
+        /// <inheritdoc />
         public Task RetryAsync(int count, int waitMilliseconds, Func<Task> action, Func<int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null, Action<Exception, int> onAfterLastIteration = null,
             CancellationToken cancel = default)
@@ -60,6 +68,7 @@ namespace SenseNet.Tools
                 cancel: cancel);
         }
 
+        /// <inheritdoc />
         public Task<T> RetryAsync<T>(int count, int waitMilliseconds, Func<Task<T>> action, Func<T, int, bool> shouldRetry = null,
             Func<Exception, int, bool> shouldRetryOnError = null,
             Action<T, Exception, int> onAfterLastIteration = null, 
