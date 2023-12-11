@@ -9,11 +9,11 @@ public enum FeatureState
 {
     /// <summary>Default state.</summary>
     Unknown,
-    /// <summary>The current user can use this feature.</summary>
+    /// <summary>The feature is available and working.</summary>
     Active,
-    /// <summary>The feature is inactivated.</summary>
+    /// <summary>The feature is switched off globally.</summary>
     Disabled,
-    /// <summary>The feature is enabled but cannot be used because it is not configured correctly.</summary>
+    /// <summary>The feature is enabled but it is not configured correctly.</summary>
     NotConfigured,
     /// <summary>The current user does not have sufficient permissions to use this feature.</summary>
     Unavailable

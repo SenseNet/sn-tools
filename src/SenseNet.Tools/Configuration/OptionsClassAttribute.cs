@@ -3,7 +3,7 @@
 namespace SenseNet.Tools.Configuration;
 
 /// <summary>
-/// Defines an attribute for a class that can bind to a configuration section.
+/// Marker attribute for sensenet options classes.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class OptionsClassAttribute : Attribute
@@ -18,7 +18,7 @@ public class OptionsClassAttribute : Attribute
     /// </summary>
     /// <remarks>
     /// The <paramref name="sectionName"/> parameter is for documentation purposes only,
-    /// it is not used in any algorithmic configuration binder.
+    /// it is not used for binding.
     /// </remarks>
     /// <param name="sectionName">Path of the section e.g. "mainsection:subsection".</param>
     public OptionsClassAttribute(string sectionName)
