@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#define SIMPLIFIED_TRACE_LINE
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,11 @@ namespace SenseNet.Tools.Tests
 
             var fields = line.Split('\t');
 
+#if SIMPLIFIED_TRACE_LINE
+            return fields.Length < 7 ? null : string.Join("\t", fields, 6, fields.Length - 6);
+#else
             return fields.Length < 10 ? null : string.Join("\t", fields, 9, fields.Length - 9);
+#endif
         }
         protected string GetColumnFromLine(string line, Entry.Field col)
         {

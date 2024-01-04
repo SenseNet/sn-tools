@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define SIMPLIFIED_TRACE_LINE
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -428,9 +430,20 @@ namespace SenseNet.Diagnostics
             var lineCounter = Interlocked.Increment(ref _lineCounter);
             var programFlow = GetProgramFlowId();
 
+#if SIMPLIFIED_TRACE_LINE
+            var line = string.Format("{0}\t{1}\tPf:{2}\tOp:{3}\t{4}\t{5:hh\':\'mm\':\'ss\'.\'ffffff}\t{6}"
+                , lineCounter
+                , op.Category
+                , programFlow
+                , op.Id
+                , op.Successful ? "End" : "UNTERMINATED"
+                , DateTime.UtcNow - op.StartedAt
+                , op.Message);
+#else
             var line = string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tPf:{5}\tOp:{6}\t{7}\t{8:hh\':\'mm\':\'ss\'.\'ffffff}\t{9}"
                 , lineCounter
-                , DateTime.UtcNow, op.Category
+                , DateTime.UtcNow
+                , op.Category
                 , AppDomainName
                 , Thread.CurrentThread.ManagedThreadId
                 , programFlow
@@ -438,6 +451,7 @@ namespace SenseNet.Diagnostics
                 , op.Successful ? "End" : "UNTERMINATED"
                 , DateTime.UtcNow - op.StartedAt
                 , op.Message);
+#endif
 
             return line;
         }
@@ -446,6 +460,19 @@ namespace SenseNet.Diagnostics
         {
             var lineCounter = Interlocked.Increment(ref _lineCounter);
             var programFlow = GetProgramFlowId();
+#if SIMPLIFIED_TRACE_LINE
+            var line = op != null
+                ? string.Format("{0}\t{1}\tPf:{2}\tOp:{3}\tStart\t\t"
+                    , lineCounter
+                    , category
+                    , programFlow
+                    , op.Id)
+                : string.Format("{0}\t{1}\tPf:{2}\t\t{3}\t\t"
+                    , lineCounter
+                    , category
+                    , programFlow
+                    , isError ? "ERROR" : "");
+#else
             var line = op != null
                 ? string.Format("{0}\t{1:yyyy-MM-dd HH:mm:ss.fffff}\t{2}\tA:{3}\tT:{4}\tPf:{5}\tOp:{6}\tStart\t\t"
                     , lineCounter
@@ -463,6 +490,7 @@ namespace SenseNet.Diagnostics
                     , Thread.CurrentThread.ManagedThreadId
                     , programFlow
                     , isError ? "ERROR" : "");
+#endif
 
             // smart formatting
             if (args != null)
