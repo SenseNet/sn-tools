@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define SIMPLIFIED_TRACE_LINE
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -19,6 +21,25 @@ namespace SenseNet.Diagnostics.Analysis
         /// <summary>
         /// Field index helper
         /// </summary>
+#if SIMPLIFIED_TRACE_LINE
+        public enum Field
+        {
+            /// <summary>Value = 0</summary>
+            LineId = 0,
+            /// <summary>Value = 1</summary>
+            Category,
+            /// <summary>Value = 2</summary>
+            ProgramFlowId,
+            /// <summary>Value = 3</summary>
+            OpId,
+            /// <summary>Value = 4</summary>
+            Status,
+            /// <summary>Value = 5</summary>
+            Duration,
+            /// <summary>Value = 6</summary>
+            Message
+        }
+#else
         public enum Field
         {
             /// <summary>Value = 0</summary>
@@ -42,6 +63,8 @@ namespace SenseNet.Diagnostics.Analysis
             /// <summary>Value = 9</summary>
             Message
         }
+#endif
+
 
         /// <summary>
         /// True if this line is the first in the block that written to disk in one step.
@@ -105,8 +128,13 @@ namespace SenseNet.Diagnostics.Analysis
         /// </summary>
         public static Entry Parse(string oneLine)
         {
+#if SIMPLIFIED_TRACE_LINE
+            // 0        1       2       3   4               5
+            // >11929	Index	Op:2743	End	00:00:00.000000	IAQ: A160064 EXECUTION.
+#else
             // 0        1                           2       3           4       5       6   7               8
             // >11929	2016-04-07 01:59:57.42589	Index	A:/LM..231	T:46	Op:2743	End	00:00:00.000000	IAQ: A160064 EXECUTION.
+#endif
 
             if (string.IsNullOrEmpty(oneLine))
                 return null;
@@ -117,6 +145,20 @@ namespace SenseNet.Diagnostics.Analysis
             if (data.Length < (int)Field.Message)
                 return null;
 
+#if SIMPLIFIED_TRACE_LINE
+            return new Entry
+            {
+                Raw = oneLine,
+                BlockStart = ParseBlockStart(data[(int)Field.LineId]),
+                LineId = ParseLineId(data[(int)Field.LineId]),
+                Category = data[(int)Field.Category],
+                ProgramFlowId = ParseProgramFlow(data[(int)Field.ProgramFlowId]),
+                OpId = ParseOperationId(data[(int)Field.OpId]),
+                Status = data[(int)Field.Status],
+                Duration = ParseDuration(data[(int)Field.Duration]),
+                Message = string.Join("\t", data.Skip((int)Field.Message))
+            };
+#else
             return new Entry
             {
                 Raw = oneLine,
@@ -132,6 +174,7 @@ namespace SenseNet.Diagnostics.Analysis
                 Duration = ParseDuration(data[(int)Field.Duration]),
                 Message = string.Join("\t", data.Skip((int)Field.Message))
             };
+#endif
         }
 
         private static bool ParseBlockStart(string src)

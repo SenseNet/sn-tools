@@ -196,16 +196,11 @@ namespace SenseNet.Tools
                         var asmName = AssemblyName.GetAssemblyName(dllPath);
                         var asmFullName = asmName.FullName;
                         var asmNameName = asmName.Name;
-                        if (assemblies.TryGetValue(asmNameName, out var origAsm))
-                        {
-                            SnTrace.Repository.Write("ASM Skipped: {0}, {1}", asmFullName, origAsm.Location);
-                        }
-                        else
+                        if (!assemblies.TryGetValue(asmNameName, out var origAsm))
                         {
                             var loadedAsm = Assembly.LoadFrom(dllPath);
                             assemblies.Add(asmNameName, loadedAsm);
                             loaded.Add(Path.GetFileName(dllPath));
-                            SnTrace.Repository.Write("ASM Loaded: {0}, {1}", asmFullName, dllPath);
                         }
                     }
                     catch (BadImageFormatException e) //logged
