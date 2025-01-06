@@ -10,7 +10,7 @@ namespace SenseNet.Extensions.DependencyInjection
 #pragma warning restore CS1591
     {
         /// <summary>
-        /// Adds the default retrier to the service collection.
+        /// Adds the default retrier (<c>SenseNet.Tools.DefaultRetrier</c>) to the service collection.
         /// </summary>
         /// <param name="services">The IServiceCollection instance.</param>
         /// <param name="configure">Configure retrier options.</param>
@@ -21,8 +21,9 @@ namespace SenseNet.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds the provided retrier to the service collection.
+        ///  Use this method when the default implementation (<c>SenseNet.Tools.DefaultRetrier</c>) needs to be replaced.
         /// </summary>
-        /// <typeparam name="T">Retrier type.</typeparam>
+        /// <typeparam name="T">Retrier implementation type.</typeparam>
         /// <param name="services">The IServiceCollection instance.</param>
         /// <param name="configure">Configure retrier options.</param>
         public static IServiceCollection AddSenseNetRetrier<T>(this IServiceCollection services,
