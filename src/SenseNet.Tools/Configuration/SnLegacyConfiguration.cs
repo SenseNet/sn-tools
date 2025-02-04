@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
@@ -26,7 +25,7 @@ namespace SenseNet.Configuration
                 throw new ArgumentNullException(nameof(key));
 
             // replace new section separator with the legacy one
-            var section = ConfigurationManager.GetSection(key.Replace(':', '/')) as NameValueCollection;
+            var section = System.Configuration.ConfigurationManager.GetSection(key.Replace(':', '/')) as NameValueCollection;
 
             return new SnLegacyConfigSection(key, section);
         }
@@ -41,7 +40,7 @@ namespace SenseNet.Configuration
 
         public string this[string key]
         {
-            get => ConfigurationManager.AppSettings[key];
+            get => System.Configuration.ConfigurationManager.AppSettings[key];
             set => throw new SnNotSupportedException("Setting a config value is not supported.");
         }
     }
@@ -81,12 +80,12 @@ namespace SenseNet.Configuration
             {
                 // special section in old configuration files
                 if (string.Compare(Key, "connectionStrings", StringComparison.InvariantCultureIgnoreCase) == 0)
-                    return ConfigurationManager.ConnectionStrings[key]?.ConnectionString;
+                    return System.Configuration.ConfigurationManager.ConnectionStrings[key]?.ConnectionString;
 
                 var configValue = _configValues?[key];
 
                 // backward compatibility: fallback to the appSettings section
-                return configValue ?? ConfigurationManager.AppSettings[key];
+                return configValue ?? System.Configuration.ConfigurationManager.AppSettings[key];
             }
             set => throw new SnNotSupportedException("Setting a section value is not supported.");
         }
