@@ -29,10 +29,6 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>bin\Release\netstandard2.0\SenseNet.Tools.xml</DocumentationFile>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="MailKit" Version="4.9.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
